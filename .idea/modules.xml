@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/CEC05Functions/CEC05Functions.iml" filepath="$PROJECT_DIR$/CEC05Functions/CEC05Functions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CMAES/CMAES.iml" filepath="$PROJECT_DIR$/CMAES/CMAES.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EvolutionaryAlgorithms.iml" filepath="$PROJECT_DIR$/EvolutionaryAlgorithms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GA-MPC/GA-MPC.iml" filepath="$PROJECT_DIR$/GA-MPC/GA-MPC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NBIPOPaCMA/NBIPOPaCMA.iml" filepath="$PROJECT_DIR$/NBIPOPaCMA/NBIPOPaCMA.iml" />
+    </modules>
+  </component>
+</project>
