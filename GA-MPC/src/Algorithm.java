@@ -44,7 +44,7 @@ public class Algorithm {
             end
             */
             for (int i=0; i<Configuration.popSize/2; i++){
-                archive[i] = x[i]; //TODO initializate archive and x
+                archive[i] = x[i];
                 //arch_size++; //TODO copiar x en archive y guardar tamños
             }
 
@@ -71,7 +71,7 @@ public class Algorithm {
 
             //%%%% Crossover Operator
             //for i=1:3:PopSize
-            for(int i=0; i<Configuration.popSize; i+=3){ //TODO comprobar que el bucle este bien construido
+            for(int i=0; i<Configuration.popSize; i+=3){
                 /*
                 if I_fno > 16 && I_fno <= 20
                 beta = normrnd(0.5,0.3);  %%% generate beta = Gaussian number, with mean=0.5 and standard deviation=0.3.%%%%
@@ -93,7 +93,7 @@ public class Algorithm {
                 %%%% sort the selected three parents
                 consecutive= sort(consecutive);
                  */
-                consecutive = sort(consecutive); //TODO funcion sort para ordenar. Mayor a menor? o menor a mayor?
+                consecutive = sort(consecutive);
 
                 /*
                 %%% Check the similarity between all selected individuals
@@ -129,21 +129,21 @@ public class Algorithm {
                     while ((consecutive[1] == consecutive[0]) || (consecutive[1] == consecutive[2])){
                         consecutive[1] = rand.getInt(0, Configuration.popSize);
                     }
-                    consecutive = sort(consecutive); //TODO funcion sort para ordenar. Mayor a menor? o menor a mayor?
+                    consecutive = sort(consecutive);
                 }
 
                 if(consecutive[0] == consecutive[2]){
                     while ((consecutive[2] == consecutive[0]) || (consecutive[2] == consecutive[1])){
                         consecutive[2] = rand.getInt(0, Configuration.popSize);
                     }
-                    consecutive = sort(consecutive); //TODO funcion sort para ordenar. Mayor a menor? o menor a mayor?
+                    consecutive = sort(consecutive);
                 }
 
                 if(consecutive[1] == consecutive[2]){
                     while ((consecutive[2] == consecutive[0]) || (consecutive[2] == consecutive[1])){
                         consecutive[2] = rand.getInt(0, Configuration.popSize);
                     }
-                    consecutive = sort(consecutive); //TODO funcion sort para ordenar. Mayor a menor? o menor a mayor?
+                    consecutive = sort(consecutive);
                 }
 
                 /*
@@ -170,7 +170,7 @@ public class Algorithm {
             end
              */
             for(int i=0; i<Configuration.popSize; i++){
-                offspring_individuals =  han_boun(offspring_individuals, n, xmax, xmin, I_fno, i); //TODO implementar funcion
+                offspring_individuals =  Bounds.han_boun(offspring_individuals, n, xmax, xmin, I_fno, i); //TODO implementar funcion
             }
 
             /*
@@ -308,16 +308,38 @@ public class Algorithm {
 
     private int min(int [] array, int tam){
         int num = Utility.infinity;
-
-
         for(int i=0; i<tam; i++){
             if(array[i] < num){
                 num = array[i];
             }
         }
-
-
         return num;
+    }
+
+    private void sort(float [] array, int tam){ // De menor a mayor
+        float tmp;
+        for(int i=0; i<tam; i++){
+            for(int j=i+1; j<tam; j++){
+                if(array[i] > array[j]){
+                    tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
+                }
+            }
+        }
+    }
+
+    private void sort(int [] array, int tam){
+        int tmp;
+        for(int i=0; i<tam; i++){
+            for(int j=i+1; j<tam; j++){
+                if(array[i] > array[j]){
+                    tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
+                }
+            }
+        }
     }
 
 
