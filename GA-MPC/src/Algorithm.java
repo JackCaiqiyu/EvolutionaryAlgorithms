@@ -3,25 +3,30 @@ import java.util.List;
 import java.util.Random;
 
 public class Algorithm {
-    Rand rand = new Rand();
+
     int current_eval = 0;
     int max_eval = Configuration.max_eval;
     int previous_eval;
     int iter = 0;
-    //List<Float> archive = new ArrayList<>();
     float[][] archive;
     int[] best;
     int[] consecutive;
     float beta;
     int best_size = 0;
-    int arch_size[];
+    int arch_size;
     float [][] offspring_individuals;
+    float [][] all_individuals;
     float [][] x;
-
+    float [] fitx;
+    float [] fitx_all;
 
     public Algorithm(){
         archive = new float[Configuration.popSize][Configuration.dim];
         x = new float[Configuration.popSize][Configuration.dim];
+        best = new int[Configuration.popSize*3];
+        consecutive = new int [3];
+        offspring_individuals = new float [Configuration.popSize][Configuration.dim];
+        all_individuals= new float [Configuration.popSize][Configuration.dim];
     }
 
 
@@ -31,7 +36,7 @@ public class Algorithm {
         benchmark benchmark = new benchmark();
         test_func aTestFunc = benchmark.testFunctionFactory(Configuration.I_fno, Configuration.dim);
        // double result = aTestFunc.f(x);
-
+        //TODO inicializar poblaciones y parametros
         while(current_eval < max_eval){
             previous_eval = current_eval;
             current_eval = current_eval + Configuration.popSize;
@@ -45,7 +50,6 @@ public class Algorithm {
             */
             for (int i=0; i<Configuration.popSize/2; i++){
                 archive[i] = x[i];
-                //arch_size++; //TODO copiar x en archive y guardar tamños
             }
 
            /*%%% Selection Pool Popsize * 3
@@ -58,15 +62,14 @@ public class Algorithm {
             best(i) = min(randnum); %%% as we sorted the array before, the better is the one with minimum randnum
                     end*/
 
-            best_size = 0;
+            best_size = Configuration.popSize*3;
             for(int i=0; i<Configuration.popSize*3; i++){
-                int TcSize = rand.getInt(2,3);
+                int TcSize = Configuration.rand.getInt(2,3);
                 int[] randnum = new int[TcSize];
                 for(int tc=0; tc<TcSize; tc++){
-                    randnum[tc] = rand.getInt(0, Configuration.popSize);
+                    randnum[tc] = Configuration.rand.getInt(0, Configuration.popSize);
                 }
-                best[i] = min(randnum, TcSize); //TODO implementar funcion min, obtiene el que tenga mejor fit de los 2 o 3 individuos
-                best_size++;
+                best[i] = min(randnum, TcSize);
             }
 
             //%%%% Crossover Operator
@@ -79,7 +82,7 @@ public class Algorithm {
                 beta = normrnd(0.7,0.1);  %%% generate beta = Gaussian number, with mean=0.7 and standard deviation=0.1.%%%%
                 end
                 */
-                beta = (float) rand.gaussian(0.5f, 0.3f); //TODO porque se aplican diferentes valores para diferentes funciones?
+                beta = (float) Configuration.rand.gaussian(0.7f, 0.1f); //TODO B = (0.7, 0.1) se utiliza para todos los problemas
                 /*
                 consecutive(1) = best(i);
                 consecutive(2) = best(i+1);
@@ -93,7 +96,7 @@ public class Algorithm {
                 %%%% sort the selected three parents
                 consecutive= sort(consecutive);
                  */
-                consecutive = sort(consecutive);
+                sort(consecutive, 3);
 
                 /*
                 %%% Check the similarity between all selected individuals
@@ -127,23 +130,23 @@ public class Algorithm {
 
                 if(consecutive[0] == consecutive[1]){
                     while ((consecutive[1] == consecutive[0]) || (consecutive[1] == consecutive[2])){
-                        consecutive[1] = rand.getInt(0, Configuration.popSize);
+                        consecutive[1] = Configuration.rand.getInt(0, Configuration.popSize);
                     }
-                    consecutive = sort(consecutive);
+                    sort(consecutive, 3);
                 }
 
                 if(consecutive[0] == consecutive[2]){
                     while ((consecutive[2] == consecutive[0]) || (consecutive[2] == consecutive[1])){
-                        consecutive[2] = rand.getInt(0, Configuration.popSize);
+                        consecutive[2] = Configuration.rand.getInt(0, Configuration.popSize);
                     }
-                    consecutive = sort(consecutive);
+                    sort(consecutive, 3);
                 }
 
                 if(consecutive[1] == consecutive[2]){
                     while ((consecutive[2] == consecutive[0]) || (consecutive[2] == consecutive[1])){
-                        consecutive[2] = rand.getInt(0, Configuration.popSize);
+                        consecutive[2] = Configuration.rand.getInt(0, Configuration.popSize);
                     }
-                    consecutive = sort(consecutive);
+                    sort(consecutive, 3);
                 }
 
                 /*
@@ -155,12 +158,12 @@ public class Algorithm {
                     end
                 end
                  */
-                if(rand.getFloat() < 1){ //TODO comprobar que sea bool y no float, no estoy seguro
-                    for(int j=0; j<Configuration.n; j++){
+                if(Configuration.rand.getFloat() < 1){ //TODO cr = 1, aplicamos el mismo cr para nuestra competición o la dejamos igual que como fue en CEC11
+                    for(int j=0; j<Configuration.dim; j++){
                         offspring_individuals[i][j] = x[consecutive[0]][j] + beta * (x[consecutive[1]][j] - x[consecutive[2]][j]);
                         offspring_individuals[i+1][j] = x[consecutive[1]][j] + beta * (x[consecutive[2]][j] - x[consecutive[0]][j]);
                         offspring_individuals[i+2][j] = x[consecutive[2]][j] + beta * (x[consecutive[0]][j] - x[consecutive[1]][j]);
-                    }//TODO inicializar offspring_indivifuals y x
+                    }
                 }
 
             }
@@ -170,7 +173,7 @@ public class Algorithm {
             end
              */
             for(int i=0; i<Configuration.popSize; i++){
-                offspring_individuals =  Bounds.han_boun(offspring_individuals, n, xmax, xmin, I_fno, i); //TODO implementar funcion
+                Bounds.han_boun(offspring_individuals, Configuration.dim, Configuration.I_fno, i, Configuration.rand);
             }
 
             /*
@@ -199,10 +202,10 @@ public class Algorithm {
             %%%%%%%%%%%%% End ... the Randomized Operator
              */
             for(int i=0; i<Configuration.popSize; i++){
-                for(int j=0; j<Configuration.n; j++){
-                    if(rand.getFloat() < Configuration.p){
+                for(int j=0; j<Configuration.dim; j++){
+                    if(Configuration.rand.getFloat() < Configuration.p){
                         int pos; // %%%% select an individual from the archive pool
-                        pos = rand.getInt(0, arch_size[1]);  //TODO arch_size es matriz????
+                        pos = Configuration.rand.getInt(0, arch_size);
                         offspring_individuals[i][j] = archive[pos][j];
                     }
                 }
@@ -220,15 +223,15 @@ public class Algorithm {
                 end
              */
 
-            for (int i=0; i<arch_size[1] + Configuration.popSize; i++){
-                if(i <= arch_size[1]){
-                    //TODO copiar contenido de archive en all_individuals
+            for (int i=0; i<arch_size + Configuration.popSize; i++){
+                if(i <= arch_size){
+                    all_individuals[i] = archive[i];
                 }else{
-                    int current = i - arch_size[1];
-                    //TODO copiar contenido de offsping_individuals en all_indiviuals
+                    int current = i - arch_size;
+                    all_individuals[i] = offspring_individuals[current];
                 }
             }
-
+            //TODO todo los siguiente hasta el inifinito
             /*
             %%%%% Calculated the fitness values for the neww offspring
         for i=1:arch_size(1)+PopSize
@@ -291,11 +294,11 @@ public class Algorithm {
             end
         end
              */
-            for(int i=0; i<arch_size[0] + Configuration.popSize; ++i){
-                if(i <= arch_size[i]){
-                    fitx_all[i] = x_all[i];
+            for(int i=0; i<arch_size + Configuration.popSize; ++i){
+                if(i <= arch_size){
+                    fitx_all[i] = fitx[i];
                 }else{
-                    fitx_all[i] = aTestFunc.f(all_individuals);
+                    fitx_all[i] = (float) aTestFunc.f(arrayFloatToDouble(all_individuals[i]));
                 }
 
                 //TODO ultima comprobacion si es igual a NAN
@@ -340,6 +343,15 @@ public class Algorithm {
                 }
             }
         }
+    }
+
+    private double[] arrayFloatToDouble(float [] floatArray){
+        double[] doubleArray = new double[floatArray.length];
+        for (int i = 0 ; i < floatArray.length; i++)
+        {
+            doubleArray[i] = (float) floatArray[i];
+        }
+        return doubleArray;
     }
 
 

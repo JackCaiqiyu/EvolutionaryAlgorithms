@@ -15,6 +15,9 @@ public class Rand {
         return random.nextFloat();
     }
 
+    public float getFloat(float min, float max){
+        return random.nextFloat() * (max - min) + min;
+    }
     /**
      * Returns a random real number uniformly in [0, 1).
      *
