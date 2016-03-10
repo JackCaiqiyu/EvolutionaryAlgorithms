@@ -33,7 +33,7 @@ public class Bounds {
 
         for(int j=0; j<n; j++){
             if(x[i][j] < getLowerBound(I_fno)){
-                x[i][j] = getLowerBound(I_fno) + rand.getFloat() * (getUpperBound(I_fno) - getLowerBound(I_fno));
+                x[i][j] = getLowerBound(I_fno) + rand.getFloat()* (getUpperBound(I_fno) - getLowerBound(I_fno));
             }else if( x[i][j] > getUpperBound(I_fno)){
                 x[i][j] = getLowerBound(I_fno) + rand.getFloat() * (getUpperBound(I_fno) - getLowerBound(I_fno));
             }

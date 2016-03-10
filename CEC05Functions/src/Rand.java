@@ -7,7 +7,17 @@ public class Rand {
         random = new Random();
     }
 
+    public int getInt(int bound){
+        int i;
+        do{
+            i = random.nextInt(bound);
+        }while (i>=bound || i < 0);
+        return i;
+    }
+
     public int getInt(int min, int max){
+
+
         return random.nextInt(max - min + 1) + min;
     }
 
