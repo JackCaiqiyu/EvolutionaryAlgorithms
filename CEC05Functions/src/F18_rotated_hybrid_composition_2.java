@@ -51,7 +51,7 @@ public class F18_rotated_hybrid_composition_2 extends test_func {
 	// Fixed (class) parameters
 	static final public String FUNCTION_NAME = "Rotated Hybrid Composition Function 2";
 	static final public String DEFAULT_FILE_DATA = "CEC05Functions/src/supportData/hybrid_func2_data.txt";
-	static final public String DEFAULT_FILE_MX_PREFIX = "supportData/hybrid_func2_M_D";
+	static final public String DEFAULT_FILE_MX_PREFIX = "CEC05Functions/src/supportData/hybrid_func2_M_D";
 	static final public String DEFAULT_FILE_MX_SUFFIX = ".txt";
 
 	// Number of functions

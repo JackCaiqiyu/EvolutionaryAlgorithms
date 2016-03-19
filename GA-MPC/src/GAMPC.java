@@ -3,8 +3,7 @@ import java.util.List;
 import java.util.Random;
 
 
-//TODO BIEN GORDO HACER FUNCION PARA COPIAR ARRAYS
-public class Algorithm {
+public class GAMPC {
 
     int current_eval = 0;
     int max_eval;
@@ -27,7 +26,7 @@ public class Algorithm {
     benchmark benchmark = new benchmark();
     test_func aTestFunc;
 
-    public Algorithm(){
+    public GAMPC(){
         archive = new float[Configuration.popSize/2][Configuration.dim];
         arch_size = Configuration.popSize/2;
         x = new float[Configuration.popSize][Configuration.dim];
@@ -64,12 +63,10 @@ public class Algorithm {
     }
 
     public void execute(){
-        while(current_eval < max_eval){
+        while(current_eval < max_eval && fitx[0] - bias.getBias(Configuration.I_fno) > Configuration.Ter_Err){
             previous_eval = current_eval;
             current_eval = current_eval + Configuration.popSize;
             iter = iter + 1;
-
-
 
 
             for (int i=0; i<Configuration.popSize/2; i++){
@@ -86,12 +83,11 @@ public class Algorithm {
                 best[i] = min(randnum, TcSize);
             }
 
-            //%%%% Crossover Operator
             /******************STEP4*********************************/
             for(int i=0; i<Configuration.popSize; i+=3){
                 int [] consecutive = new int [3];
 
-                beta = (float) Configuration.rand.gaussian(0.7f, 0.1f); //TODO B = (0.7, 0.1) se utiliza para todos los problemas
+                beta = (float) Configuration.rand.gaussian(0.7f, 0.1f);
 
                 consecutive[0] = best[i];
                 consecutive[1] = best[i+1];
@@ -120,7 +116,7 @@ public class Algorithm {
                 }
 
 
-                if(Configuration.rand.getFloat() < 1){ //TODO cr = 1, aplicamos el mismo cr para nuestra competición o la dejamos igual que como fue en CEC11
+                if(Configuration.rand.getFloat() < 1){
                     for(int j=0; j<Configuration.dim; j++){
                         offspring_individuals[i][j] = x[consecutive[0]][j] + beta * (x[consecutive[1]][j] - x[consecutive[2]][j]);
                         offspring_individuals[i+1][j] = x[consecutive[1]][j] + beta * (x[consecutive[2]][j] - x[consecutive[0]][j]);
@@ -172,7 +168,10 @@ public class Algorithm {
                 fitx[i] = fitx_all[i];
             }
 
-            System.out.println("Best result: "+fitx[0]+" in eval: " +current_eval);
+         //   System.out.println("Best result: "+fitx[0]+" in eval: " +current_eval);
+            Configuration.records.newRecord(fitx[0] - bias.getBias(Configuration.I_fno), current_eval);
+
+
 
             /********************************STEP6************************************/
             for(int i=1; i<Configuration.popSize; i++){
@@ -191,14 +190,8 @@ public class Algorithm {
 
 
 
-
-
-
-
-
-
         }
-        //TODO recoger resultados
+        Configuration.records.newRecord(fitx[0] - bias.getBias(Configuration.I_fno));
     }
 
     private int min(int [] array, int tam){
@@ -273,8 +266,8 @@ public class Algorithm {
 
 
     private float[] copyArray(float [] aOld){
-        float [] aNew = new float [Configuration.dim];
-        for(int i=0; i<Configuration.dim; i++){
+        float [] aNew = new float [aOld.length];
+        for(int i=0; i<aOld.length; i++){
             aNew[i] = aOld[i];
         }
         return aNew;

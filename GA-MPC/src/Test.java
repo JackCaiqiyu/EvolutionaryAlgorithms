@@ -1,60 +1,24 @@
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Random;
-
 public class Test {
 
     public static void main(String [] args) {
-        Algorithm algorithm = new Algorithm();
-       algorithm.execute();
 
-
-       // writeInFile();
-
-
-
-    }
-
-    static void writeInFile(){
-        FileOutputStream fop = null;
-        File file;
-        Random rand = new Random();
-        rand.setSeed(0);
-        try {
-
-            file = new File("C:\\newfile.txt");
-            fop = new FileOutputStream(file);
-
-            // if file doesnt exists, then create it
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            for(int i=0; i<999; i++){
-                String content = Integer.toString(rand.nextInt(3)) + " ,";
-                byte[] contentInBytes = content.getBytes();
-                fop.write(contentInBytes);
-            }
-            // get the content in bytes
-
-
-
-       //     fop.flush();
-            fop.close();
-
-           // System.out.println("Done");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fop != null) {
-                    fop.close();
+        for(int F=1; F<=25; F++) {
+            for (int DIM = 10; DIM <= 50; DIM += 20) {
+                Configuration.records = new Records();
+                for(int run =0; run<25; run++) {
+                    Configuration.dim = DIM;
+                    Configuration.I_fno = F;
+                    Configuration.max_eval = 10000 * DIM;
+                    Rand rand = new Rand(seeds.getSeed(Configuration.I_fno));
+                    Configuration.rand = rand;
+                    GAMPC gampc = new GAMPC();
+                    gampc.execute();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                Configuration.records.write(DIM, F, "GA_MPC", false);
             }
         }
 
+
     }
+
 }

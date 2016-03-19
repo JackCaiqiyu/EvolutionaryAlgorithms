@@ -7,6 +7,11 @@ public class Rand {
         random = new Random();
     }
 
+    public Rand(long seed){
+        random = new Random();
+        random.setSeed(seed);
+    }
+
     public int getInt(int bound){
         int i;
         do{

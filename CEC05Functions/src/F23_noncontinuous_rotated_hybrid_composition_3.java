@@ -51,7 +51,7 @@ public class F23_noncontinuous_rotated_hybrid_composition_3 extends test_func {
 	// Fixed (class) parameters
 	static final public String FUNCTION_NAME = "Non-Continuous Rotated Hybrid Composition Function 3";
 	static final public String DEFAULT_FILE_DATA = "CEC05Functions/src/supportData/hybrid_func3_data.txt";
-	static final public String DEFAULT_FILE_MX_PREFIX = "supportData/hybrid_func3_M_D";
+	static final public String DEFAULT_FILE_MX_PREFIX = "CEC05Functions/src/supportData/hybrid_func3_M_D";
 	static final public String DEFAULT_FILE_MX_SUFFIX = ".txt";
 
 	// Number of functions

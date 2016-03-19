@@ -51,7 +51,7 @@ public class F22_rotated_hybrid_composition_3_high_cond_num_matrix extends test_
 	// Fixed (class) parameters
 	static final public String FUNCTION_NAME = "Rotated Hybrid Composition Function 3 with High Condition Number Matrix";
 	static final public String DEFAULT_FILE_DATA = "CEC05Functions/src/supportData/hybrid_func3_data.txt";
-	static final public String DEFAULT_FILE_MX_PREFIX = "supportData/hybrid_func3_HM_D";
+	static final public String DEFAULT_FILE_MX_PREFIX = "CEC05Functions/src/supportData/hybrid_func3_HM_D";
 	static final public String DEFAULT_FILE_MX_SUFFIX = ".txt";
 
 	// Number of functions

@@ -44,6 +44,7 @@
 //		dated March 8, 2005.
 //
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 
 public class F03_shifted_rotated_high_cond_elliptic extends test_func {
@@ -51,7 +52,7 @@ public class F03_shifted_rotated_high_cond_elliptic extends test_func {
 	// Fixed (class) parameters
 	static final public String FUNCTION_NAME = "Shifted Rotated High Conditioned Elliptic Function";
 	static final public String DEFAULT_FILE_DATA = "CEC05Functions/src/supportData/high_cond_elliptic_rot_data.txt";
-	static final public String DEFAULT_FILE_MX_PREFIX = "supportData/Elliptic_M_D";
+	static final public String DEFAULT_FILE_MX_PREFIX = "CEC05Functions/src/supportData/Elliptic_M_D";
 	static final public String DEFAULT_FILE_MX_SUFFIX = ".txt";
 
 	// Shifted global optimum
@@ -72,6 +73,8 @@ public class F03_shifted_rotated_high_cond_elliptic extends test_func {
 	public F03_shifted_rotated_high_cond_elliptic (int dimension, double bias, String file_data, String file_m) {
 		super(dimension, bias, FUNCTION_NAME);
 
+		//URL location = F03_shifted_rotated_high_cond_elliptic.class.getProtectionDomain().getCodeSource().getLocation();
+		//System.out.println(location.getFile());
 		// Note: dimension starts from 0
 		m_o = new double[m_dimension];
 		m_matrix = new double[m_dimension][m_dimension];
