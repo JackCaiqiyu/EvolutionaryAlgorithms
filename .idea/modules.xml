@@ -9,6 +9,8 @@
       <module fileurl="file://$PROJECT_DIR$/GA-MPC/GA-MPC.iml" filepath="$PROJECT_DIR$/GA-MPC/GA-MPC.iml" />
       <module fileurl="file://$PROJECT_DIR$/ICMAESILS/ICMAESILS.iml" filepath="$PROJECT_DIR$/ICMAESILS/ICMAESILS.iml" />
       <module fileurl="file://$PROJECT_DIR$/NBIPOPaCMA/NBIPOPaCMA.iml" filepath="$PROJECT_DIR$/NBIPOPaCMA/NBIPOPaCMA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SPS_L_SHADE_EIG/SPS_L_SHADE_EIG.iml" filepath="$PROJECT_DIR$/SPS_L_SHADE_EIG/SPS_L_SHADE_EIG.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Utils/Utils.iml" filepath="$PROJECT_DIR$/Utils/Utils.iml" />
     </modules>
   </component>
 </project>

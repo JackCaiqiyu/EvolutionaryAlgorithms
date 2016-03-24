@@ -12,6 +12,7 @@ public class Rand {
         random.setSeed(seed);
     }
 
+
     public int getInt(int bound){
         int i;
         do{

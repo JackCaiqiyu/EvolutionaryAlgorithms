@@ -1,8 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-
 public class GAMPC {
 
     int current_eval = 0;
@@ -10,16 +5,13 @@ public class GAMPC {
     int previous_eval;
     int iter = 0;
     float beta;
-    int best_size = 0;
     int arch_size;
-    float best_result;
 
     float [][] offspring_individuals;
     float [][] all_individuals;
     float [][] x;
     float [] fitx;
     float [] fitx_all;
-    float [] fitx_archive;
     float[][] archive;
     int[] best;
 
