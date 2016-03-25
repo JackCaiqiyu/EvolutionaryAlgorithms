@@ -2,6 +2,10 @@
  * Created by framg on 19/03/2016.
  */
 public class Util {
+    public static double inf = 999999999;
+    public static double ninf = -999999999;
+    public static int iinf = 999999999;
+
 
     public static double std(double [] array){
         double mean = mean(array);
@@ -63,6 +67,13 @@ public class Util {
 
             array[i] = value;
     }
+
+    public static void assignArray(double [] array, double [] values){
+        for(int i=0; i<array.length; i++)
+
+            array[i] = values[i];
+    }
+
 
     public static double[][] copyMatrix(double [][] old){
         double [][] aNew = new double[old.length][old[0].length];
@@ -172,5 +183,30 @@ public class Util {
 
         return indexs;
     }
+
+    public static int [] sortOnlyIndexs(double [] a){
+        double [] array = copyArray(a);
+        int [] indexs = new int[array.length];
+        for(int i=0; i<indexs.length; i++)
+            indexs[i] = i;
+
+        for(int i=0; i<array.length; i++){
+            for(int j=i+1; j<array.length; j++){
+                if(array[i] > array[j]){
+                    double tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
+
+                    int tmpi = indexs[i];
+                    indexs[i] = indexs[j];
+                    indexs[j] = tmpi;
+                }
+            }
+        }
+
+        return indexs;
+    }
+
+
 
 }
