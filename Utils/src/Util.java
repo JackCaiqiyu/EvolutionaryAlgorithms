@@ -145,6 +145,18 @@ public class Util {
         return  newArray;
     }
 
+    public static double [][] range (double [][] array, int low, int up){
+        int dim = up - low;
+        double [][] newArray = new double[dim][array[0].length];
+
+        for(int i=low; i<up; i++){
+            newArray[i] = Util.copyArray(array[i]);
+        }
+
+        return newArray;
+
+    }
+
     public static double[][] add(double [][] a1, double [][] a2){
         double [][] a = new double[a1.length][a1.length + a2.length];
         int index = 0;

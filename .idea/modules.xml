@@ -2,12 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Benchmark/Benchmark.iml" filepath="$PROJECT_DIR$/Benchmark/Benchmark.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC05Functions/CEC05Functions.iml" filepath="$PROJECT_DIR$/CEC05Functions/CEC05Functions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CEC11GA-MPC/CEC11GA-MPC.iml" filepath="$PROJECT_DIR$/CEC11GA-MPC/CEC11GA-MPC.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC15MVMO/CEC15MVMO.iml" filepath="$PROJECT_DIR$/CEC15MVMO/CEC15MVMO.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC15SPS_L_SHADE_EIG/CEC15SPS_L_SHADE_EIG.iml" filepath="$PROJECT_DIR$/CEC15SPS_L_SHADE_EIG/CEC15SPS_L_SHADE_EIG.iml" />
       <module fileurl="file://$PROJECT_DIR$/CMAES/CMAES.iml" filepath="$PROJECT_DIR$/CMAES/CMAES.iml" />
       <module fileurl="file://$PROJECT_DIR$/EvolutionaryAlgorithms.iml" filepath="$PROJECT_DIR$/EvolutionaryAlgorithms.iml" />
-      <module fileurl="file://$PROJECT_DIR$/GA-MPC/GA-MPC.iml" filepath="$PROJECT_DIR$/GA-MPC/GA-MPC.iml" />
       <module fileurl="file://$PROJECT_DIR$/ICMAESILS/ICMAESILS.iml" filepath="$PROJECT_DIR$/ICMAESILS/ICMAESILS.iml" />
       <module fileurl="file://$PROJECT_DIR$/NBIPOPaCMA/NBIPOPaCMA.iml" filepath="$PROJECT_DIR$/NBIPOPaCMA/NBIPOPaCMA.iml" />
       <module fileurl="file://$PROJECT_DIR$/Utils/Utils.iml" filepath="$PROJECT_DIR$/Utils/Utils.iml" />

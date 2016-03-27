@@ -7,4 +7,5 @@ public class Configuration {
     public static Rand rand;
     public static double Ter_Err = 10e-8;
     public static Records records;
+    public static AllBenchmarks benchmark;
 }

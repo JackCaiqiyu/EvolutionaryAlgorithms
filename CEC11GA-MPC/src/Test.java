@@ -11,6 +11,10 @@ public class Test {
                     Configuration.max_eval = 10000 * DIM;
                     Rand rand = new Rand(seeds.getSeed(Configuration.I_fno));
                     Configuration.rand = rand;
+                    benchmark benchmark = new benchmark();
+                    test_func aTestFunc = benchmark.testFunctionFactory(Configuration.I_fno, Configuration.dim);
+                    Configuration.benchmark = aTestFunc;
+
                     GAMPC gampc = new GAMPC();
                     gampc.execute();
                 }

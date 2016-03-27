@@ -2,7 +2,7 @@
   <artifact type="jar" name="GA-MPC:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/GA_MPC_jar</output-path>
     <root id="archive" name="GA-MPC.jar">
-      <element id="module-output" name="GA-MPC" />
+      <element id="module-output" name="CEC11GA-MPC" />
       <element id="module-output" name="CEC05Functions" />
     </root>
   </artifact>

@@ -43,7 +43,7 @@
 //		Revised according to the Matlab reference code and the PDF document
 //		dated March 8, 2005.
 //
-public abstract class test_func {
+public abstract class test_func extends AllBenchmarks {
 
 	protected int		m_dimension;
 	protected double	m_bias;

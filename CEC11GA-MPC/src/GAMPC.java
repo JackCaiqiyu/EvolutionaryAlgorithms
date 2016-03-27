@@ -15,8 +15,8 @@ public class GAMPC {
     float[][] archive;
     int[] best;
 
-    benchmark benchmark = new benchmark();
-    test_func aTestFunc;
+  //  benchmark benchmark = new benchmark();
+   // test_func aTestFunc;
 
     public GAMPC(){
         archive = new float[Configuration.popSize/2][Configuration.dim];
@@ -29,7 +29,7 @@ public class GAMPC {
         fitx = new float[Configuration.popSize];
         fitx_all = new float[Configuration.popSize + arch_size];
 
-        aTestFunc = benchmark.testFunctionFactory(Configuration.I_fno, Configuration.dim);
+
         initialize();
     }
 
@@ -41,7 +41,7 @@ public class GAMPC {
         }
 
         for(int i=0; i<Configuration.popSize; i++){
-            fitx[i] = (float) aTestFunc.f(arrayFloatToDouble(x[i]));
+            fitx[i] = (float) Configuration.benchmark.f(arrayFloatToDouble(x[i]));
         }
     }
 
@@ -149,7 +149,7 @@ public class GAMPC {
                 if(i < arch_size){
                     fitx_all[i] = fitx[i];
                 }else {
-                    fitx_all[i] = (float) aTestFunc.f(arrayFloatToDouble(all_individuals[i]));
+                    fitx_all[i] = (float) Configuration.benchmark.f(arrayFloatToDouble(all_individuals[i]));
                 }
             }
 
@@ -187,8 +187,8 @@ public class GAMPC {
     }
 
     private int min(int [] array, int tam){
-        int pos = Utility.infinity;
-        for(int i=0; i<tam; i++){
+        int pos = array[0];
+        for(int i=1; i<tam; i++){
             if(array[i] <= pos){
                 pos = array[i];
             }
