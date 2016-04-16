@@ -255,8 +255,8 @@ public class CMAParameters implements java.io.Serializable {
 	 * @see #setPopulationSize() 
 	 */
 	void setLambda(int lambda) {
-		if (locked != 0)
-			error("parameters cannot be set anymore");
+		//if (locked != 0)
+		//	error("parameters cannot be set anymore");
 		this.lambda = lambda; 
 	}
 	/** @see #getLambda() */

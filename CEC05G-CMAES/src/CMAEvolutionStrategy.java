@@ -96,7 +96,7 @@ import java.util.*; // Properties, Arrays.sort, Formatter not needed anymore
  * <p>The main functionality is provided by the methods <code>double[][] {@link #samplePopulation()}</code> and 
  * <code>{@link #updateDistribution(double[])}</code> or <code>{@link #updateDistribution(double[][], double[])}</code>. 
  * Here is an example code snippet, see file 
- * <tt>CMAExample1.java</tt> for a similar example, and 
+ * <tt>Test.java</tt> for a similar example, and
  *   <tt>CMAExample2.java</tt> for a more extended example with multi-starts implemented.
  *   <pre>
         // new a CMA-ES and set some initial values
@@ -578,19 +578,30 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
     	setDimension(dimension);
     	return init();
     }
-    /** 
+
+
+	private double ub;
+	private double lb;
+	public void setBounds (double ub, double lb){
+		this.ub = ub;
+		this.lb = lb;
+	}
+
+
+
+	/**
      * @see #init(int, double[], double[])
      * */
     public double[] init() {
     	int i;
     	if (N <= 0)
     		error("dimension needs to be determined, use eg. setDimension() or setInitialX()");
-    	if (state >= 0)
-    		error("init() cannot be called twice");
+    //	if (state >= 0)
+    //		error("init() cannot be called twice");
     	if (state == 0) // less save variant 
     		return new double[sp.getLambda()]; 
-    	if (state > 0)  
-    		error("init() cannot be called after the first population was sampled");
+    //	if (state > 0)
+    //		error("init() cannot be called after the first population was sampled");
 
     	sp = parameters; /* just in case the user assigned parameters */
     	if (sp.supplemented == 0) // a bit a hack
@@ -606,14 +617,14 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
     	if (LBound == null) {
     		LBound = new double[N];
     		for (i = 0; i < N; ++i)
-    			LBound[i] = Double.NEGATIVE_INFINITY;
+    			LBound[i] = lb;
     	}
 
 		UBound = expandToDimension(UBound, N);
     	if (UBound == null) {
     		UBound = new double[N];
     		for (i = 0; i < N; ++i)
-    			UBound[i] = Double.POSITIVE_INFINITY;
+    			UBound[i] = ub;
     	}
 
     	/* Initialization of sigmas */
@@ -803,7 +814,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
 //        if (fileName.equals(""))
 //            return properties;
         try {
-            java.io.FileInputStream fis = new java.io.FileInputStream(fileName);
+            java.io.FileInputStream fis = new java.io.FileInputStream("CMAES/" + fileName);
             properties.load(fis);
             fis.close();
         } 
@@ -814,6 +825,14 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         setFromProperties(properties);
         return properties;
     }
+
+	public void setPopulationSize(int n){
+		sp.setPopulationSize(n);
+	}
+
+	public int getPopulationSize(){
+		return sp.getPopulationSize();
+	}
 
     /** reads properties from Properties class 
      * input and sets options and parameters accordingly
@@ -850,6 +869,8 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         }
         if ((s = properties.getProperty("populationSize")) != null) {
             sp.setPopulationSize(Integer.parseInt(options.getFirstToken(s)));
+			//System.out.println("Dimension: " + getDimension());
+			//sp.setPopulationSize((int)(4 + Math.floor(3*Math.log(getDimension()))));
         }
         if ((s = properties.getProperty("cCov")) != null) {
             sp.setCcov(Double.parseDouble(options.getFirstToken(s)));

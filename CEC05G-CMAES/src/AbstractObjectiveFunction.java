@@ -1,9 +1,7 @@
 /** extending from this abstract class implements a generic isFeasible method and adds the
  * IObjectiveFunctionParallel interface to a class that implements 
  * the interface IObjectiveFunction */
-public abstract class AbstractObjectiveFunction implements 
-IObjectiveFunction,
-IObjectiveFunctionParallel  { 
+public abstract class AbstractObjectiveFunction implements IObjectiveFunction, IObjectiveFunctionParallel  {
     abstract public double valueOf(double[] x);
     public double [] valuesOf(double[][] pop) {
         double [] res = new double[pop.length];

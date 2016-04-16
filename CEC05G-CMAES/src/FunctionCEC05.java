@@ -11,8 +11,8 @@ public class FunctionCEC05 extends AbstractObjectiveFunction{
     public double valueOf(double[] x) {
         benchmark benchmark = new benchmark();
         test_func aTestFunc = benchmark.testFunctionFactory(nFun, dim);
-
-        return aTestFunc.f(x);
+        AllBenchmarks allBenchmarks = aTestFunc;
+        return allBenchmarks.f(x);
 
     }
 }

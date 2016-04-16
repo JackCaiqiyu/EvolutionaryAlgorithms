@@ -11,5 +11,6 @@
     <orderEntry type="module" module-name="FunctionsCEC05" />
     <orderEntry type="library" name="FunctionsCEC05" level="application" />
     <orderEntry type="module" module-name="CEC05Functions" />
+    <orderEntry type="module" module-name="Benchmark" />
   </component>
 </module>
