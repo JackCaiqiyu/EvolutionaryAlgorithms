@@ -33,6 +33,8 @@ public class LSHADE_SPS {
         S_CR = new double[NP];
         S_F = new double[NP];
         S_df = new double[NP];
+
+        initialize();
     }
 
 
@@ -91,28 +93,28 @@ public class LSHADE_SPS {
 
         for(int i=0; i<NP; i++) {
             for (int j = 0; j < D; j++) {
-                X[i][j]=lb + (ub - lb) * Configuration.rand.getFloat(0, D-1);
+                X[i][j]=lb + (ub - lb) * Configuration.rand.getFloat();
             }
         }
 
 
         for(int i=0; i<NP; i++){
-            fx[i] = Configuration.benchmark.f(X[i]); //TODO check si esta funcion en matlab los ordena
+            fx[i] = Configuration.benchmark.f(X[i]);
         }
         counteval = counteval + NP;
-        Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+
 
         Asize = Math.round(Ar * NP);
         A = new double[Asize][D];
         for(int i=0; i<Asize; i++){
             for (int j = 0 ; j< D; j++) {
-                A[i][j]=lb + (ub - lb) * Configuration.rand.getFloat(0, D-1);
+                A[i][j]=lb + (ub - lb) * Configuration.rand.getFloat();
             }
         }
 
         nA = 0;
 
-
+        //SORT POPULATION
         for(int i=0; i < NP; i++){
             for(int j=i+1; j<NP; j++){
                 if(fx[i] > fx[j]){
@@ -127,25 +129,26 @@ public class LSHADE_SPS {
                 }
             }
         }
-
+        Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
 
         Util.assignArray(MF, F);
         Util.assignArray(MCR, CR);
-        iM = 1;
+        iM = 0;
         Util.assignArray(FC, 0);
         SP = Util.copyMatrix(X);
         fSP = Util.copyArray(fx);
 
 
-        iSP = 1;
+        iSP = 0;
 
         V = Util.copyMatrix(X);
         U = Util.copyMatrix(X);
         Util.assignArray(S_CR, 0);
         Util.assignArray(S_F, 0);
         Util.assignArray(S_df, 0);
-        //Chy = cauchyrnd(0, 0.1, NP + 10); //TODO implementar distribucion de cauchy inicializar Chy no se a que
-        iChy = 1;
+
+        Chy = Configuration.rand.cauchyrnd(NP+10, 0, 0.1);
+        iChy = 0;
         sortidxfSP = Util.sortOnlyIndexs(fSP);
 
 
@@ -154,7 +157,7 @@ public class LSHADE_SPS {
 
 
     public void execute(){
-        while(true) {
+        while(counteval < Configuration.maxfunevals && fx[0] - bias.getBias(Configuration.nF) > Bounds.Ter_Err) {
             boolean outofmaxfunevals = counteval > maxfunevals - NP;
             boolean outofusefunevals = counteval > usefunevals - NP;
 
@@ -190,16 +193,18 @@ public class LSHADE_SPS {
             }
 
             countiter = countiter + 1;
+            int [] r = new int[NP];
+            for(int i=0; i<NP; i++)
+                r[i] = (int) Math.floor((H-1) * Configuration.rand.getFloat());
 
-            int r = (int) Math.floor(1 + H * Configuration.rand.getInt(0, NP - 1));
-            for (int i = 0; i < CR.length; i++)
-                CR[i] = MCR[r] + (0.1 * Configuration.rand.uniform(0, NP - 1));
+            for (int i = 0; i < NP; i++)
+                CR[i] = MCR[r[i]] + (0.1 * Configuration.rand.uniform());
 
-            for (int i = 0; i < CR.length; i++)
-                if (CR[i] < 0 || MCR[r] == -1)
+            for (int i = 0; i < NP; i++)
+                if (CR[i] < 0 || MCR[r[i]] == -1)
                     CR[i] = 0;
 
-            for (int i = 0; i < CR.length; i++)
+            for (int i = 0; i < NP; i++)
                 if (CR[i] > 1)
                     CR[i] = 1;
 
@@ -207,8 +212,8 @@ public class LSHADE_SPS {
             Util.assignArray(F, 0);
             for (int i = 0; i < NP; i++) {
                 while (F[i] <= 0) {
-                    F[i] = MF[r] + Chy[iChy]; // TODO r esta como double y como vector al mismo tiempo controlar
-                    iChy = iChy % Chy.length;
+                    F[i] = MF[r[i]] + Chy[iChy];
+                    iChy = (iChy + 1) % Chy.length;
                 }
             }
 
@@ -219,7 +224,7 @@ public class LSHADE_SPS {
             }
 
             for (int i = 0; i < NP; i++)
-                pbest[i] = (int) Math.floor(Math.max(2, Math.round(p * NP)) * Configuration.rand.getInt(0, NP - 1));
+                pbest[i] = (int) Math.floor(Math.max(2, Math.round(p * NP)) * Configuration.rand.getFloat());
 
             XA = Util.add(X, A);
             SPA = Util.add(SP, A);
@@ -291,7 +296,7 @@ public class LSHADE_SPS {
                 fu[i] = Configuration.benchmark.f(U[i]);
             }
             counteval+= NP;
-            Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+
 
             boolean FailedIteration = true;
             int nS = 0;
@@ -313,18 +318,16 @@ public class LSHADE_SPS {
                         nA = nA + 1;
                     } else {
                         int ri = (int) Math.floor(Asize * Configuration.rand.getFloat());
-                        for (int j = 0; j < A.length; j++) {
+                        for (int j = 0; j < A[0].length; j++) {
                             A[ri][j] = X[i][j];
                         }
                     }
 
                     FailedIteration = false;
                     FC[i] = 0;
-                    for (int j = 0; j < A.length; j++) {
-                        SP[iSP][j] = U[i][j];
-                    }
+                    SP[iSP] = Util.copyArray(U[i]);
                     fSP[iSP] = fu[i];
-                    iSP = iSP % NP;
+                    iSP = (iSP + 1) % NP;
                 } else if (fu[i] == fx[i]) {
                     for (int j = 0; j < A.length; j++) {
                         X[i][j] = U[i][j];
@@ -345,10 +348,10 @@ public class LSHADE_SPS {
                     MCR[iM] = Util.summatory(Util.multiplies(Util.multiplies(w, Util.range(S_CR, 0, nS)), Util.range(S_CR, 0, nS))) / Util.summatory(Util.multiplies(w, Util.range(S_CR, 0, nS)));
                 }
                 MF[iM] = Util.summatory(Util.multiplies(Util.multiplies(w, Util.range(S_F, 0, nS)), Util.range(S_F, 0, nS))) / Util.summatory(Util.multiplies(w, Util.range(S_F, 0, nS)));
-                iM = iM % H;
+                iM = (iM + 1) % H;
             }
 
-
+            //SORT
             for (int i = 0; i < fx.length; i++) {
                 for (int j = i + 1; j < fx.length; j++) {
                     if (fx[i] > fx[j]) {
@@ -368,17 +371,18 @@ public class LSHADE_SPS {
                     }
                 }
             }
-
+            Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+         //   System.out.println(fx[0]);
 
             NP = Math.round(NPinit - (NPinit - NPmin) * counteval / maxfunevals);
             fx = Util.range(fx, 0, NP);
-            X = Util.range(X,0, NP);
+            X = Util.range(X, 0, NP);
             U = Util.range(U, 0, NP);
 
             Asize = Math.round(Ar * NP);
             if (nA > Asize) {
                 nA = Asize;
-                A = Util.range(A, 0, NP);
+                A = Util.range(A, 0, Asize);
             }
 
             FC = Util.range(FC, 0, NP);
@@ -405,6 +409,7 @@ public class LSHADE_SPS {
             }
 
             iSP = (iSP - 1) % NP;
+            if(iSP < 0) iSP = NP - 1;
 
             if (FailedIteration)
                 countstagnation = countstagnation + 1;
@@ -412,6 +417,7 @@ public class LSHADE_SPS {
                 countstagnation = 0;
 
         }
+        Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
     }
 
 

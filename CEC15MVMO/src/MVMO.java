@@ -275,13 +275,12 @@ public class MVMO {
             }
             ipx = 0;
             while(ipx < n_par){
-                ipx++;
                 ipp = IX[ipx];
-               // considered(ipp,1:ps.D) = false
+                ipx++;
+
                 for(int i=0; i<ps.D; i++){
                     considered[ipp][i] = false;
                 }
-
 
                 x_normalized[ipp] = Util.copyArray(Util.multiplyArray(x_normalized[ipp], ps.x_min + parameter.scaling));
                 if(local_search[ipp] && local_i < local_max && local_search0 > 0) {
@@ -342,19 +341,19 @@ public class MVMO {
                                 A[ia] = A[ia] + amax;
                             }
                         }
-                        [~, IX]=sort(A); //TODO implementar creo que se ordenan IX y A no estoy seguro
+                        IX = Util.sortOnlyIndexs(A);
                     }
                     verybest=IX[0];
-                    for(int i=border_gute+1; i<n_par; i++){ //TODO check esta bien
+                    for(int i=border_gute; i<n_par; i++){
                         goodbad[IX[i]] = false;
                     }
 
-                    for(int i=0; i<border_gute; i++){ //TODO check esta bien
+                    for(int i=0; i<border_gute; i++){
                         goodbad[IX[i]] = true;
                     }
 
                     if(!goodbad[ipp]){
-                        int bestp = -1, onep1 = -1, worstp = -1;
+                        int bestp, onep1, worstp;
 
                         int [] returnObject = must();
                         bestp = returnObject[0];
@@ -502,6 +501,49 @@ public class MVMO {
             }
         }
     }
+
+    /*function [ffx,oox,ggx,xn_out,FEVALS] = LocalSearchMVMOSH(testcase,iii,jjj,kkk,args,xx_yy,FEsAllowed)
+    global PPL GGL
+    if FEsAllowed <= 0, return, end
+            options=optimset('Display','off','algorithm','interior-point','UseParallel','never','MaxFunEvals',FEsAllowed,'FinDiffType','central' ) ;
+    [Xsqp, FUN , ~ , output]=...
+    fmincon(@(xx_yy)LSearch(xx_yy,testcase,iii,jjj,kkk,args),xx_yy,[],[],[],[],ps.x_min,ps.x_max,[],options);
+
+
+    FEVALS=output.funcCount  ;
+    for nvar=1:size(xx_yy,2)
+    if isnan(Xsqp(1,nvar))
+    Xsqp=xx_yy;
+    break;
+    end
+            end
+
+    xn_out = Xsqp;
+    ffx=FUN;
+    oox=PPL;
+    ggx=GGL;
+    end*/
+    public double LocalSearchMVMOSH(int n){
+        if(n <= 0){
+            //TODO terminar
+        }
+
+    }
+
+    /*
+        function J=LSearch(xx_yy2,testcase,iii,jjj,kkk,args)
+        global PPL GGL
+        [J,PPL,GGL,~] = feval(testcase,iii,jjj,kkk,args,xx_yy2);
+
+    end
+     */
+
+    public double LSearch(){
+        double f = Configuration.benchmark.f(x_normalized[ipp]);
+        proc.i_eval++;
+        return f;
+    }
+
 
     //Evacuated h-function
     public double h_function(double x_bar,double s1,double s2, double x_p) {

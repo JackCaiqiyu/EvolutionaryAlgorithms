@@ -16,12 +16,16 @@ public class Test {
                     Configuration.D = DIM;
                     Configuration.nF = F;
                     Configuration.maxfunevals = 10000 * DIM;
+                    Configuration.NP = 540;
+                    Configuration.CR = 0.5;
+                    Configuration.EarlyStop = "fitness";
+                    Configuration.ConstraintHandling = "Interpolation";
                     Rand rand = new Rand(seeds.getSeed(Configuration.nF));
                     Configuration.rand = rand;
                     benchmark benchmark = new benchmark();
                     test_func test_func = benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
                     Configuration.benchmark = test_func;
-
+                    System.out.println("Fun: "+ F + "Run: " + run + "DIM: " + DIM);
                     LSHADE_SPS algorithm = new LSHADE_SPS();
                     algorithm.execute();
                 }

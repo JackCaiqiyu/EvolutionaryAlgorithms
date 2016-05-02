@@ -183,7 +183,7 @@ public class GAMPC {
 
 
         }
-        Configuration.records.newRecord(fitx[0] - bias.getBias(Configuration.I_fno));
+        Configuration.records.newRecord(fitx[0] - bias.getBias(Configuration.I_fno), current_eval, max_eval );
     }
 
     private int min(int [] array, int tam){

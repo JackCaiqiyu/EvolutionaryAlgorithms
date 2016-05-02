@@ -2,7 +2,7 @@
 public class Bounds {
     private static float [] lowerBound = {-100, -100, -100, -100, -100, -100, 0, -32, -5, -5, -0.5f, (float)-Math.PI, -3, -100, -5, -5, -5,    -5, -5, -5,    -5, -5, -5,   -5 ,2 };
     private static float [] upperBound = {100, 100, 100, 100, 100, 100, 600, 32, 5, 5, 0.5f, (float) Math.PI, 1, 100, 5, 5, 5,     5, 5, 5,   5, 5, 5,  5 ,5};
-
+    public static double Ter_Err = 10e-8;
 
     public static float getLowerBound(int nFun){
         return lowerBound[nFun-1];

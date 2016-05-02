@@ -3,4 +3,5 @@
  */
 public class Configuration {
     public static Rand rand;
+    public static AllBenchmarks benchmark;
 }

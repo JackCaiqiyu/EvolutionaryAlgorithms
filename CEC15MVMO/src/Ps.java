@@ -3,6 +3,6 @@
  */
 public class Ps {
     public int D;
-    public double [] x_min;
-    public double [] x_max;
+    public double x_min;
+    public double x_max;
 }
