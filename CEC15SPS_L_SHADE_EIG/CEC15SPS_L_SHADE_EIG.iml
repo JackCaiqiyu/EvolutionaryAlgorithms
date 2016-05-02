@@ -8,7 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="module" module-name="CEC05Functions" />
+    <orderEntry type="module" module-name="CEC05-Benchmark" />
     <orderEntry type="module" module-name="Benchmark" />
   </component>
 </module>
