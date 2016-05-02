@@ -8,10 +8,13 @@
       <module fileurl="file://$PROJECT_DIR$/CEC05G-CMAES/CEC05G-CMAES.iml" filepath="$PROJECT_DIR$/CEC05G-CMAES/CEC05G-CMAES.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC11Benchmark/CEC11Benchmark.iml" filepath="$PROJECT_DIR$/CEC11Benchmark/CEC11Benchmark.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC11GA-MPC/CEC11GA-MPC.iml" filepath="$PROJECT_DIR$/CEC11GA-MPC/CEC11GA-MPC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CEC13-Benchmark/CEC13-Benchmark.iml" filepath="$PROJECT_DIR$/CEC13-Benchmark/CEC13-Benchmark.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC13DRMA/CEC13DRMA.iml" filepath="$PROJECT_DIR$/CEC13DRMA/CEC13DRMA.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC13ICMAESILS/CEC13ICMAESILS.iml" filepath="$PROJECT_DIR$/CEC13ICMAESILS/CEC13ICMAESILS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CEC14-Benchmark/CEC14-Benchmark.iml" filepath="$PROJECT_DIR$/CEC14-Benchmark/CEC14-Benchmark.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC14LSHADE/CEC14LSHADE.iml" filepath="$PROJECT_DIR$/CEC14LSHADE/CEC14LSHADE.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC14MVMO/CEC14MVMO.iml" filepath="$PROJECT_DIR$/CEC14MVMO/CEC14MVMO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CEC15-Benchmark/CEC15-Benchmark.iml" filepath="$PROJECT_DIR$/CEC15-Benchmark/CEC15-Benchmark.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC15LSHADEND/CEC15LSHADEND.iml" filepath="$PROJECT_DIR$/CEC15LSHADEND/CEC15LSHADEND.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC15MVMO/CEC15MVMO.iml" filepath="$PROJECT_DIR$/CEC15MVMO/CEC15MVMO.iml" />
       <module fileurl="file://$PROJECT_DIR$/CEC15SPS_L_SHADE_EIG/CEC15SPS_L_SHADE_EIG.iml" filepath="$PROJECT_DIR$/CEC15SPS_L_SHADE_EIG/CEC15SPS_L_SHADE_EIG.iml" />

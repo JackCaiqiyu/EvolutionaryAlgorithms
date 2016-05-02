@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package cec2015.math;
+package math;
 
 import java.util.Arrays;
 

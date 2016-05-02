@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cec2015.profiler;
+package profiler;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import cec2015.math.Constants;
+import math.Constants;
 
 /**
  * 

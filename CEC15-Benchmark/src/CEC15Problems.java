@@ -5,7 +5,6 @@ BO Zheng (email: zheng.b1988@gmail.com)
 Dec. 19th 2013
 Modified in Aug. 8th 2014
  */
-package cec2015;
 
 //~--- non-JDK imports --------------------------------------------------------
 

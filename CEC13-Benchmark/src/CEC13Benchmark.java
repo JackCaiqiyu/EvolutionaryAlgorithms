@@ -5,11 +5,11 @@ import java.util.Scanner;
 /**
  * Created by framg on 02/05/2016.
  */
-public class Benchmark extends AllBenchmarks {
+public class CEC13Benchmark extends AllBenchmarks {
     boolean init_flag;
     double[] OShift, M, y, z;
 
-    public Benchmark(int DIM, int FUN) {
+    public CEC13Benchmark(int DIM, int FUN) {
         super(DIM, FUN, 28);
         init_flag = true;
     }

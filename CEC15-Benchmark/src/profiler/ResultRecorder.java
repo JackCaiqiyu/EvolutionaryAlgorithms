@@ -4,11 +4,11 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
  */
-package cec2015.profiler;
+package profiler;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import cec2015.math.Statistics;
+import math.Statistics;
 import io.IOUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
