@@ -1,22 +1,30 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 public class Records {
-    public double [] records;
-    public double [] records1e3;
-    public double [] records1e4;
-    public double [] records1e5;
+    private double [] records;
+    private double [] records1e3;
+    private double [] records1e4;
+    private double [] records1e5;
 
-    public int actualRun;
-    public int nFun;
+    private boolean isRecord1e3;
+    private boolean isRecord1e4;
+    private boolean isRecord1e5;
+
+    private int [] FEs;
+    public int nSucess;
+
+    private int actualRun;
+    private int nFun;
 
     public Records(){
         records = new double[25];
         records1e3 = new double[25];
         records1e4 = new double[25];
         records1e5 = new double[25];
-
+        FEs = new int[25];
 
 
             for(int j=0; j<25; j++){
@@ -26,10 +34,15 @@ public class Records {
                 records1e5[j] = 0;
             }
 
+        nSucess = 0;
         actualRun = 0;
+
+        isRecord1e3 = false;
+        isRecord1e4 = false;
+        isRecord1e5 = false;
     }
 
-    public double getMean(double [] rec){
+    private double getMean(int [] rec){
         double sum = 0;
         for(int i=0; i<25; i++){
             sum+=rec[i];
@@ -37,17 +50,25 @@ public class Records {
         return sum/25;
     }
 
-    public double std(double [] rec){ //TODO HACER ESTO FUNCIONAR
-        double mean = getMean(rec);
+    private double getMean(double [] rec){
         double sum = 0;
         for(int i=0; i<25; i++){
-            sum += (rec[i] - mean) * (rec[i] - mean);
+            sum+=rec[i];
         }
-
-      return Math.sqrt(sum/25);
+        return sum/25;
     }
 
-    public void sort(double [] rec){
+    protected double std(double [] rec){
+        double mean = getMean(rec);
+        BigDecimal sum = BigDecimal.ZERO;
+        for(int i=0; i<25; i++){
+            sum = sum.add(BigDecimal.valueOf((rec[i] - mean) * (rec[i] - mean)));
+        }
+
+      return Math.sqrt(sum.divide(BigDecimal.valueOf(25)).doubleValue());
+    }
+
+    private void sort(double [] rec){
         for(int i=0; i<25; i++){
             for(int j=i+1; j<25; j++){
                 if(rec[i] > rec[j]){
@@ -61,19 +82,42 @@ public class Records {
 
 
     public void newRecord(double value, int iter){
-        if(iter >= 1000){
+        if(iter >= 1000 && iter <10000 && !isRecord1e3){
             records1e3[actualRun] = value;
-        }else if(iter >= 10000){
+            isRecord1e3 = true;
+        }else if(iter >= 10000 && iter <100000 && !isRecord1e4){
             records1e4[actualRun] = value;
-        }else if(iter >= 100000){
+            isRecord1e4 = true;
+        }else if(iter >= 100000 && !isRecord1e5){
             records1e5[actualRun] = value;
+            isRecord1e5 = true;
         }
     }
 
-    public void newRecord(double value){
+    public void newRecord(double value, int current_fes, int max_fes){
         records[actualRun] = value;
+        FEs[actualRun] = current_fes;
         actualRun++;
+
+        isRecord1e3 = false;
+        isRecord1e4 = false;
+        isRecord1e5 = false;
+
+        if(max_fes > current_fes){
+            nSucess++;
+            if(nSucess > 25){
+                System.err.println("Number of success can't be greater than number of runs.");
+                System.exit(0);
+            }
+        }
+
     }
+
+    public void recordAgain(){
+        actualRun--;
+    }
+
+
 
     public void write(int dim, int fun, String file_name, boolean excel){
         File file = new File( file_name + ".txt");
@@ -103,6 +147,11 @@ public class Records {
             sort(records1e5);
             results = "Records 1e5:\n";
             results += "1: " + records1e5[0] + " 7: " + records1e5[6] + " 13: " + records1e5[12] + " 19: " + records1e5[18] + " 25: " + records1e5[24] + "\n" + "Mean: " + getMean(records1e5) + " STD: " + std(records1e5) + "\n";
+            stringBuilder.append(results);
+
+            double nSuc = nSucess;
+            results = "\nSucess rate: " + (nSuc/25.0) + " Sucess performance: " + (getMean(FEs)*25)/nSucess + "\n";
+
             stringBuilder.append(results);
 
             stringBuilder.append("\n");

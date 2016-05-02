@@ -89,4 +89,39 @@ public class Rand {
         return mu + sigma * gaussian();
     }
 
+
+    public double cauchyrnd(double a, double b){
+        return a + b * Math.tan(Math.PI*(getFloat()-0.5));
+    }
+
+
+    public double [] cauchyrnd(int dim, double a, double b){
+        double [] probs = new double[dim];
+
+        for(int i=0; i<dim; i++){
+            probs[i] = a + b * Math.tan(Math.PI*(getFloat()-0.5));
+        }
+
+        return probs;
+    }
+
+
+
+    public int [] randperm(int n){
+        int [] rand = new int[n];
+        int pos;
+        int aux;
+        for(int i=0; i<n; i++){
+            rand[i] = i;
+        }
+
+        for(int i=0; i<n; i++){
+            pos = getInt(0, n-1);
+            aux = rand[i];
+            rand[i] = rand[pos];
+            rand[pos] = aux;
+        }
+        return rand;
+    }
+
 }
