@@ -10,8 +10,8 @@ public class CEC14Benchmark extends AllBenchmarks {
     boolean ini_flag;
 
 
-    CEC14Benchmark(int DIM, int FUN, int n_FUN) {
-        super(DIM, FUN, n_FUN);
+    CEC14Benchmark(int DIM, int FUN) {
+        super(DIM, FUN, 30);
         ini_flag = true;
     }
 

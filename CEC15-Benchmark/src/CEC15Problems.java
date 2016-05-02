@@ -8,10 +8,10 @@ Modified in Aug. 8th 2014
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import cec2015.math.Functions;
+import math.Functions;
 
-import cec2015.profiler.FEvCount;
-import cec2015.profiler.ResultRecorder;
+import profiler.FEvCount;
+import profiler.ResultRecorder;
 
 import input_data.DataReader;
 
