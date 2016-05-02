@@ -6,4 +6,10 @@ public class Configuration {
     public static int DIM;
     public static long seed;
     public static Records records;
+    public static Rand rand;
+    public static AllBenchmarks benchmark;
+
+
+    public static boolean flgscience;
+
 }
