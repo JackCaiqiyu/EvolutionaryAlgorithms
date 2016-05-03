@@ -2,6 +2,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import  org.apache.poi.hssf.usermodel.HSSFSheet;
+import  org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import  org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.util.CellRangeAddress;
+
 
 public class Records {
     private double [] records;
@@ -14,10 +20,13 @@ public class Records {
     private boolean isRecord1e5;
 
     private int [] FEs;
-    public int nSucess;
+    private int nSucess;
 
     private int actualRun;
-    private int nFun;
+
+    private static boolean excel_created = false;
+    private static int n_column_excel;
+    private static HSSFWorkbook workbook;
 
     public Records(){
         records = new double[25];
@@ -40,6 +49,20 @@ public class Records {
         isRecord1e3 = false;
         isRecord1e4 = false;
         isRecord1e5 = false;
+
+        if(!excel_created) {
+            init();
+        }
+
+    }
+
+
+    private static double[] copyArray(double [] aOld){
+        double [] aNew = new double [aOld.length];
+        for(int i=0; i<aNew.length; i++){
+            aNew[i] = aOld[i];
+        }
+        return aNew;
     }
 
     private double getMean(int [] rec){
@@ -113,18 +136,32 @@ public class Records {
 
     }
 
-    public void recordAgain(){
-        actualRun--;
+    public void write(String file_name){
+        String filename = file_name + ".xls";
+        File file = new File(filename);
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            workbook.write(fileOut);
+            fileOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Your excel file has been generated!");
     }
 
 
-
     public void write(int dim, int fun, String file_name, boolean excel){
-        File file = new File( file_name + ".txt");
-        StringBuilder stringBuilder = new StringBuilder();
-        String results = "";
-
         if(!excel) {
+            File file = new File(file_name + ".txt");
+            StringBuilder stringBuilder = new StringBuilder();
+            String results = "";
+
+
             stringBuilder.append("Function: " + fun + "\n");
             stringBuilder.append("DIM: " + dim + "\n");
 
@@ -150,53 +187,174 @@ public class Records {
             stringBuilder.append(results);
 
             double nSuc = nSucess;
-            results = "\nSucess rate: " + (nSuc/25.0) + " Sucess performance: " + (getMean(FEs)*25)/nSucess + "\n";
+            results = "\nSucess rate: " + (nSuc / 25.0) + " Sucess performance: " + (getMean(FEs) * 25) / nSucess + "\n";
 
             stringBuilder.append(results);
 
             stringBuilder.append("\n");
-        }else{
-            sort(records);
-            results = records[0] + " " + records[6] + " " + records[12] + " " + records[18] + " " + records[24] + " " + " " + getMean(records) + " " + std(records) + "\n";
-            stringBuilder.append(results);
 
-            sort(records1e3);
-            results = records1e3[0] + " " + records1e3[6] + " " + records1e3[12] + " " + records1e3[18] + " " + records1e3[24] +  " " + getMean(records1e3) + " " + std(records1e3) + "\n";
-            stringBuilder.append(results);
 
-            sort(records1e4);
-            results = records1e4[0] + " " + records1e4[6] + " " + records1e4[12] + " " + records1e4[18] + " " + records1e4[24] +  " " + getMean(records1e4) + " " + std(records1e4) + "\n";
-            stringBuilder.append(results);
+            if (!file.exists()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
-            sort(records1e5);
-            results = records1e5[0] + " " + records1e5[6] + " " + records1e5[12] + " " + records1e5[18] + " " + records1e5[24] + " " + getMean(records1e5) + " " + std(records1e5) + "\n";
-            stringBuilder.append(results);
+            try (FileOutputStream fop = new FileOutputStream(file, true)) {
 
-            stringBuilder.append("\n");
-        }
+                byte[] contentInBytes = stringBuilder.toString().getBytes();
+                fop.write(contentInBytes);
+                fop.flush();
+                fop.close();
 
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
+                System.out.println("Done" + "FUN: " + fun + " DIM: " + dim);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }else {
+
         }
 
-        try (FileOutputStream fop = new FileOutputStream(file, true)) {
+    }
 
-            byte[] contentInBytes = stringBuilder.toString().getBytes();
-            fop.write(contentInBytes);
-            fop.flush();
-            fop.close();
+    public void writeColumn(int fun, int dim) {
+        try {
+            int n_row = 0;
 
-            System.out.println("Done" + "FUN: " + fun + " DIM: " + dim);
+            HSSFSheet sheet = workbook.getSheet(String.valueOf(dim));
+            sheet.setColumnWidth(n_column_excel, (int)Math.round((3.0 * 1000)/0.78) );
 
-        } catch (IOException e) {
-            e.printStackTrace();
+
+
+            HSSFRow rowhead = sheet.getRow((short)n_row);
+            rowhead.createCell(n_column_excel).setCellValue(fun);
+            n_row++;
+
+
+            for(int FES=0; FES<4; FES++) {
+                double [] current_record = null;
+                switch (FES){
+                    case 0:
+                        current_record = copyArray(records1e3);
+                        break;
+                    case 1:
+                        current_record = copyArray(records1e4);
+                        break;
+                    case 2:
+                        current_record = copyArray(records1e5);
+                        break;
+                    case 3:
+                        current_record = copyArray(records);
+                        break;
+                }
+                sort(current_record);
+                for (int i = 0; i < 25; i++) {
+                    HSSFRow row = sheet.getRow((short) n_row);
+                    n_row++;
+                    row.createCell(n_column_excel).setCellValue(current_record[i]);
+                }
+                HSSFRow rowStd = sheet.getRow((short) n_row);
+                rowStd.createCell(n_column_excel).setCellValue(std(current_record));
+                n_row++;
+
+                HSSFRow rowMean = sheet.getRow((short) n_row);
+                n_row++;
+                rowMean.createCell(n_column_excel).setCellValue(getMean(current_record));
+
+            }
+
+            n_column_excel++;
+
+        } catch ( Exception ex ) {
+            System.out.println(ex);
         }
     }
 
+
+
+    public static void init(){
+        workbook = new HSSFWorkbook();
+        createWorbook("10");
+        createWorbook("30");
+        createWorbook("50");
+        excel_created = true;
+    }
+
+
+    private static void createWorbook(String dim){
+        try {
+
+            int n_row = 0;
+
+
+            HSSFSheet sheet = workbook.createSheet(dim);
+
+            //1000 = 0.78cm
+            sheet.setColumnWidth(0, (int)Math.round((3.5 * 1000)/0.78) );
+            sheet.setColumnWidth(1, (int)Math.round((3.5 * 1000)/0.78) );
+
+
+
+            HSSFRow rowhead = sheet.createRow((short)n_row);
+            rowhead.createCell(0).setCellValue("FES");
+            rowhead.createCell(1).setCellValue("Problem");
+            n_row++;
+
+            for(int FES=0; FES<4; FES++) {
+                String tag = null;
+                switch (FES){
+                    case 0:
+                        tag = "1E3";
+                        break;
+                    case 1:
+                        tag = "1E4";
+                        break;
+                    case 2:
+                        tag = "1E5";
+                        break;
+                    case 3:
+                        tag = "Finish";
+                        break;
+                }
+
+
+                CellStyle cellStyle = workbook.createCellStyle();
+                cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+                rowhead.getCell(0).setCellStyle(cellStyle);
+
+                HSSFRow row = sheet.createRow((short) n_row);
+                row.createCell(0).setCellValue(tag);
+                row.createCell(1).setCellValue("Record: " + 1);
+                n_row++;
+
+
+                sheet.addMergedRegion(new CellRangeAddress(n_row - 1, n_row + 25, 0, 0));
+
+                for (int i = 1; i < 25; i++) {
+                    row = sheet.createRow((short) n_row);
+                    n_row++;
+                    row.createCell(1).setCellValue("Record: " + (i + 1));
+                }
+                HSSFRow rowStd = sheet.createRow((short) n_row);
+                rowStd.createCell(1).setCellValue("Std:");
+                n_row++;
+
+                HSSFRow rowMean = sheet.createRow((short) n_row);
+                n_row++;
+                rowMean.createCell(1).setCellValue("Mean:");
+
+            }
+
+
+            n_column_excel = 2;
+
+        } catch ( Exception ex ) {
+            System.out.println(ex);
+        }
+    }
 
 }
 

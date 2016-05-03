@@ -28,28 +28,32 @@ public class CMAES {
 
 	public static void main(String[] args) {
 		int DIM = 10;
-		int F = 8;
-		benchmarks = new CEC14Benchmark(DIM, F);
-		double stop_fitness = 10e-8;
-		double best_fmin = Util.inf;
-		records = new Records();
-		for(int run=0; run<25; run++) {
-			int pop_size = 4 + (int) Math.floor(3 * Math.log(DIM));
-			double fmin = Util.inf;
-			max_values = 10000 * DIM;
-			while ((max_values > pop_size) && (fmin - benchmarks.bias() > stop_fitness)) {
-				CMAES(DIM, F, pop_size);
-				max_values -= last_eval;
-				fmin = last_fitness;
-				pop_size *= 2;
-				if (fmin < best_fmin) {
-					best_fmin = fmin;
+		for(int F = 1; F <= 3; F++) {
+			benchmarks = new CEC05Benchmark(DIM, F);
+			double stop_fitness = 10e-8;
+			double best_fmin = Util.inf;
+			records = new Records();
+			for (int run = 0; run < 25; run++) {
+				int pop_size = 4 + (int) Math.floor(3 * Math.log(DIM));
+				double fmin = Util.inf;
+				max_values = 10000 * DIM;
+				while ((max_values > pop_size) && (fmin - benchmarks.bias() > stop_fitness)) {
+					CMAES(DIM, F, pop_size);
+					max_values -= last_eval;
+					fmin = last_fitness;
+					pop_size *= 2;
+					if (fmin < best_fmin) {
+						best_fmin = fmin;
+					}
 				}
+				records.newRecord(fmin - benchmarks.bias(), last_eval, max_values);
 			}
-			records.newRecord(fmin - benchmarks.bias(), last_eval, max_values);
+			//records.write(DIM, F, "G-CMAES", false);
+			records.writeColumn(F, DIM);
+			System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
 		}
-		records.write(DIM, F, "G-CMAES", false);
-		System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
+
+		records.write("G-CMAES");
 
 	}
 
