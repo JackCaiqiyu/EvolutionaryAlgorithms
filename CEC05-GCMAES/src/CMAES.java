@@ -53,7 +53,7 @@ public class CMAES {
 			System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
 		}
 
-		records.write("G-CMAES");
+		records.exportExcel("G-CMAES");
 
 	}
 

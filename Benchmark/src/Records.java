@@ -136,7 +136,7 @@ public class Records {
 
     }
 
-    public void write(String file_name){
+    public void exportExcel(String file_name){
         String filename = file_name + ".xls";
         File file = new File(filename);
         if (file.exists()) {
