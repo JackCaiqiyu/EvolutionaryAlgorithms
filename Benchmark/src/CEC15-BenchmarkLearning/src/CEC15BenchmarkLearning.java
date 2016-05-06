@@ -110,14 +110,14 @@ public class CEC15BenchmarkLearning extends AllBenchmarks {
             } else {
                 for (i = 0; i < cf_nums[func_num] - 1; i++) {
                     for (j = 0; j < nx; j++) {
-                        OShift[i * nx + j] = input.nextDouble();
+                        OShift[i * nx + j] = Double.parseDouble(input.next());
                     }
                     String sss = input.nextLine();
 
                     //System.out.println(OShift[i*nx+j]);
                 }
                 for (j = 0; j < nx; j++) {
-                    OShift[(cf_nums[func_num] - 1) * nx + j] = input.nextDouble();
+                    OShift[(cf_nums[func_num] - 1) * nx + j] = Double.parseDouble(input.next());
                 }
 
             }
