@@ -10,5 +10,7 @@
     <orderEntry type="module" module-name="CEC05-Benchmark" />
     <orderEntry type="module" module-name="Utils" />
     <orderEntry type="module" module-name="Benchmark" />
+    <orderEntry type="module" module-name="CEC15-Benchmark" />
+    <orderEntry type="module" module-name="CEC15-BenchmarkLearning" />
   </component>
 </module>

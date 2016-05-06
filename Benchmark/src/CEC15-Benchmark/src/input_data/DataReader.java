@@ -7,6 +7,8 @@ package input_data;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import java.util.Arrays;
@@ -26,7 +28,7 @@ public final class DataReader {
 
 			// Scanner input = new Scanner(dataFile);
 			for (int i = 0; i < ret.length; i++) {
-				ret[i] = input.nextDouble();
+				ret[i] = Double.parseDouble(input.next());
 				actualSize++;
 			}
 		} catch (NoSuchElementException e) {
@@ -64,10 +66,14 @@ public final class DataReader {
 		int size = nx;
 
 		if (size != -1) {
-			String fn = "/input_data/shuffle_data_" + func_num + "_D" + nx + ".txt";
+			String fn = "Benchmark/src/CEC15-Benchmark/src/input_data/shuffle_data_" + func_num + "_D" + nx + ".txt";
 			InputStream dataFile = DataReader.class.getResourceAsStream(fn);
-
-			return readInt(new Scanner(dataFile), size);
+			File file = new File(fn);
+			try {
+				return readInt(new Scanner(file), size);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return null;
@@ -75,18 +81,29 @@ public final class DataReader {
 
 	public static double[] readRotation(int func_num, int nx, int cf_num) {
 		int size = (func_num < 13) ? nx * nx : cf_num * nx * nx;
-		String fn = "/input_data/M_" + func_num + "_D" + nx + ".txt";
+		String fn = "Benchmark/src/CEC15-Benchmark/src/input_data/M_" + func_num + "_D" + nx + ".txt";
 		InputStream dataFile = DataReader.class.getResourceAsStream(fn);
-
-		return readDouble(new Scanner(dataFile), size);
+		File file = new File(fn);
+		try {
+			return readDouble(new Scanner(file), size);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return  null;
 	}
 
 	public static double[] readShiftData(int func_num, int nx, int cf_num) {
 		int size = (func_num < 13) ? nx : nx * cf_num;
-		String fn = "/input_data/shift_data_" + func_num + "_D" + nx + ".txt";
+		String fn = "Benchmark/src/CEC15-Benchmark/src/input_data/shift_data_" + func_num + "_D" + nx + ".txt";
 		InputStream dataFile = DataReader.class.getResourceAsStream(fn);
+		File file = new File(fn);
 
-		return readDouble(new Scanner(dataFile), size);
+		try {
+			return readDouble(new Scanner(file), size);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	// double ellips_func (double[] , double , int , double[] ,double[] ,int ,int) /* Ellipsoidal */

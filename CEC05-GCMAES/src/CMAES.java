@@ -28,11 +28,12 @@ public class CMAES {
 
 	public static void main(String[] args) {
 		int DIM = 10;
-		for(int F = 1; F <= 3; F++) {
+		records = new Records();
+		for(int F = 25; F <= 25; F++) {
 			benchmarks = new CEC05Benchmark(DIM, F);
 			double stop_fitness = 10e-8;
 			double best_fmin = Util.inf;
-			records = new Records();
+			records.startRecord();
 			for (int run = 0; run < 25; run++) {
 				int pop_size = 4 + (int) Math.floor(3 * Math.log(DIM));
 				double fmin = Util.inf;
@@ -46,10 +47,10 @@ public class CMAES {
 						best_fmin = fmin;
 					}
 				}
-				records.newRecord(fmin - benchmarks.bias(), last_eval, max_values);
+				records.endRun(fmin - benchmarks.bias(), last_eval, max_values);
 			}
 			//records.write(DIM, F, "G-CMAES", false);
-			records.writeColumn(F, DIM);
+			records.endRecord(F, DIM);
 			System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
 		}
 
@@ -100,7 +101,14 @@ public class CMAES {
 				//   sufficiently small to prevent quasi-infinite looping here
 				// compute fitness/objective value
 				fitness[i] = benchmarks.f(pop[i]); //fitfun.valueOf(pop[i]);  // fitfun.valueOf() is to be minimized
+				while(Double.isNaN(fitness[i])){
+					pop[i] = cma.resampleSingle(i);
+					fitness[i] = benchmarks.f(pop[i]);
+				}
 			}
+
+
+
 			cma.updateDistribution(fitness);         // pass fitness array to update search distribution
 			//bestValue = cma.getBestFunctionValue();
 			System.out.println("VALUE: " + (cma.bestever_fit - benchmarks.bias()) + " at: " + cma.getCountEval());

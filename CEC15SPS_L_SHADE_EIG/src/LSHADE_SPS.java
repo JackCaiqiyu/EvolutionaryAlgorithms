@@ -129,8 +129,8 @@ public class LSHADE_SPS {
                 }
             }
         }
-        Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
-
+       // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+        Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
         Util.assignArray(MF, F);
         Util.assignArray(MCR, CR);
         iM = 0;
@@ -157,7 +157,9 @@ public class LSHADE_SPS {
 
 
     public void execute(){
-        while(counteval < Configuration.maxfunevals && fx[0] - bias.getBias(Configuration.nF) > Bounds.Ter_Err) {
+        while(counteval < Configuration.maxfunevals && Math.abs(Configuration.benchmark.bias() - fx[0]) > Bounds.Ter_Err) {
+        //while(counteval < Configuration.maxfunevals && fx[0] - bias.getBias(Configuration.nF) > Bounds.Ter_Err) {
+            System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
             boolean outofmaxfunevals = counteval > maxfunevals - NP;
             boolean outofusefunevals = counteval > usefunevals - NP;
 
@@ -244,7 +246,7 @@ public class LSHADE_SPS {
                         V[i][j] = X[i][j] + F[i] * (X[pbest[i]][j] - X[i][j]) + F[i] * (X[r1][j] - XA[r2][j]);
                 } else {
                     for (int j = 0; j < D; j++)
-                        V[i][j] = SP[i][j] + F[i] * (SP[i][sortidxfSP[pbest[i]]] - SP[i][j]) + F[i] * (SP[r1][j] - SPA[r2][j]);
+                        V[i][j] = SP[i][j] + F[i] * (SP[sortidxfSP[pbest[i]]][j] - SP[i][j]) + F[i] * (SP[r1][j] - SPA[r2][j]);
                 }
             }
 
@@ -329,7 +331,7 @@ public class LSHADE_SPS {
                     fSP[iSP] = fu[i];
                     iSP = (iSP + 1) % NP;
                 } else if (fu[i] == fx[i]) {
-                    for (int j = 0; j < A.length; j++) {
+                    for (int j = 0; j < D; j++) {
                         X[i][j] = U[i][j];
                     }
 
@@ -371,7 +373,8 @@ public class LSHADE_SPS {
                     }
                 }
             }
-            Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+            //Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+            Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
          //   System.out.println(fx[0]);
 
             NP = Math.round(NPinit - (NPinit - NPmin) * counteval / maxfunevals);
@@ -417,7 +420,9 @@ public class LSHADE_SPS {
                 countstagnation = 0;
 
         }
-        Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
+       // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
+       // Configuration.records.endRun(fx[0] - bias.getBias(Configuration.nF), counteval, Configuration.maxfunevals);
+        Configuration.records.endRun(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval, Configuration.maxfunevals);
     }
 
 

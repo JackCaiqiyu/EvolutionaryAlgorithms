@@ -1,7 +1,17 @@
 import java.util.Random;
 
 public class Rand {
-    public Random random;
+    private Random random;
+
+    private boolean isMock = false;
+    private float mock_float = 0;
+    private double mock_double = 0;
+    private int mock_int;
+
+
+    public Rand(boolean isMock){
+        this.isMock = true;
+    }
 
     public Rand(){
         random = new Random();
@@ -28,7 +38,29 @@ public class Rand {
     }
 
     public float getFloat(){
-        return random.nextFloat();
+        if(isMock == false) {
+            return random.nextFloat();
+        }else{
+            mock_float += 0.1;
+            if(mock_float > 1){
+                mock_float = 0;
+            }
+            return mock_float;
+        }
+
+    }
+
+    public double getDouble(){
+        if(isMock == false) {
+            return random.nextDouble();
+        }else{
+            mock_double += 0.1;
+            if(mock_double > 1){
+                mock_double = 0;
+            }
+            return mock_double;
+        }
+
     }
 
     public float getFloat(float min, float max){

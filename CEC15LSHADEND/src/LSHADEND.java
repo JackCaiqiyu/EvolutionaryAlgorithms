@@ -42,7 +42,7 @@ public class LSHADEND {
         pop = new double[pop_size][Configuration.D];
         for(int i=0; i<pop_size; i++) {
             for (int j = 0; j < Configuration.D; j++) {
-                pop[i][j]=Bounds.getLowerBound(Configuration.nF) + (Bounds.getUpperBound(Configuration.nF) - Bounds.getLowerBound(Configuration.nF)) * Configuration.rand.getFloat();
+                pop[i][j]= Configuration.benchmark.lbound() + (Configuration.benchmark.ubound() - Configuration.benchmark.lbound()) * Configuration.rand.getDouble();
             }
         }
         fitness = new double[pop_size];
@@ -51,10 +51,10 @@ public class LSHADEND {
         }
      //   assert (Configuration.benchmark.f(pop[0]) != fitness[0]);
         double [] valBest =  Util.sortNewArray(fitness);
-        best_value = valBest[0];
+        best_value = Math.abs(Configuration.benchmark.bias() - valBest[0]);
         nfes = pop_size;
 
-        Configuration.records.newRecord(best_value - bias.getBias(Configuration.nF), nfes);
+        Configuration.records.newRecord(best_value, nfes);
 
         int [] indexBest = Util.sortOnlyIndexs(fitness);
         loc = indexBest[0];
@@ -81,9 +81,9 @@ public class LSHADEND {
         int [] mem_rand_index ;
         double [][] popold;
         popold = Util.copyMatrix(pop);
+        //while ( Configuration.max_nfes > nfes){
+        while (best_value > Bounds.Ter_Err && Configuration.max_nfes > nfes){
 
-        while (best_value - bias.getBias(Configuration.nF) > Bounds.Ter_Err && Configuration.max_nfes > nfes){
-          //  System.out.println("value " + (best_value - bias.getBias(Configuration.nF)) + " nfes: " + (Configuration.max_nfes > nfes));
             if(Configuration.rand.getFloat() < PND && nfes <ND_fes ){
                 popold = ND(loc, popold, fitness);
                 pop = Util.copyMatrix(popold);
@@ -386,8 +386,17 @@ public class LSHADEND {
             int [] indexBest = Util.sortOnlyIndexs(fitness);
             double [] valBest =  Util.sortNewArray(fitness);
             loc = indexBest[0];
-            best_value = valBest[0];
-            Configuration.records.newRecord(best_value - bias.getBias(Configuration.nF), nfes);
+            best_value = Math.abs(Configuration.benchmark.bias() - valBest[0]);
+            System.out.println("value " + best_value + " nfes: " +  nfes);
+       /*     if(nfes >= Configuration.max_nfes){
+                System.out.println("Val: " + Configuration.benchmark.f(pop[loc]));
+                for(int i=0; i<10; i++){
+
+                    System.out.println("x" + i + ": " + pop[loc][i]);
+                }
+            }*/
+
+            Configuration.records.newRecord(best_value, nfes);
             //System.out.println("CEC05: " + Configuration.benchmark.f(popold[loc]));
            // System.out.println("fitness: " + (best_value - bias.getBias(Configuration.nF) )+ " at " + nfes);
        //     if(Configuration.benchmark.f(popold[loc]) != best_value){
@@ -400,7 +409,7 @@ public class LSHADEND {
 
 
         }
-        Configuration.records.newRecord(best_value - bias.getBias(Configuration.nF));
+        Configuration.records.endRun(best_value, nfes, Configuration.max_nfes);
     }
 
     private int [][] gnR1R2(int NP1, int NP2, int [] r0){
@@ -467,11 +476,11 @@ public class LSHADEND {
     private double [][] boundConstraint(double [][] vi, double[][] pop){
         for(int i=0; i<pop_size; i++){
             for(int j=0; j<Configuration.D; j++){
-                if(Bounds.getLowerBound(Configuration.nF) > vi[i][j]){
-                    vi[i][j] = (pop[i][j] + Bounds.getLowerBound(Configuration.nF))/2;
+                if(Configuration.benchmark.lbound() > vi[i][j]){
+                    vi[i][j] = (pop[i][j] + Configuration.benchmark.lbound())/2;
                 }
-                if(Bounds.getUpperBound(Configuration.nF) < vi[i][j]){
-                    vi[i][j] = (pop[i][j] + Bounds.getUpperBound(Configuration.nF)) /2;
+                if(Configuration.benchmark.ubound() < vi[i][j]){
+                    vi[i][j] = (pop[i][j] + Configuration.benchmark.ubound()) /2;
                 }
             }
         }
@@ -653,8 +662,8 @@ public class LSHADEND {
         double [] grd = new double[Configuration.D];
         double [] x = plf(y);
         double delta = 1e-2;
-        double xmin = Bounds.getLowerBound(Configuration.nF);
-        double xmax = Bounds.getUpperBound(Configuration.nF);
+        double xmin = Configuration.benchmark.lbound();
+        double xmax = Configuration.benchmark.ubound();
 
         for(int i=0; i<Configuration.D; i++){
             double [] x_dum = Util.copyArray(x);
@@ -678,8 +687,8 @@ public class LSHADEND {
 
     private double [] plf(double [] x){
         double [] lumta = new double[Configuration.D];
-        double lmin = Bounds.getLowerBound(Configuration.nF);
-        double lmax = Bounds.getUpperBound(Configuration.nF);
+        double lmin = Configuration.benchmark.lbound();
+        double lmax = Configuration.benchmark.ubound();
 
         for(int i=0; i<Configuration.D; i++){
             if(x[i] < lmin){

@@ -24,11 +24,20 @@ public class Records {
 
     private int actualRun;
 
-    private static boolean excel_created = false;
-    private static int n_column_excel;
-    private static HSSFWorkbook workbook;
+    private int n_column_excel;
+    private HSSFWorkbook workbook;
 
     public Records(){
+        workbook = new HSSFWorkbook();
+
+        createWorbook("10");
+        createWorbook("30");
+        createWorbook("50");
+
+    }
+
+
+    public void startRecord(){
         records = new double[25];
         records1e3 = new double[25];
         records1e4 = new double[25];
@@ -36,24 +45,18 @@ public class Records {
         FEs = new int[25];
 
 
-            for(int j=0; j<25; j++){
-                records[j] = 0;
-                records1e3[j] = 0;
-                records1e4[j] = 0;
-                records1e5[j] = 0;
-            }
-
+        for(int j=0; j<25; j++){
+            records[j] = 0;
+            records1e3[j] = 0;
+            records1e4[j] = 0;
+            records1e5[j] = 0;
+        }
         nSucess = 0;
         actualRun = 0;
 
         isRecord1e3 = false;
         isRecord1e4 = false;
         isRecord1e5 = false;
-
-        if(!excel_created) {
-            init();
-        }
-
     }
 
 
@@ -117,7 +120,7 @@ public class Records {
         }
     }
 
-    public void newRecord(double value, int current_fes, int max_fes){
+    public void endRun(double value, int current_fes, int max_fes){
         records[actualRun] = value;
         FEs[actualRun] = current_fes;
         actualRun++;
@@ -155,7 +158,7 @@ public class Records {
     }
 
 
-    public void write(int dim, int fun, String file_name, boolean excel){
+  /*  public void write(int dim, int fun, String file_name, boolean excel){
         if(!excel) {
             File file = new File(file_name + ".txt");
             StringBuilder stringBuilder = new StringBuilder();
@@ -218,9 +221,9 @@ public class Records {
 
         }
 
-    }
+    }*/
 
-    public void writeColumn(int fun, int dim) {
+    public void endRecord(int fun, int dim) {
         try {
             int n_row = 0;
 
@@ -275,16 +278,7 @@ public class Records {
 
 
 
-    public static void init(){
-        workbook = new HSSFWorkbook();
-        createWorbook("10");
-        createWorbook("30");
-        createWorbook("50");
-        excel_created = true;
-    }
-
-
-    private static void createWorbook(String dim){
+    private void createWorbook(String dim){
         try {
 
             int n_row = 0;
@@ -327,7 +321,7 @@ public class Records {
 
                 HSSFRow row = sheet.createRow((short) n_row);
                 row.createCell(0).setCellValue(tag);
-                row.createCell(1).setCellValue("Record: " + 1);
+                row.createCell(1).setCellValue("Run: " + 1);
                 n_row++;
 
 
@@ -336,7 +330,7 @@ public class Records {
                 for (int i = 1; i < 25; i++) {
                     row = sheet.createRow((short) n_row);
                     n_row++;
-                    row.createCell(1).setCellValue("Record: " + (i + 1));
+                    row.createCell(1).setCellValue("Run: " + (i + 1));
                 }
                 HSSFRow rowStd = sheet.createRow((short) n_row);
                 rowStd.createCell(1).setCellValue("Std:");

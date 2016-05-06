@@ -30,9 +30,16 @@ public class TestRecords {
         assertNotEquals(0, records.std(array));
     }
 
-    @Test
-    public void createExcelFile() {
-        records.write("TEST");
-    }
+    //@Test
+    //public void createExcelFile() {
+     //   records.write("TEST");
+   // }
 
+    @Test
+    public void testCEC15benchmark(){
+        CEC15Problems problems = new CEC15Problems();
+        double [] x ={1,2,3,4,5,6,7,8,9,10};
+        double f[] = problems.eval(x, 10, 1, 8);
+        System.out.println(f[0]);
+    }
 }

@@ -4,26 +4,29 @@
 public class Test {
     public static void main(String [] args) {
        // testVi();
-
-        for(int F=8; F<=25; F++) {
-            for (int DIM = 10; DIM <= 20; DIM += 20) {
-                Configuration.records = new Records();
+        Configuration.records = new Records();
+        for(int F=8; F<=7; F++) {
+            for (int DIM = 10; DIM <= 10; DIM += 20) {
+                Configuration.benchmark = new CEC15BenchmarkLearning(DIM, F);
+                Configuration.records.startRecord();
                 for(int run =0; run<25; run++) {
                     Configuration.D = DIM;
                     Configuration.nF = F;
                     Configuration.max_nfes = 10000 * DIM;
-                    Rand rand = new Rand(seeds.getSeed(Configuration.nF));
-                    Configuration.rand = rand;
-                    benchmark benchmark = new benchmark();
-                    test_func test_func = benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
-                    Configuration.benchmark = test_func;
+                    //Rand rand = new Rand(seeds.getSeed(Configuration.nF));
+                    Configuration.rand = new Rand();
+                    //benchmark benchmark = new benchmark();
+                    //test_func test_func = benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
+                    //Configuration.benchmark = test_func;
                     System.out.println("Fun: "+ F + "Run: " + run + "DIM: " + DIM);
                     LSHADEND algorithm = new LSHADEND();
                     algorithm.execute();
                 }
-                Configuration.records.write(DIM, F, "LSHADEND", false);
+                Configuration.records.endRecord(F,DIM);
             }
         }
+
+        Configuration.records.exportExcel("LSHADEND");
     }
 
 

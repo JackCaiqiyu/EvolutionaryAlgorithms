@@ -5,7 +5,7 @@ import math.Functions;
  * Created by framg on 02/05/2016.
  */
 public class CEC15Benchmark extends AllBenchmarks {
-    private double[]                  OShift, M, y, z, x_bound;
+    private double[]                  OShift, M, x_bound;
     private int[]                     SS;
 
     private boolean ini_flag;
@@ -14,6 +14,11 @@ public class CEC15Benchmark extends AllBenchmarks {
     CEC15Benchmark(int DIM, int FUN) {
         super(DIM, FUN, 15);
         ini_flag = true;
+    }
+
+
+    public static int nProblems(){
+        return 15;
     }
 
     @Override
@@ -39,13 +44,12 @@ public class CEC15Benchmark extends AllBenchmarks {
         if (ini_flag) /* initiailization */ {
             ini_flag = false;
 
-            y       = new double[nx];
-            z       = new double[nx];
-            x_bound = new double[nx];
 
-            for (i = 0; i < nx; i++) {
-                x_bound[i] = 100.0;
-            }
+          //  x_bound = new double[nx];
+
+            //for (i = 0; i < nx; i++) {
+           //     x_bound[i] = 100.0;
+           // }
 
             //
             // if (!((nx == 2) || (nx == 10) || (nx == 20) || (nx == 30) || (nx == 50) || (nx == 100))) {
@@ -229,7 +233,7 @@ public class CEC15Benchmark extends AllBenchmarks {
             // Apply f^*
 
 
-        return f;
+        return f+bias();
     }
 
     @Override

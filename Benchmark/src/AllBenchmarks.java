@@ -13,10 +13,6 @@ public abstract class AllBenchmarks {
     }
 
 
-    public int nFunctions(){
-     return n_FUN;
-    }
-
     public abstract double f(double[] x);
     public abstract double bias();
     public abstract double lbound();

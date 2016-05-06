@@ -10,6 +10,7 @@ public class CEC05Benchmark extends AllBenchmarks{
         test_func = benchmark.testFunctionFactory(FUN, DIM);
     }
 
+
     @Override
     public double f(double[] x) {
         return test_func.f(x);
