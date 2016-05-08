@@ -5,9 +5,9 @@ public class Test {
     public static void main(String [] args) {
        // testVi();
         Configuration.records = new Records();
-        for(int F=8; F<=7; F++) {
+        for(int F=5; F<=5; F++) {
             for (int DIM = 10; DIM <= 10; DIM += 20) {
-                Configuration.benchmark = new CEC15BenchmarkLearning(DIM, F);
+                Configuration.benchmark = new CEC15Benchmark(DIM, F);
                 Configuration.records.startRecord();
                 for(int run =0; run<25; run++) {
                     Configuration.D = DIM;
