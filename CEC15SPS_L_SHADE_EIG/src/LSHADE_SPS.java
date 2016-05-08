@@ -41,8 +41,8 @@ public class LSHADE_SPS {
 
     private void initialize() {
         maxfunevals = Configuration.maxfunevals;
-        ub = Bounds.getUpperBound(Configuration.nF);
-        lb = Bounds.getLowerBound(Configuration.nF);
+        ub = Configuration.benchmark.ubound(); //Bounds.getUpperBound(Configuration.nF);
+        lb = Configuration.benchmark.lbound(); //Bounds.getLowerBound(Configuration.nF);
 
 
         Util.assignArray(CR, Configuration.CR);
@@ -159,7 +159,7 @@ public class LSHADE_SPS {
     public void execute(){
         while(counteval < Configuration.maxfunevals && Math.abs(Configuration.benchmark.bias() - fx[0]) > Bounds.Ter_Err) {
         //while(counteval < Configuration.maxfunevals && fx[0] - bias.getBias(Configuration.nF) > Bounds.Ter_Err) {
-            System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
+         //   System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
             boolean outofmaxfunevals = counteval > maxfunevals - NP;
             boolean outofusefunevals = counteval > usefunevals - NP;
 
@@ -199,17 +199,14 @@ public class LSHADE_SPS {
             for(int i=0; i<NP; i++)
                 r[i] = (int) Math.floor((H-1) * Configuration.rand.getFloat());
 
-            for (int i = 0; i < NP; i++)
+            for (int i = 0; i < NP; i++) {
                 CR[i] = MCR[r[i]] + (0.1 * Configuration.rand.uniform());
-
-            for (int i = 0; i < NP; i++)
                 if (CR[i] < 0 || MCR[r[i]] == -1)
                     CR[i] = 0;
-
-            for (int i = 0; i < NP; i++)
                 if (CR[i] > 1)
                     CR[i] = 1;
 
+            }
 
             Util.assignArray(F, 0);
             for (int i = 0; i < NP; i++) {
@@ -217,9 +214,6 @@ public class LSHADE_SPS {
                     F[i] = MF[r[i]] + Chy[iChy];
                     iChy = (iChy + 1) % Chy.length;
                 }
-            }
-
-            for (int i = 0; i < F.length; i++) {
                 if (F[i] > 1) {
                     F[i] = 1;
                 }
@@ -420,6 +414,7 @@ public class LSHADE_SPS {
                 countstagnation = 0;
 
         }
+        System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
        // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
        // Configuration.records.endRun(fx[0] - bias.getBias(Configuration.nF), counteval, Configuration.maxfunevals);
         Configuration.records.endRun(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval, Configuration.maxfunevals);

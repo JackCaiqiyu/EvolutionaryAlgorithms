@@ -10,16 +10,16 @@ public class Test {
 
 
         Configuration.records = new Records();
-
-        for(int F=8; F<=8; F++) {
+       // int F = 5;
+        for(int F=1; F<=15; F++) {
             for (int DIM = 10; DIM <= 10; DIM += 20) {
-                Configuration.benchmark = new CEC15BenchmarkLearning(DIM, F);
+                Configuration.benchmark = new CEC15Benchmark(DIM, F);
                 Configuration.records.startRecord();
                 for(int run =0; run<1; run++) {
                     Configuration.D = DIM;
                     Configuration.nF = F;
                     Configuration.maxfunevals = 10000 * DIM;
-                    Configuration.NP = 540;
+                    Configuration.NP = 19*DIM;//540;
                     Configuration.CR = 0.5;
                     Configuration.EarlyStop = "fitness";
                     Configuration.ConstraintHandling = "Interpolation";
