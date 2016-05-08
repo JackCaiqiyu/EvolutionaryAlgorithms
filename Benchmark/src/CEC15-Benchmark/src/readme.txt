@@ -1,5 +1,5 @@
 /*
-  CEC15 Test Function Suite for Single Objective Optimization
+  CEC15 Test2 Function Suite for Single Objective Optimization
   B. Zheng (email: zheng.b1988@gmail.com) 
   Nov. 20th 2014
 */

@@ -1,14 +1,17 @@
-import input_data.DataReader;
-import math.Functions;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 /**
- * Created by framg on 02/05/2016.
+ * Created by framg on 05/05/2016.
  */
 public class CEC15Benchmark extends AllBenchmarks {
-    private double[]                  OShift, M, x_bound;
-    private int[]                     SS;
+    double[] OShift, M, bias;
+    boolean ini_flag ;
+    int[] SS;
+    int[] cf_nums = {0, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 5, 5, 5, 7, 10};
 
-    private boolean ini_flag;
+    int[] bShuffle = {0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0};
 
 
     CEC15Benchmark(int DIM, int FUN) {
@@ -16,233 +19,225 @@ public class CEC15Benchmark extends AllBenchmarks {
         ini_flag = true;
     }
 
-
-    public static int nProblems(){
-        return 15;
-    }
-
     @Override
     public double f(double[] x) {
-        double f = 0.0;
+        //int cf_num=10,i,j;
         int func_num = FUN;
         int nx = DIM;
+        int cf_num, i, j;
+        cf_num = cf_nums[func_num];
 
 
-        if ((func_num < 1) || (func_num > 15)) {
-            System.err.println("Error: functiont cant be lower than 1 and greater than 15.");
-            System.exit(0);
-            return 0;
-        }
-
-
-
-
-        // cf_num not correct for D2
-        int cf_num = 10, i, j;
-
-
-        if (ini_flag) /* initiailization */ {
+        if (ini_flag) /* initiailization*/ {
             ini_flag = false;
-
-
-          //  x_bound = new double[nx];
-
-            //for (i = 0; i < nx; i++) {
-           //     x_bound[i] = 100.0;
-           // }
-
-            //
-            // if (!((nx == 2) || (nx == 10) || (nx == 20) || (nx == 30) || (nx == 50) || (nx == 100))) {
-            if (!((nx == 10) || (nx == 30))) {
-                System.out.println("\nError: Expensive Test functions are only defined for D=10, 30.");
-                System.exit(0);
-                return 0;
+            if (!(nx == 2 || nx == 10 || nx == 20 || nx == 50 || nx == 100)) {
+                System.out.println("\nError: Test functions are only defined for D=2,10,30,50,100.");
             }
 
-//          if ((nx == 2) && (((func_num >= 17) && (func_num <= 22)) || ((func_num >= 29) && (func_num <= 30)))) {
-//              System.out.println("\nError: hf01,hf02,hf03,hf04,hf05,hf06,cf07&cf08 are NOT defined for D=2.\n");
-//
-//              return null;
-//          }
+            if (nx == 2 && ((func_num >= 6 && func_num <= 8) || (func_num == 10) || (func_num == 13))) {
+                System.out.println("\nError: hf01,hf02,hf03,cf02&cf05 are NOT defined for D=2.\n");
+            }
+      //      System.out.println("Working Directory = " +
+       //             System.getProperty("user.dir"));
+			/*Load Matrix M*****************************************************/
+            File fpt = new File(System.getProperty("user.dir") +"/Benchmark/src/CEC15-Benchmark/src/input_data/M_" + func_num + "_D" + nx + ".txt");//* Load M data *
+            Scanner input = null;
+            try {
+                input = new Scanner(fpt);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            if (!fpt.exists()) {
+                System.out.println("\n Error: Cannot open input file for reading ");
+            }
 
-            /* Load Matrix M**************************************************** */
-            M = DataReader.readRotation(func_num, nx, cf_num);
+            M = new double[cf_num * nx * nx];
 
-            /* Load shift_data************************************************** */
-            OShift = DataReader.readShiftData(func_num, nx, cf_num);
 
-            /* Load Shuffle_data****************************************** */
-            SS        = DataReader.readShuffleData(func_num, nx);
+            for (i = 0; i < cf_num * nx * nx; i++) {
+                M[i] = Double.parseDouble(input.next());
+            }
+
+            input.close();
+
+
+            if (cf_num > 1) {
+
+                fpt = new File(  System.getProperty("user.dir") +"/Benchmark/src/CEC15-Benchmark/src/input_data/bias_" + func_num + ".txt");//* Load bias data *
+                try {
+                    input = new Scanner(fpt);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (!fpt.exists()) {
+                    System.out.println("\n Error: Cannot open input file for reading ");
+                }
+                bias = new double[cf_num];
+                for (i = 0; i < cf_num; i++) {
+                    bias[i] = Double.parseDouble(input.next());
+                }
+                input.close();
+
+
+            }
+
+
+
+
+			/*Load shift_data***************************************************/
+
+            fpt = new File( System.getProperty("user.dir") + "/Benchmark/src/CEC15-Benchmark/src/input_data/shift_data_" + func_num + ".txt");
+            try {
+                input = new Scanner(fpt);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            if (!fpt.exists()) {
+                System.out.println("\n Error: Cannot open input file for reading ");
+            }
+
+            OShift = new double[cf_num * nx];
+
+			/*for(i=0;i<cf_num*nx;i++)
+            {
+				OShift[i]=input.nextDouble();
+				//System.out.println(OShift[i]);
+			}*/
+            if (func_num < 9) {
+                for (i = 0; i < nx * cf_nums[func_num]; i++) {
+
+                    OShift[i] = Double.parseDouble(input.next());
+                }
+            } else {
+                for (i = 0; i < cf_nums[func_num] - 1; i++) {
+                    for (j = 0; j < nx; j++) {
+                        OShift[i * nx + j] = Double.parseDouble(input.next());
+                    }
+                    String sss = input.nextLine();
+
+                    //System.out.println(OShift[i*nx+j]);
+                }
+                for (j = 0; j < nx; j++) {
+                    OShift[(cf_nums[func_num] - 1) * nx + j] = Double.parseDouble(input.next());
+                }
+
+            }
+
+
+            input.close();
+
+
+
+
+
+			/*Load Shuffle_data*******************************************/
+
+            if (bShuffle[func_num] == 1) {
+                fpt = new File( System.getProperty("user.dir") + "/Benchmark/src/CEC15-Benchmark/src/input_data/shuffle_data_" + func_num + "_D" + nx + ".txt");
+                try {
+                    input = new Scanner(fpt);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (!fpt.exists()) {
+                    System.out.println("\n Error: Cannot open input file for reading ");
+                }
+                SS = new int[cf_num * nx];
+
+                for (i = 0; i < cf_num * nx; i++) {
+                    //fscanf(fpt,"%d",&SS[i]);
+                    SS[i] = Integer.parseInt(input.next());
+                }
+                input.close();
+            }
+
+        }
+        testfunc15L tf = new testfunc15L(DIM);
+        double f = 0;
+
+        switch (func_num) {
+            case 1:
+                f = tf.ellips_func(x, f, nx, OShift, M, 1, 1);
+                f += 100.0;
+                break;
+            case 2:
+                f = tf.bent_cigar_func(x, f, nx, OShift, M, 1, 1);
+                f += 200.0;
+                break;
+            case 3:
+                f = tf.ackley_func(x, f, nx, OShift, M, 1, 1);
+                f += 300.0;
+                break;
+            case 4:
+                f = tf.rastrigin_func(x, f, nx, OShift, M, 1, 1);
+                f += 400.0;
+                break;
+            case 5:
+                f = tf.schwefel_func(x, f, nx, OShift, M, 1, 1);
+                f += 500.0;
+                break;
+            case 6:
+                f = tf.hf01(x, f, nx, OShift, M, SS, 1, 1);
+                f += 600.0;
+                break;
+            case 7:
+                f = tf.hf02(x, f, nx, OShift, M, SS, 1, 1);
+                f += 700.0;
+                break;
+            case 8:
+                f = tf.hf03(x, f, nx, OShift, M, SS, 1, 1);
+                f += 800.0;
+                break;
+            case 9:
+                f = tf.cf01(x, f, nx, OShift, M, bias, 1);
+                f += 900.0;
+                break;
+            case 10:
+                f = tf.cf02(x, f, nx, OShift, M, SS, bias, 1);
+                f += 1000.0;
+                break;
+            case 11:
+                f = tf.cf03(x, f, nx, OShift, M, bias, 1);
+                f += 1100.0;
+                break;
+            case 12:
+                f = tf.cf04(x, f, nx, OShift, M, bias, 1);
+                f += 1200.0;
+                break;
+            case 13:
+                f = tf.cf05(x, f, nx, OShift, M, SS, bias, 1);
+                f += 1300.0;
+                break;
+            case 14:
+                f = tf.cf06(x, f, nx, OShift, M, bias, 1);
+                f += 1400.0;
+                break;
+            case 15:
+                f = tf.cf07(x, f, nx, OShift, M, bias, 1);
+                f += 1500.0;
+                break;
+
+
+            default:
+                System.out.println("\nError: There are only 15 test functions in this test suite!");
+                f = 0.0;
+                break;
         }
 
+        return f;
 
 
-
-            switch (func_num) {
-
-//          case 1 :
-//              f[i] = Functions.ellips_func(x, nx, OShift, M, 1, 1);
-//              f = 100.0;
-//
-//              break;
-                case 1 :
-                    f = Functions.bent_cigar_func(x, nx, OShift, M, 1, 1);
-
-                    break;
-
-                case 2 :
-                    f = Functions.discus_func(x, nx, OShift, M, 1, 1);
-
-                    break;
-
-//          case 4 :
-//              f[i] = Functions.rosenbrock_func(x, nx, OShift, M, 1, 1);
-//              break;
-//
-//          case 5 :
-//              f[i] = Functions.ackley_func(x, nx, OShift, M, 1, 1);
-//              f = 500.0;
-//
-//              break;
-                case 3 :
-                    f = Functions.weierstrass_func(x, nx, OShift, M, 1, 1);
-
-                    break;
-
-//          case 7 :
-//              f[i] = Functions.griewank_func(x, nx, OShift, M, 1, 1);
-//              f = 700.0;
-//
-//              break;
-//
-//          case 8 :
-//              f[i] = Functions.rastrigin_func(x, nx, OShift, M, 1, 0);
-//              f = 800.0;
-//
-//              break;
-//
-//          case 9 :
-//              f[i] = Functions.rastrigin_func(x, nx, OShift, M, 1, 1);
-//              f = 900.0;
-//
-//              break;
-                case 4 :
-                    f = Functions.schwefel_func(x, nx, OShift, M, 1, 0);
-                    break;
-
-//          case 11 :
-//              f[i] = Functions.schwefel_func(x, nx, OShift, M, 1, 1);
-//              f = 1100.0;
-//
-//              break;
-                case 5 :
-                    f = Functions.katsuura_func(x, nx, OShift, M, 1, 1);
-                    break;
-
-                case 6 :
-                    f = Functions.happycat_func(x, nx, OShift, M, 1, 1);
-                    break;
-
-                case 7 :
-                    f = Functions.hgbat_func(x, nx, OShift, M, 1, 1);
-                    break;
-
-                case 8 :
-                    f = Functions.grie_rosen_func(x, nx, OShift, M, 1, 1);
-                    break;
-
-                case 9 :
-                    f = Functions.escaffer6_func(x, nx, OShift, M, 1, 1);
-                    break;
-
-                case 10 :
-                    f = Functions.hf01(x, nx, OShift, M, SS, 1, 1);
-                    break;
-
-//          case 18 :
-//              f[i] = Functions.hf02(x, nx, OShift, M, SS, 1, 1);
-//              f = 1800.0;
-//
-//              break;
-                case 11 :
-                    f = Functions.hf03(x, nx, OShift, M, SS, 1, 1);
-                    break;
-
-//          case 20 :
-//              f[i] = Functions.hf04(x, nx, OShift, M, SS, 1, 1);
-//              f = 2000.0;
-//
-//              break;
-//
-//          case 21 :
-//              f[i] = Functions.hf05(x, nx, OShift, M, SS, 1, 1);
-//              f = 2100.0;
-//
-//              break;
-                case 12 :
-                    f = Functions.hf06(x, nx, OShift, M, SS, 1, 1);
-                    break;
-
-                case 13 :
-                    f = Functions.cf01(x, nx, OShift, M, 1);
-                    break;
-
-//          case 24 :
-//              f[i] = Functions.cf02(x, nx, OShift, M, 1);
-//              f = 2400.0;
-//
-//              break;
-                case 14 :
-                    f = Functions.cf03(x, nx, OShift, M, 1);
-                    break;
-
-//          case 26 :
-//              f[i] = Functions.cf04(x, nx, OShift, M, 1);
-//              f = 2600.0;
-//
-//              break;
-                case 15 :
-                    f = Functions.cf05(x, nx, OShift, M, 1);
-                    break;
-
-//          case 28 :
-//              f[i] = Functions.cf06(x, nx, OShift, M, 1);
-//              f = 2800.0;
-//
-//              break;
-//
-//          case 29 :
-//              f[i] = Functions.cf07(x, nx, OShift, M, SS, 1);
-//              f = 2900.0;
-//
-//              break;
-//
-//          case 30 :
-//              f[i] = Functions.cf08(x, nx, OShift, M, SS, 1);
-//              f = 3000.0;
-//
-//              break;
-                default :
-
-                     System.out.println("\nError: There are only 15 test functions in this test suite!");
-                    System.exit(0);
-                    // f[i] = 0.0;
-                    break;
-            }
-
-            // Apply f^*
-
-
-        return f+bias();
     }
 
     @Override
     public double bias() {
-        switch (FUN){
+        switch (FUN) {
             case 1:
+
                 return 100.0;
 
             case 2:
+
                 return 200.0;
 
             case 3:
@@ -283,9 +278,11 @@ public class CEC15Benchmark extends AllBenchmarks {
 
             case 15:
                 return 1500.0;
+
+
             default:
-                System.err.println("\nError: There are only 30 test functions in this test suite!");
-                System.exit(0);
+                System.out.println("\nError: There are only 15 test functions in this test suite!");
+
         }
         return 0;
     }

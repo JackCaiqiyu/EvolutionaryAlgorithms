@@ -58,6 +58,9 @@ public class Rand {
             if(mock_double > 1){
                 mock_double = 0;
             }
+          //  if(mock_double == 0){
+           //     mock_double = 0.1;
+          //  }
             return mock_double;
         }
 
@@ -118,8 +121,20 @@ public class Rand {
      *         with mean <tt>mu</tt> and standard deviation <tt>sigma</tt>
      */
     public double gaussian(double mu, double sigma) {
+        if(!isMock){
         return mu + sigma * gaussian();
+        }else{
+            mock_double += 0.1;
+            if(mock_double > 1){
+                mock_double = 0;
+            }
+            //  if(mock_double == 0){
+            //     mock_double = 0.1;
+            //  }
+            return mock_double;
     }
+
+}
 
 
     public double cauchyrnd(double a, double b){
