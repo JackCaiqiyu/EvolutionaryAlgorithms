@@ -16,21 +16,12 @@ public class TestUtils {
                 m[i][j] = i;
             }
         }
-        //Random rand = new Random();
 
         int [] indexs = new int[20];
-       // int pos;
-       // int aux;
         for(int i=0; i<20; i++){
             indexs[i] = (i+8)%20;
         }
 
-        /*for(int i=0; i<20; i++){
-            pos = rand.nextInt(20);
-            aux = indexs[i];
-            indexs[i] = indexs[pos];
-            indexs[pos] = aux;
-        }*/
 
         m = Util.sortByIndexs(m, indexs);
 
@@ -41,8 +32,20 @@ public class TestUtils {
 
     }
 
+    @Test
+    public void testSort(){
+        double [] a = new double[20];
+        for(int i=0; i<20; i++){
+            a[i] = (i+8)%20;
+        }
+        int [] index = new int[20];
+
+         index = Util.sort(a);
 
 
+        assertEquals(String.valueOf(0.0), String.valueOf(a[0]));
+        assertEquals( 12,index[0]);
+    }
 
 
 }

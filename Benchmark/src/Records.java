@@ -27,25 +27,36 @@ public class Records {
     private int n_column_excel;
     private HSSFWorkbook workbook;
 
+    private int n_runs;
+
     public Records(){
         workbook = new HSSFWorkbook();
 
         createWorbook("10");
         createWorbook("30");
         createWorbook("50");
+        n_runs = 25;
+    }
 
+    public Records(int n_runs){
+        workbook = new HSSFWorkbook();
+
+        createWorbook("10");
+        createWorbook("30");
+        createWorbook("50");
+        this.n_runs = n_runs;
     }
 
 
     public void startRecord(){
-        records = new double[25];
-        records1e3 = new double[25];
-        records1e4 = new double[25];
-        records1e5 = new double[25];
-        FEs = new int[25];
+        records = new double[n_runs];
+        records1e3 = new double[n_runs];
+        records1e4 = new double[n_runs];
+        records1e5 = new double[n_runs];
+        FEs = new int[n_runs];
 
 
-        for(int j=0; j<25; j++){
+        for(int j=0; j<n_runs; j++){
             records[j] = 0;
             records1e3[j] = 0;
             records1e4[j] = 0;
@@ -70,33 +81,33 @@ public class Records {
 
     private double getMean(int [] rec){
         double sum = 0;
-        for(int i=0; i<25; i++){
+        for(int i=0; i<n_runs; i++){
             sum+=rec[i];
         }
-        return sum/25;
+        return sum/n_runs;
     }
 
     private double getMean(double [] rec){
         double sum = 0;
-        for(int i=0; i<25; i++){
+        for(int i=0; i<n_runs; i++){
             sum+=rec[i];
         }
-        return sum/25;
+        return sum/n_runs;
     }
 
     protected double std(double [] rec){
         double mean = getMean(rec);
         BigDecimal sum = BigDecimal.ZERO;
-        for(int i=0; i<25; i++){
+        for(int i=0; i<n_runs; i++){
             sum = sum.add(BigDecimal.valueOf((rec[i] - mean) * (rec[i] - mean)));
         }
 
-      return Math.sqrt(sum.divide(BigDecimal.valueOf(25)).doubleValue());
+      return Math.sqrt(sum.divide(BigDecimal.valueOf(n_runs)).doubleValue());
     }
 
     private void sort(double [] rec){
-        for(int i=0; i<25; i++){
-            for(int j=i+1; j<25; j++){
+        for(int i=0; i<n_runs; i++){
+            for(int j=i+1; j<n_runs; j++){
                 if(rec[i] > rec[j]){
                     double tmp = rec[i];
                     rec[i] = rec[j];
@@ -131,7 +142,7 @@ public class Records {
 
         if(max_fes > current_fes){
             nSucess++;
-            if(nSucess > 25){
+            if(nSucess > n_runs){
                 System.err.println("Number of success can't be greater than number of runs.");
                 System.exit(0);
             }
@@ -254,7 +265,7 @@ public class Records {
                         break;
                 }
                 sort(current_record);
-                for (int i = 0; i < 25; i++) {
+                for (int i = 0; i < n_runs; i++) {
                     HSSFRow row = sheet.getRow((short) n_row);
                     n_row++;
                     row.createCell(n_column_excel).setCellValue(current_record[i]);
@@ -325,9 +336,9 @@ public class Records {
                 n_row++;
 
 
-                sheet.addMergedRegion(new CellRangeAddress(n_row - 1, n_row + 25, 0, 0));
+                sheet.addMergedRegion(new CellRangeAddress(n_row - 1, n_row + n_runs, 0, 0));
 
-                for (int i = 1; i < 25; i++) {
+                for (int i = 1; i < n_runs; i++) {
                     row = sheet.createRow((short) n_row);
                     n_row++;
                     row.createCell(1).setCellValue("Run: " + (i + 1));

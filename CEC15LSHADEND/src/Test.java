@@ -4,12 +4,23 @@
 public class Test {
     public static void main(String [] args) {
        // testVi();
-        Configuration.records = new Records();
-        for(int F=5; F<=5; F++) {
+       // CEC15Benchmark benchmark = new CEC15Benchmark(10, 8);
+       // double [] x = {1,2,3,4,5,6,7,8,9,10};
+       // System.out.println(benchmark.f(x));
+       /* Rand rand = new Rand(21341244);
+        for(int i=0; i<20; i++) {
+            System.out.println(rand.getDouble());
+        }*/
+
+
+        //System.exit(0);
+
+        Configuration.records = new Records(50);
+        for(int F=14; F<=14; F++) {
             for (int DIM = 10; DIM <= 10; DIM += 20) {
                 Configuration.benchmark = new CEC15Benchmark(DIM, F);
                 Configuration.records.startRecord();
-                for(int run =0; run<25; run++) {
+                for(int run =0; run<1; run++) {
                     Configuration.D = DIM;
                     Configuration.nF = F;
                     Configuration.max_nfes = 10000 * DIM;
@@ -18,15 +29,15 @@ public class Test {
                     //benchmark benchmark = new benchmark();
                     //test_func test_func = benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
                     //Configuration.benchmark = test_func;
-                    System.out.println("Fun: "+ F + "Run: " + run + "DIM: " + DIM);
+                   // System.out.println("Fun: "+ F + "Run: " + run + "DIM: " + DIM);
                     LSHADEND algorithm = new LSHADEND();
                     algorithm.execute();
                 }
-                Configuration.records.endRecord(F,DIM);
+              //  Configuration.records.endRecord(F,DIM);
             }
         }
 
-        Configuration.records.exportExcel("LSHADEND");
+     //   Configuration.records.exportExcel("LSHADEND");
     }
 
 

@@ -122,7 +122,7 @@ public class LSHADEND {
                 }else{
                     for(int i=0; i<cr.length; i++) {
                         do {
-                            cr[i] = mu_cr[i] + (0.1 * Math.tan(Math.PI * (Configuration.rand.getFloat() - 0.5)));
+                            cr[i] = mu_cr[i] + (0.1 * Math.tan(Math.PI * (Configuration.rand.getDouble() - 0.5)));
                         }while (cr[i] <= 0);
                         if(cr[i] > 1){
                             cr[i] = 1;
@@ -156,7 +156,9 @@ public class LSHADEND {
 
                 int [] randindex = new int[pop_size];
                 for(int i=0; i<pop_size; i++) {
-                    randindex[i] = (int)Math.ceil(Configuration.rand.getDouble() * pNP);
+                    randindex[i] = (int)Math.ceil(Configuration.rand.getDouble() * pNP) -1;
+                    if(randindex[i] < 0)
+                        randindex[i] = 0;
                 }
 
                 double [][] pbest = new double[randindex.length][];
@@ -322,7 +324,7 @@ public class LSHADEND {
             double [] valBest =  Util.sortNewArray(fitness);
             loc = indexBest[0];
             best_value = Math.abs(Configuration.benchmark.bias() - valBest[0]);
-            System.out.println("value " + best_value + " nfes: " +  nfes);
+      //      System.out.println("value " + best_value + " nfes: " +  nfes);
 
             Configuration.records.newRecord(best_value, nfes);
 
@@ -331,12 +333,12 @@ public class LSHADEND {
 
 
         }
-       // for(int i=0; i<10; i++){
+        /*for(int i=0; i<10; i++){
 
-        //    System.out.println("x" + i + ": " + pop[loc][i]);
-       // }
+            System.out.println("x" + i + ": " + pop[loc][i]);
+        }*/
         Configuration.records.endRun(best_value, nfes, Configuration.max_nfes);
-      //  System.out.println("value " + best_value + " nfes: " +  nfes);
+        System.out.println("value " + best_value + " nfes: " +  nfes);
       //  System.out.println("value " + Configuration.benchmark.f(pop[loc]));
     }
 
@@ -388,6 +390,7 @@ public class LSHADEND {
             if(sum == 0){
                 break;
             }else{
+
                 for(Integer j : pos){
                     r2[j] = (int)Math.floor(Configuration.rand.getDouble() * (NP2-1));
                 }
@@ -546,7 +549,7 @@ public class LSHADEND {
         if(iter < 2){
             PND = 1;
         }else{
-            if (r == 21){
+            if (r == 20){
                 PND = 0.01;
             }else{
                 double diff = result.get(iter-2) - result.get(iter -1);

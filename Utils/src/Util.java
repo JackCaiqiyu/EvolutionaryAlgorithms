@@ -423,7 +423,7 @@ public class Util {
 
 
         for(int i=0; i < a1.length; i++){
-            sum += a1[i] + a2[i];
+            sum += a1[i] * a2[i];
         }
 
 
@@ -618,6 +618,14 @@ public class Util {
         double [][] tmp = new double[indexs.length][];
         for(int i=0; i<indexs.length; i++){
             tmp[i] = Util.copyArray(m[indexs[i]]);
+        }
+        return tmp;
+    }
+
+    public static int [] sortByIndexs(int [] a, int [] indexs){
+        int [] tmp = Util.copyArray(a);
+        for(int i=0; i<indexs.length; i++){
+            tmp[i] = a[indexs[i]];
         }
         return tmp;
     }

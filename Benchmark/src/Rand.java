@@ -50,9 +50,24 @@ public class Rand {
 
     }
 
+    private double Beta(int a, int b){
+        double x = Gamma1(a);
+        double y = Gamma1(b);
+        return x/(x+y);
+    }
+
+    private double Gamma1(int n){
+        double sum = 0;
+        for (int i = 0; i < n; i++){
+            sum += -Math.log(random.nextDouble());
+        }
+        return sum;
+    }
+
     public double getDouble(){
         if(isMock == false) {
             return random.nextDouble();
+            //return Beta(111111, 22222);
         }else{
             mock_double += 0.1;
             if(mock_double > 1){
@@ -76,6 +91,10 @@ public class Rand {
      */
     public double uniform() {
         return random.nextDouble();
+    }
+
+    public double randn() {
+        return random.nextGaussian();
     }
 
     /**
@@ -156,18 +175,34 @@ public class Rand {
 
     public int [] randperm(int n){
         int [] rand = new int[n];
-        int pos;
-        int aux;
-        for(int i=0; i<n; i++){
-            rand[i] = i;
+        if(!isMock) {
+            int pos;
+            int aux;
+            for (int i = 0; i < n; i++) {
+                rand[i] = i;
+            }
+
+            for (int i = 0; i < n; i++) {
+                pos = getInt(0, n - 1);
+                aux = rand[i];
+                rand[i] = rand[pos];
+                rand[pos] = aux;
+            }
+        }else{
+            int pos;
+            int aux;
+            for (int i = 0; i < n; i++) {
+                rand[i] = i;
+            }
+
+            for (int i = 0; i < n; i++) {
+                pos = (int)Math.round(getDouble() * (n-1));
+                aux = rand[i];
+                rand[i] = rand[pos];
+                rand[pos] = aux;
+            }
         }
 
-        for(int i=0; i<n; i++){
-            pos = getInt(0, n-1);
-            aux = rand[i];
-            rand[i] = rand[pos];
-            rand[pos] = aux;
-        }
         return rand;
     }
 
