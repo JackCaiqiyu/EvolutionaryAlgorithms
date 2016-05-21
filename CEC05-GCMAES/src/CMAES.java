@@ -1,3 +1,12 @@
+import com.benchmark.AllBenchmarks;
+import com.benchmark.Rand;
+import com.benchmark.Records;
+import com.benchmark.cec.cec05.CEC05Benchmark;
+import com.benchmark.cec.cec13.CEC13Benchmark;
+import com.benchmark.cec.cec14.CEC14Benchmark;
+import com.benchmark.cec.cec15.CEC15Benchmark;
+import com.benchmark.seeds;
+
 /** The very well-known Rosenbrock objective function to be minimized.
  */
 /*class fitfun implements IObjectiveFunction { // meaning implements methods valueOf and isFeasible
@@ -23,38 +32,97 @@ public class CMAES {
 	public static int last_eval;
 	public static double last_fitness;
 	public static int max_values;
-	 public static Records records;
-	 public static AllBenchmarks benchmarks;
+	public static Records records;
+	public static AllBenchmarks benchmarks;
+	public static boolean debug = false;
+	public static int runs;
 
 	public static void main(String[] args) {
-		int DIM = 10;
-		records = new Records();
-		for(int F = 25; F <= 25; F++) {
-			benchmarks = new CEC05Benchmark(DIM, F);
-			double stop_fitness = 10e-8;
-			double best_fmin = Util.inf;
-			records.startRecord();
-			for (int run = 0; run < 25; run++) {
-				int pop_size = 4 + (int) Math.floor(3 * Math.log(DIM));
-				double fmin = Util.inf;
-				max_values = 10000 * DIM;
-				while ((max_values > pop_size) && (fmin - benchmarks.bias() > stop_fitness)) {
-					CMAES(DIM, F, pop_size);
-					max_values -= last_eval;
-					fmin = last_fitness;
-					pop_size *= 2;
-					if (fmin < best_fmin) {
-						best_fmin = fmin;
-					}
-				}
-				records.endRun(fmin - benchmarks.bias(), last_eval, max_values);
-			}
-			//records.write(DIM, F, "G-CMAES", false);
-			records.endRecord(F, DIM);
-			System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
+		runs = 25;
+		benchmark("CEC05");
+		//benchmark("CEC13");
+		//benchmark("CEC14");
+		//benchmark("CEC15");
+	}
+
+
+
+	public static void benchmark(String name){
+		//int DIM = 10;
+		int nProblems = 0;
+		records = new Records(runs);
+
+		switch (name){
+			case "CEC05":
+				nProblems = CEC05Benchmark.nProblems();
+				break;
+			case "CEC13":
+				nProblems = CEC13Benchmark.nProblems();
+				break;
+			case "CEC14":
+				nProblems = CEC14Benchmark.nProblems();
+				break;
+			case "CEC15":
+				nProblems = CEC15Benchmark.nProblems();
+				break;
+			default:
+				System.err.println("No benchmark avaiable.");
+				System.exit(0);
+				break;
 		}
 
-		records.exportExcel("G-CMAES");
+		for(int F = 1; F <= nProblems; F++) {
+			for(int DIM = 10; DIM <= 50; DIM += 20) {
+				//records.createWorbook(String dim)
+				switch (name) {
+					case "CEC05":
+						benchmarks = new CEC05Benchmark(DIM, F);
+						nProblems = CEC05Benchmark.nProblems();
+						break;
+					case "CEC13":
+						benchmarks = new CEC13Benchmark(DIM, F);
+						nProblems = CEC13Benchmark.nProblems();
+						break;
+					case "CEC14":
+						benchmarks = new CEC14Benchmark(DIM, F);
+						nProblems = CEC14Benchmark.nProblems();
+						break;
+					case "CEC15":
+						benchmarks = new CEC15Benchmark(DIM, F);
+						nProblems = CEC15Benchmark.nProblems();
+						break;
+					default:
+						System.err.println("No benchmark avaiable.");
+						System.exit(0);
+						break;
+				}
+
+				double stop_fitness = 10e-8;
+				double best_fmin = Util.inf;
+				records.startRecord();
+				System.out.println("F: " + F + ", DIM: " + DIM);
+				for (int run = 0; run < runs; run++) {
+					int pop_size = 4 + (int) Math.floor(3 * Math.log(DIM));
+					double fmin = Util.inf;
+					max_values = 10000 * DIM;
+					while ((max_values > pop_size) && (fmin - benchmarks.bias() > stop_fitness)) {
+						CMAES(DIM, F, pop_size);
+						max_values -= last_eval;
+						fmin = last_fitness;
+						pop_size *= 2;
+						if (fmin < best_fmin) {
+							best_fmin = fmin;
+						}
+					}
+					records.endRun(fmin - benchmarks.bias(), last_eval, max_values);
+				}
+				//records.write(DIM, F, "G-CMAES", false);
+				records.endRecord(F, DIM);
+				System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
+			}
+		}
+
+		records.exportExcel("G-CMAES" + "-" + name);
 
 	}
 
@@ -111,7 +179,7 @@ public class CMAES {
 
 			cma.updateDistribution(fitness);         // pass fitness array to update search distribution
 			//bestValue = cma.getBestFunctionValue();
-			System.out.println("VALUE: " + (cma.bestever_fit - benchmarks.bias()) + " at: " + cma.getCountEval());
+			//System.out.println("VALUE: " + cma.bestever_fit + " at: " + cma.getCountEval());
 			records.newRecord((cma.bestever_fit - benchmarks.bias()), (int)cma.getCountEval());
 			// --- end core iteration step ---
 
@@ -126,18 +194,18 @@ public class CMAES {
 		// evaluate mean value as it is the best estimator for the optimum
 		cma.setFitnessOfMeanX(benchmarks.f(cma.getMeanX())); // updates the best ever solution
 
-		// final output
-		cma.writeToDefaultFiles(1);
-		cma.println();
-		cma.println("Terminated due to");
-		for (String s : cma.stopConditions.getMessages())
-			cma.println("  " + s);
-		cma.println("best function value " + cma.getBestFunctionValue()
-				+ " at evaluation " + cma.getBestEvaluationNumber());
+//		// final output
+//		//cma.writeToDefaultFiles(1);
+//		//cma.println();
+//		cma.println("Terminated due to");
+//		for (String s : cma.stopConditions.getMessages())
+//			cma.println("  " + s);
+//		cma.println("best function value " + cma.getBestFunctionValue()
+//				+ " at evaluation " + cma.getBestEvaluationNumber());
 
-	//	System.out.println(benchmarks.lbound()+ ", " +benchmarks.ubound());
-	//	System.out.println(Util.arrayToList(cma.bestever_x));
-	//	System.out.println(benchmarks.f(cma.bestever_x) - benchmarks.bias());
+		//	System.out.println(benchmarks.lbound()+ ", " +benchmarks.ubound());
+		//	System.out.println(Util.arrayToList(cma.bestever_x));
+		//	System.out.println(benchmarks.f(cma.bestever_x) - benchmarks.bias());
 		// we might return cma.getBestSolution() or cma.getBestX()
 
 		last_eval = (int)cma.getCountEval();

@@ -1,3 +1,7 @@
+import com.benchmark.AllBenchmarks;
+import com.benchmark.Rand;
+import com.benchmark.Records;
+
 /**
  * Created by framg on 09/04/2016.
  */

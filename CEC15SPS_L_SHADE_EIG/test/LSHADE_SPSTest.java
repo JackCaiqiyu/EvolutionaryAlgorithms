@@ -1,3 +1,8 @@
+import com.benchmark.Rand;
+import com.benchmark.Records;
+import com.benchmark.cec.cec15.CEC15Benchmark;
+import com.benchmark.seeds;
+
 /**
  * Created by framg on 08/05/2016.
  */
@@ -20,11 +25,12 @@ public class LSHADE_SPSTest {
                 Configuration.CR = 0.5;
                 Configuration.EarlyStop = "fitness";
                 Configuration.ConstraintHandling = "Interpolation";
+
                 Rand rand = new Rand(seeds.getSeed(Configuration.nF));
                 Configuration.rand = rand;
-                // benchmark benchmark = new benchmark();
-                // test_func test_func = benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
-                // Configuration.benchmark = test_func;
+                // com.benchmark.cec.cec05.benchmark com.benchmark.cec.cec05.benchmark = new com.benchmark.cec.cec05.benchmark();
+                // com.benchmark.cec.cec05.test_func com.benchmark.cec.cec05.test_func = com.benchmark.cec.cec05.benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
+                // Configuration.com.benchmark.cec.cec05.benchmark = com.benchmark.cec.cec05.test_func;
                 System.out.println("Fun: "+ F + "Run: " + run + "DIM: " + DIM);
                 LSHADE_SPS algorithm = new LSHADE_SPS();
                 algorithm.execute();

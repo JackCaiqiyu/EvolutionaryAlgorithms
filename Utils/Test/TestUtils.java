@@ -40,7 +40,7 @@ public class TestUtils {
         }
         int [] index = new int[20];
 
-         index = Util.sort(a);
+        index = Util.sort(a);
 
 
         assertEquals(String.valueOf(0.0), String.valueOf(a[0]));

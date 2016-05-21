@@ -25,6 +25,7 @@ public class LSHADEND {
     int loc;
     int pop_size;
     double best_value;
+    double Ter_Err = 10e-8;
 
     public LSHADEND(){
         result = new ArrayList<>();
@@ -49,7 +50,7 @@ public class LSHADEND {
         for(int i=0; i<pop_size; i++){
             fitness[i] = Configuration.benchmark.f(pop[i]);
         }
-     //   assert (Configuration.benchmark.f(pop[0]) != fitness[0]);
+     //   assert (Configuration.com.benchmark.cec.cec05.benchmark.f(pop[0]) != fitness[0]);
         double [] valBest =  Util.sortNewArray(fitness);
         best_value = Math.abs(Configuration.benchmark.bias() - valBest[0]);
         nfes = pop_size;
@@ -84,7 +85,7 @@ public class LSHADEND {
         mu_cr = new double[pop_size];
         mu_sf = new double[pop_size];
         //while ( Configuration.max_nfes > nfes){
-        while (best_value > Bounds.Ter_Err && Configuration.max_nfes > nfes){
+        while (best_value > Ter_Err && Configuration.max_nfes > nfes){
 
             if(Configuration.rand.getDouble() < PND && nfes <ND_fes ){
                 popold = ND(loc, popold, fitness);
@@ -339,7 +340,7 @@ public class LSHADEND {
         }*/
         Configuration.records.endRun(best_value, nfes, Configuration.max_nfes);
         System.out.println("value " + best_value + " nfes: " +  nfes);
-      //  System.out.println("value " + Configuration.benchmark.f(pop[loc]));
+      //  System.out.println("value " + Configuration.com.benchmark.cec.cec05.benchmark.f(pop[loc]));
     }
 
     private int [][] gnR1R2(int NP1, int NP2, int [] r0){

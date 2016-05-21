@@ -1,22 +1,52 @@
+import com.benchmark.Rand;
+import com.benchmark.cec.cec05.Bounds;
+
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class LSHADE_SPS {
     int counteval, maxfunevals, NP, usefunevals, D, H, countstagnation, NPinit, NPmin, iChy, countiter, iM, nA, Q, Asize, iSP, TolStagnationIteration;
-    boolean interpolation, EarlyStopOnFitness, AutoEarlyStop, EarlyStopOnTolFun;
+    boolean interpolation, EarlyStopOnFitness, AutoEarlyStop, EarlyStopOnTolFun, noiseHandling;
     double ftarget, ub, lb,  p, TolFun;
 
-    float Ar;
-
+    double erw, crw, Ar, CRmin, CRmax;
     double [] fx, MCR, F, MF, Chy, FC,  CR, S_CR, S_F, S_df, fSP;
     double [][] X, V, XA, SP, SPA, U, A;
+    double [] ER, MER, S_ER; //EIG version
+    double [][] C;//EIG version
+    double cw, cwinit; //EIG version
     int [] pbest, sortidxfSP;
     //test_func test_func;
 
     public LSHADE_SPS(){
+        maxfunevals = Configuration.maxfunevals;
+        ub = Configuration.benchmark.ubound();
+        lb = Configuration.benchmark.lbound();
+
         NP = Configuration.NP;
         D = Configuration.D;
-        H = 6;
+        H = Configuration.H;
+        erw=Configuration.erw;
+        crw = Configuration.crw;
+        cw = Configuration.cw;
+        cwinit = Configuration.cwinit;
+        Ar = Configuration.Ar;
+        p = Configuration.p;
+        NPmin = Configuration.NPmin;
+        Q = Configuration.Q;
+        CRmin = Configuration.CRmin;
+        CRmax = Configuration.CRmax;
+        ftarget = Configuration.benchmark.bias();
+        noiseHandling = Configuration.noise;
+//        NP = Configuration.NP;
+//        D = Configuration.D;
+//        H = Configuration.H;
+//        erw = Configuration.erw;
+//        crw = Configuration.crw;
+//        cw = Configuration.cw;
+//        cwinit = Configuration.cwinit;
 
         SP = new double[NP][D];
         fSP = new double[NP];
@@ -34,30 +64,127 @@ public class LSHADE_SPS {
         S_F = new double[NP];
         S_df = new double[NP];
 
+        S_ER = new double[NP];
+        C = new double[NP][];
+        ER = new double[NP];
+        MER = new double[H];
         initialize();
     }
 
 
 
     private void initialize() {
-        maxfunevals = Configuration.maxfunevals;
-        ub = Configuration.benchmark.ubound(); //Bounds.getUpperBound(Configuration.nF);
-        lb = Configuration.benchmark.lbound(); //Bounds.getLowerBound(Configuration.nF);
-
-
-        Util.assignArray(CR, Configuration.CR);
-        Util.assignArray(F, 0.5);
-
-        Ar = 2.6f;
-        p = 0.11;
-        NPmin = 4;
-        Q = 64;
-
-        ftarget = Util.ninf;
-        TolFun = 0;
+//        Util.assignArray(MER, Configuration.ER);
+//        Util.assignArray(S_ER, 0);
+//        Util.assignArray(CR, Configuration.CR);
+//        Util.assignArray(F, 0.5);
+//
+//        Ar = 2.6f;
+//        p = 0.11;
+//        NPmin = 4;
+//        Q = 64;
+//
+//        ftarget = Util.ninf;
+//        TolFun = 0;
+//        TolStagnationIteration = Util.iinf;
+//        usefunevals = Util.iinf;
+//
+//        NPinit = NP;
+//
+//        if (Configuration.ConstraintHandling.equals("Interpolation")) {
+//            interpolation = true;
+//        } else {
+//            interpolation = false;
+//        }
+//
+//
+//        if (Configuration.EarlyStop.equals("fitness")) {
+//            EarlyStopOnFitness = true;
+//            AutoEarlyStop = false;
+//            EarlyStopOnTolFun = false;
+//        }else if (Configuration.EarlyStop.equals("'auto'")) {
+//            EarlyStopOnFitness = false;
+//            AutoEarlyStop = true;
+//            EarlyStopOnTolFun = false;
+//        }else if (Configuration.EarlyStop.equals("TolFun")) {
+//            EarlyStopOnFitness = false;
+//            AutoEarlyStop = false;
+//            EarlyStopOnTolFun = true;
+//        }else {
+//            EarlyStopOnFitness = false;
+//            AutoEarlyStop = false;
+//            EarlyStopOnTolFun = false;
+//        }
+//
+//        counteval = 0;
+//        countiter = 1;
+//        countstagnation = 0;
+//
+//
+//
+//        for(int i=0; i<NP; i++) {
+//            for (int j = 0; j < D; j++) {
+//                X[i][j]=lb + (ub - lb) * Configuration.rand.getDouble();
+//            }
+//        }
+//
+//
+//        for(int i=0; i<NP; i++){
+//            fx[i] = Configuration.benchmark.f(X[i]);
+//        }
+//        counteval = counteval + NP;
+//
+//
+//        Asize = Math.round(Ar * NP);
+//        A = new double[Asize][D];
+//        for(int i=0; i<Asize; i++){
+//            for (int j = 0 ; j< D; j++) {
+//                A[i][j]=lb + (ub - lb) * Configuration.rand.getDouble();
+//            }
+//        }
+//
+//        nA = 0;
+//
+//        //SORT POPULATION
+//        for(int i=0; i < NP; i++){
+//            for(int j=i+1; j<NP; j++){
+//                if(fx[i] > fx[j]){
+//                    double tmp = fx[i];
+//                    fx[i] = fx[j];
+//                    fx[j] = tmp;
+//
+//                    double [] tmpa = Util.copyArray(X[i]);
+//                    X[j] = Util.copyArray(X[j]);
+//                    X[i] = Util.copyArray(tmpa);
+//
+//                }
+//            }
+//        }
+//        // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+//        Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
+//        Util.assignArray(MF, F);
+//        Util.assignArray(MCR, CR);
+//        iM = 0;
+//        Util.assignArray(FC, 0);
+//        SP = Util.copyMatrix(X);
+//        fSP = Util.copyArray(fx);
+//
+//
+//        iSP = 0;
+//
+//        V = Util.copyMatrix(X);
+//        U = Util.copyMatrix(X);
+//        Util.assignArray(S_CR, 0);
+//        Util.assignArray(S_F, 0);
+//        Util.assignArray(S_df, 0);
+//
+//        Chy = Configuration.rand.cauchyrnd(NP+10, 0, 0.1);
+//        iChy = 0;
+//        sortidxfSP = Util.sortOnlyIndexs(fSP);
+//
+//        C = Matlab.cov(X);
         TolStagnationIteration = Util.iinf;
         usefunevals = Util.iinf;
-
         NPinit = NP;
 
         if (Configuration.ConstraintHandling.equals("Interpolation")) {
@@ -66,34 +193,39 @@ public class LSHADE_SPS {
             interpolation = false;
         }
 
-
         if (Configuration.EarlyStop.equals("fitness")) {
             EarlyStopOnFitness = true;
             AutoEarlyStop = false;
-            EarlyStopOnTolFun = false;
-        }else if (Configuration.EarlyStop.equals("'auto'")) {
+        }else if (Configuration.EarlyStop.equals("auto")) {
             EarlyStopOnFitness = false;
             AutoEarlyStop = true;
-            EarlyStopOnTolFun = false;
-        }else if (Configuration.EarlyStop.equals("TolFun")) {
-            EarlyStopOnFitness = false;
-            AutoEarlyStop = false;
-            EarlyStopOnTolFun = true;
         }else {
             EarlyStopOnFitness = false;
             AutoEarlyStop = false;
-            EarlyStopOnTolFun = false;
         }
+
+        int startX = 0;
+        if(Configuration.Xinitial != null){
+            X = new double[Configuration.Xinitial.length][D];
+            for(int i=0; i<Configuration.Xinitial.length; i++){
+                X[i] = Util.copyArray(Configuration.Xinitial[i]);
+            }
+            startX = Configuration.Xinitial.length;
+            NP = startX;
+        }
+
+
 
         counteval = 0;
         countiter = 1;
         countstagnation = 0;
 
-
-
-        for(int i=0; i<NP; i++) {
-            for (int j = 0; j < D; j++) {
-                X[i][j]=lb + (ub - lb) * Configuration.rand.getFloat();
+        if(Configuration.Xinitial == null) {
+            X = new double[NP][D];
+            for (int i = startX; i < NP; i++) {
+                for (int j = 0; j < D; j++) {
+                    X[i][j] = lb + (ub - lb) * Configuration.rand.getDouble();
+                }
             }
         }
 
@@ -104,18 +236,18 @@ public class LSHADE_SPS {
         counteval = counteval + NP;
 
 
-        Asize = Math.round(Ar * NP);
+        Asize = (int)Math.round(Ar * (double)NP);
         A = new double[Asize][D];
         for(int i=0; i<Asize; i++){
             for (int j = 0 ; j< D; j++) {
-                A[i][j]=lb + (ub - lb) * Configuration.rand.getFloat();
+                A[i][j]=lb + (ub - lb) * Configuration.rand.getDouble();
             }
         }
 
         nA = 0;
 
         //SORT POPULATION
-        for(int i=0; i < NP; i++){
+        /*for(int i=0; i < NP; i++){
             for(int j=i+1; j<NP; j++){
                 if(fx[i] > fx[j]){
                     double tmp = fx[i];
@@ -128,13 +260,28 @@ public class LSHADE_SPS {
 
                 }
             }
-        }
-       // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
+        }*/
+
+        int []fidx = Util.sort(fx);
+        X = Util.sortByIndexs(X, fidx);
         Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
-        Util.assignArray(MF, F);
-        Util.assignArray(MCR, CR);
+
+        Util.assignArray(MF, Configuration.F);
+        Util.assignArray(MCR, Configuration.CR);
+        Util.assignArray(MER, Configuration.ER);
         iM = 0;
         Util.assignArray(FC, 0);
+
+
+        Util.assignArray(CR, 0);
+        Util.assignArray(F, 0);
+
+        Util.assignArray(S_ER, 0);
+
+        C = Matlab.cov(X);
+
+
+
         SP = Util.copyMatrix(X);
         fSP = Util.copyArray(fx);
 
@@ -146,8 +293,9 @@ public class LSHADE_SPS {
         Util.assignArray(S_CR, 0);
         Util.assignArray(S_F, 0);
         Util.assignArray(S_df, 0);
+        Util.assignArray(S_ER, 0);
 
-        Chy = Configuration.rand.cauchyrnd(NP+10, 0, 0.1);
+        Chy = Configuration.rand.cauchyrnd((NP+10) * (NP+10), 0, Configuration.fw);
         iChy = 0;
         sortidxfSP = Util.sortOnlyIndexs(fSP);
 
@@ -156,10 +304,8 @@ public class LSHADE_SPS {
 
 
 
-    public void execute(){
-        while(counteval < Configuration.maxfunevals && Math.abs(Configuration.benchmark.bias() - fx[0]) > Bounds.Ter_Err) {
-        //while(counteval < Configuration.maxfunevals && fx[0] - bias.getBias(Configuration.nF) > Bounds.Ter_Err) {
-         //   System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
+    public double execute(){
+        while(true) {
             boolean outofmaxfunevals = counteval > maxfunevals - NP;
             boolean outofusefunevals = counteval > usefunevals - NP;
 
@@ -193,99 +339,249 @@ public class LSHADE_SPS {
                 if (outofmaxfunevals || outofusefunevals || functionvalueconvergence)
                     break;
             }
+//if(countiter == 16){
+//    System.out.println("Debug");
+//}
 
-            countiter = countiter + 1;
+            countiter++;
             int [] r = new int[NP];
             for(int i=0; i<NP; i++)
-                r[i] = (int) Math.floor((H-1) * Configuration.rand.getFloat());
+                r[i] = (int) Math.floor((H-1) * Configuration.rand.getDouble());
 
-            for (int i = 0; i < NP; i++) {
-                CR[i] = MCR[r[i]] + (0.1 * Configuration.rand.uniform());
-                if (CR[i] < 0 || MCR[r[i]] == -1)
-                    CR[i] = 0;
-                if (CR[i] > 1)
-                    CR[i] = 1;
-
+            ER = new double[NP];
+            for(int i=0; i<NP; i++){
+                ER[i] = MER[r[i]] + erw * Configuration.rand.gaussian();
+                if(ER[i] < 0){
+                    ER[i] = 0;
+                }
+                if(ER[i] >1){
+                    ER[i] = 1;
+                }
             }
 
-            Util.assignArray(F, 0);
+            F = new double[NP];
             for (int i = 0; i < NP; i++) {
-                while (F[i] <= 0) {
+                do {
                     F[i] = MF[r[i]] + Chy[iChy];
                     iChy = (iChy + 1) % Chy.length;
-                }
+                }while (F[i] <= 0);
                 if (F[i] > 1) {
                     F[i] = 1;
                 }
             }
 
+            CR = new double[NP];
+            for (int i = 0; i < NP; i++) {
+                CR[i] = MCR[r[i]] + (crw * Configuration.rand.gaussian());
+                if (CR[i] < CRmin)
+                    CR[i] = CRmin;
+                if (CR[i] > CRmax)
+                    CR[i] = CRmax;
+
+            }
+
+            pbest = new int[NP];
             for (int i = 0; i < NP; i++)
-                pbest[i] = (int) Math.floor(Math.max(2, Math.round(p * NP)) * Configuration.rand.getFloat());
+                pbest[i] = (int) Math.floor(Math.max(2, Math.round(p * (double)NP)) * Configuration.rand.getDouble());
 
             XA = Util.add(X, A);
             SPA = Util.add(SP, A);
+            int [] r1 = new int[NP];
+            int [] r2 = new int[NP];
+
 
             for (int i = 0; i < NP; i++) {
-                int r1 = (int) Math.floor((NP - 1) * Configuration.rand.getFloat());
-                while (i == r1)
-                    r1 = (int) Math.floor((NP - 1) * Configuration.rand.getFloat());
+                r1[i] = i;
+                while (i == r1[i])
+                    r1[i] = (int) Math.floor((NP - 1) * Configuration.rand.getDouble());
 
-                int r2 = (int) Math.floor((NP + nA - 1) * Configuration.rand.getFloat());
-                while (i == r1 || r1 == r2) {
-                    r2 = (int) Math.floor((NP + nA - 1) * Configuration.rand.getFloat());
-                }
-
-                if (FC[i] <= Q) {
-                    for (int j = 0; j < D; j++)
-                        V[i][j] = X[i][j] + F[i] * (X[pbest[i]][j] - X[i][j]) + F[i] * (X[r1][j] - XA[r2][j]);
-                } else {
-                    for (int j = 0; j < D; j++)
-                        V[i][j] = SP[i][j] + F[i] * (SP[sortidxfSP[pbest[i]]][j] - SP[i][j]) + F[i] * (SP[r1][j] - SPA[r2][j]);
+                r2[i] = i;
+                while (i == r2[i] || r1[i] == r2[i]) {
+                    r2[i] = (int) Math.floor((NP + nA - 1) * Configuration.rand.getDouble());
                 }
             }
 
+            for (int i = 0; i < NP; i++) {
+                if (FC[i] <= Q) {
+                    for (int j = 0; j < D; j++)
+                        V[i][j] = X[i][j] + F[i] * (X[pbest[i]][j] - X[i][j]) + F[i] * (X[r1[i]][j] - XA[r2[i]][j]);
+                } else {
+                    for (int j = 0; j < D; j++)
+                        V[i][j] = SP[i][j] + F[i] * (SP[sortidxfSP[pbest[i]]][j] - SP[i][j]) + F[i] * (SP[r1[i]][j] - SPA[r2[i]][j]);
+                }
+            }
+
+
+            C = Matrix.add(Matrix.multiplies(C, 1 -cw), Matrix.multiplies(Matlab.cov(X), cw));
+            double [][] B = Matlab.eigV(C);
+//            double [][] B = new double[D][D];
+//            for(int i=0; i<D; i++){
+//                for(int j=0; j<D; j++){
+//                    B[i][j] = C[i][j] / 2;
+//                }
+//            }
+            double [][] XT = Util.copyMatrix(X);
+            double [][] VT = Util.copyMatrix(V);
+            double [][] UT = Util.copyMatrix(U);
+            double [][] SPT = Util.copyMatrix(SP);
+
+
+
+//            for (int i = 0; i < NP; i++) {
+//                int jrand = (int) Math.floor((D - 1) * Configuration.rand.getDouble());
+//
+//                if (FC[i] <= Q) {
+//                    for (int j = 0; j < D; j++) {
+//                        if (Configuration.rand.getDouble() < CR[i] || j == jrand) {
+//                            U[i][j] = V[i][j];
+//                        } else {
+//                            U[i][j] = X[i][j];
+//                        }
+//                    }
+//                } else {
+//
+//                    for (int j = 0; j > D; j++) {
+//                        if (Configuration.rand.getDouble() < CR[i] || j == jrand) {
+//                            U[i][j] = V[i][j];
+//                        } else {
+//                            U[i][j] = SP[i][j];
+//                        }
+//                    }
+//                }
+//            }
+            for (int i = 0; i < NP; i++) {
+                int jrand = (int) Math.floor((D - 1) * Configuration.rand.getDouble());
+
+//                if(i == 71){
+//                    System.out.print("DEBUG");
+//                }
+
+                if (FC[i] <= Q) {
+
+
+
+
+                    if(Configuration.rand.getDouble() < ER[i]) {
+                        XT[i] = Util.copyArray(Matrix.multiplies(B, X[i]));
+                        VT[i] = Util.copyArray(Matrix.multiplies(B, V[i]));
+                        for (int j = 0; j < D; j++) {
+                            if (Configuration.rand.getDouble() < CR[i] || j == jrand) {
+                                UT[i][j] = VT[i][j];
+                            } else {
+                                UT[i][j] = XT[i][j];
+                            }
+                        }
+                        U[i] = Matrix.multiplies(B, UT[i]);
+                    }else{
+                        for(int j=0; j<D; j++){
+                            if(Configuration.rand.getDouble() < CR[i] || j==jrand){
+                                U[i][j] = V[i][j];
+                            }else{
+                                U[i][j] = X[i][j];
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
+
+                } else {
+
+
+                    if(Configuration.rand.getDouble() < ER[i]){
+                        XT[i] = Util.copyArray(Matrix.multiplies(B, X[i]));
+                        VT[i] = Util.copyArray(Matrix.multiplies(B, V[i]));
+                        SPT[i] = Util.copyArray(Matrix.multiplies(B, SP[i]));
+                        for(int j=0; j<D; j++){
+                            if(Configuration.rand.getDouble() < CR[i] || j == jrand){
+                                UT[i][j] = VT[i][j];
+                            }else{
+                                UT[i][j] = SPT[i][j];
+                            }
+                        }
+                        U[i] = Util.copyArray(Matrix.multiplies(B, UT[i]));
+                    }else {
+                        for (int j = 0; j > D; j++) {
+                            if (Configuration.rand.getDouble() < CR[i] || j == jrand) {
+                                U[i][j] = V[i][j];
+                            } else {
+                                U[i][j] = SP[i][j];
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+//            for (int i = 0; i < NP; i++) {
+//                int jrand = (int) Math.floor((D - 1) * Configuration.rand.getDouble());
+//
+//                if (FC[i] <= Q) {
+//                    for (int j = 0; j < D; j++) {
+//                        if (Configuration.rand.getDouble() < CR[i] || j == jrand) {
+//                            U[i][j] = V[i][j];
+//                        } else {
+//                            U[i][j] = X[i][j];
+//                        }
+//                    }
+//                } else {
+//
+//                    for (int j = 0; j > D; j++) {
+//                        if (Configuration.rand.getDouble() < CR[i] || j == jrand) {
+//                            U[i][j] = V[i][j];
+//                        } else {
+//                            U[i][j] = SP[i][j];
+//                        }
+//                    }
+//                }
+//            }
+
+//            if (interpolation) {
+//                for (int i = 0; i < NP; i++) {
+//                    for (int j = 0; j < D; j++) {
+//                        if (V[i][j] < lb) {
+//                            if (FC[i] <= Q) {
+//                                V[i][j] = 0.5 * (lb + X[i][j]);
+//                            } else {
+//                                V[i][j] = 0.5 * (lb + SP[i][j]);
+//                            }
+//                        } else if (V[i][j] > ub) {
+//                            if (FC[i] <= Q) {
+//                                V[i][j] = 0.5 * (ub + X[i][j]);
+//                            } else {
+//                                V[i][j] = 0.5 * (ub + SP[i][j]);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
             if (interpolation) {
                 for (int i = 0; i < NP; i++) {
-                    for (int j = 0; j < D; j++) {
-                        if (V[i][j] < lb) {
-                            if (FC[i] <= Q) {
-                                V[i][j] = 0.5 * (lb + X[i][j]);
-                            } else {
-                                V[i][j] = 0.5 * (lb + SP[i][j]);
+                    if (FC[i] <= Q) {
+                        for (int j = 0; j < D; j++) {
+                            if( U[i][j] < lb) {
+                                U[i][j] = 0.5 * (lb + X[i][j]);
+                            }else if (U[i][j] > ub) {
+                                U[i][j] = 0.5 * (ub + X[i][j]);
                             }
-                        } else if (V[i][j] > ub) {
-                            if (FC[i] <= Q) {
-                                V[i][j] = 0.5 * (ub + X[i][j]);
-                            } else {
-                                V[i][j] = 0.5 * (ub + SP[i][j]);
+                        }
+                    }else{
+                        for (int j = 0; j < D; j++) {
+                            if( U[i][j] < lb) {
+                                U[i][j] = 0.5 * (lb + SP[i][j]);
+                            }else if (U[i][j] > ub) {
+                                U[i][j] = 0.5 * (ub + SP[i][j]);
                             }
                         }
                     }
                 }
             }
 
-            for (int i = 0; i < NP; i++) {
-                int jrand = (int) Math.floor((D - 1) * Configuration.rand.getFloat());
-
-                if (FC[i] <= Q) {
-                    for (int j = 0; j < D; j++) {
-                        if (Configuration.rand.getFloat() < CR[i] || j == jrand) {
-                            U[i][j] = V[i][j];
-                        } else {
-                            U[i][j] = X[i][j];
-                        }
-                    }
-                } else {
-
-                    for (int j = 0; j > D; j++) {
-                        if (Configuration.rand.getFloat() < CR[i] || j == jrand) {
-                            U[i][j] = V[i][j];
-                        } else {
-                            U[i][j] = SP[i][j];
-                        }
-                    }
-                }
-            }
 
             double[] fu = new double[NP];
             for(int i=0; i<NP; i++){
@@ -298,10 +594,11 @@ public class LSHADE_SPS {
             int nS = 0;
             for (int i = 0; i < NP; i++) {
                 if (fu[i] < fx[i]) {
-                    nS = nS + 1;
                     S_CR[nS] = CR[i];
                     S_F[nS] = F[i];
+                    S_ER[nS] = ER[i];
                     S_df[nS] = Math.abs(fu[i] - fx[i]);
+                    nS = nS + 1;
                     for (int j = 0; j < D; j++) {
                         X[i][j] = U[i][j];
                     }
@@ -313,7 +610,7 @@ public class LSHADE_SPS {
                         }
                         nA = nA + 1;
                     } else {
-                        int ri = (int) Math.floor(Asize * Configuration.rand.getFloat());
+                        int ri = (int) Math.floor((Asize-1) * Configuration.rand.getDouble());
                         for (int j = 0; j < A[0].length; j++) {
                             A[ri][j] = X[i][j];
                         }
@@ -324,12 +621,7 @@ public class LSHADE_SPS {
                     SP[iSP] = Util.copyArray(U[i]);
                     fSP[iSP] = fu[i];
                     iSP = (iSP + 1) % NP;
-                } else if (fu[i] == fx[i]) {
-                    for (int j = 0; j < D; j++) {
-                        X[i][j] = U[i][j];
-                    }
 
-                    FC[i] = FC[i] + 1;
                 } else {
                     FC[i] = FC[i] + 1;
                 }
@@ -337,46 +629,33 @@ public class LSHADE_SPS {
 
             if (nS > 0) {
                 double[] w = Util.divides(Util.range(S_df, 0, nS), Util.summatory(Util.range(S_df, 0, nS)));
-
-                if (all(Util.range(S_CR, 0, nS))) {
-                    MCR[iM] = -1;
-                } else if (MCR[iM] != -1) {
-                    MCR[iM] = Util.summatory(Util.multiplies(Util.multiplies(w, Util.range(S_CR, 0, nS)), Util.range(S_CR, 0, nS))) / Util.summatory(Util.multiplies(w, Util.range(S_CR, 0, nS)));
-                }
-                MF[iM] = Util.summatory(Util.multiplies(Util.multiplies(w, Util.range(S_F, 0, nS)), Util.range(S_F, 0, nS))) / Util.summatory(Util.multiplies(w, Util.range(S_F, 0, nS)));
+                MER[iM] = Util.summatory(Matrix.multipliesElementByElement(w, Util.range(S_ER, 0, nS)));
+                MCR[iM] = Util.summatory(Matrix.multipliesElementByElement(w, Util.range(S_CR, 0, nS)));
+                MF[iM] = Util.summatory(Matrix.multipliesElementByElement(w, Matrix.power2(Util.range(S_F, 0, nS)))) / Util.summatory(Matrix.multipliesElementByElement(w, Util.range(S_F, 0, nS))) ;
                 iM = (iM + 1) % H;
             }
+            double NPinitAux = NPinit;
+            double NPminAux = NPmin;
+            double countevalAux = counteval;
+            double maxfunevalsAux = maxfunevals;
 
-            //SORT
-            for (int i = 0; i < fx.length; i++) {
-                for (int j = i + 1; j < fx.length; j++) {
-                    if (fx[i] > fx[j]) {
-                        double tmp = fx[i];
-                        fx[i] = fx[j];
-                        fx[j] = tmp;
-
-                        double[] aTmp = Util.copyArray(X[i]);
-                        X[i] = Util.copyArray(X[j]);
-                        X[j] = Util.copyArray(aTmp);
-
-                        tmp = FC[i];
-                        FC[i] = FC[j];
-                        FC[j] = tmp;
-
-
-                    }
-                }
-            }
+            cw = (1 - countevalAux / maxfunevalsAux) * cwinit;
+            //SORTS
+            int [] indexs = Util.sort(fx);
+            X = Util.sortByIndexs(X, indexs);
+            FC = Util.sortByIndexs(FC, indexs);
             //Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
             Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
-         //   System.out.println(fx[0]);
+            //   System.out.println(fx[0]);
+            System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
 
-            NP = Math.round(NPinit - (NPinit - NPmin) * counteval / maxfunevals);
+
+            NP = (int)Math.round(NPinitAux - (NPinitAux - NPminAux) * countevalAux / maxfunevalsAux);
             fx = Util.range(fx, 0, NP);
             X = Util.range(X, 0, NP);
             U = Util.range(U, 0, NP);
 
-            Asize = Math.round(Ar * NP);
+            Asize = (int) Math.round(Ar * (double)NP);
             if (nA > Asize) {
                 nA = Asize;
                 A = Util.range(A, 0, Asize);
@@ -384,6 +663,8 @@ public class LSHADE_SPS {
 
             FC = Util.range(FC, 0, NP);
             sortidxfSP = Util.sortOnlyIndexs(fSP);
+
+
             List<double[]> SPtmp = new ArrayList<>();
             List<Double> fSPtmp = new ArrayList<>();
             List<Integer> sortidxfSPtmp = new ArrayList<>();
@@ -394,19 +675,12 @@ public class LSHADE_SPS {
                     sortidxfSPtmp.add(sortidxfSP[i]);
                 }
             }
+            SP = Util.listVectorToArray(SPtmp);
+            fSP = Util.listToArrayDouble(fSPtmp);
+            sortidxfSP = Util.listToArray(sortidxfSPtmp);
 
-            SP = new double[SPtmp.size()][SPtmp.get(0).length];
-            fSP = new double[fSPtmp.size()];
-            sortidxfSP = new int[sortidxfSPtmp.size()];
-
-            for (int i = 0; i < SP.length; i++) {
-                SP[i] = Util.copyArray(SPtmp.get(i));
-                fSP[i] = fSPtmp.get(i);
-                sortidxfSP[i] = sortidxfSPtmp.get(i);
-            }
-
-            iSP = (iSP - 1) % NP;
-            if(iSP < 0) iSP = NP - 1;
+           iSP = ((iSP - 1) % NP) + 1;
+           // if(iSP < 0) iSP = NP - 1;
 
             if (FailedIteration)
                 countstagnation = countstagnation + 1;
@@ -415,19 +689,20 @@ public class LSHADE_SPS {
 
         }
         System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
-       // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
-       // Configuration.records.endRun(fx[0] - bias.getBias(Configuration.nF), counteval, Configuration.maxfunevals);
+        // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
+        // Configuration.records.endRun(fx[0] - bias.getBias(Configuration.nF), counteval, Configuration.maxfunevals);
         Configuration.records.endRun(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval, Configuration.maxfunevals);
+        return Math.abs(Configuration.benchmark.bias() - fx[0]);
     }
 
 
-    private boolean all(double [] array){
-        for(int i=0; i<array.length; i++){
-            if(array[i] != 0.0){
-                return false;
-            }
-        }
-        return true;
-    }
+//    private boolean all(double [] array){
+//        for(int i=0; i<array.length; i++){
+//            if(array[i] != 0.0){
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
 }

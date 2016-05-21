@@ -1,12 +1,17 @@
+import com.benchmark.Rand;
+import com.benchmark.Records;
+import com.benchmark.cec.cec05.CEC05Benchmark;
+import com.benchmark.cec.cec15.CEC15Benchmark;
+
 /**
  * Created by framg on 11/04/2016.
  */
 public class Test {
     public static void main(String [] args) {
        // testVi();
-       // CEC15Benchmark benchmark = new CEC15Benchmark(10, 8);
+       // CEC15Benchmark com.benchmark.cec.cec05.benchmark = new CEC15Benchmark(10, 8);
        // double [] x = {1,2,3,4,5,6,7,8,9,10};
-       // System.out.println(benchmark.f(x));
+       // System.out.println(com.benchmark.cec.cec05.benchmark.f(x));
        /* Rand rand = new Rand(21341244);
         for(int i=0; i<20; i++) {
             System.out.println(rand.getDouble());
@@ -16,9 +21,9 @@ public class Test {
         //System.exit(0);
 
         Configuration.records = new Records(50);
-        for(int F=14; F<=14; F++) {
+        for(int F=1; F<=1; F++) {
             for (int DIM = 10; DIM <= 10; DIM += 20) {
-                Configuration.benchmark = new CEC15Benchmark(DIM, F);
+                Configuration.benchmark = new CEC05Benchmark(DIM, F);
                 Configuration.records.startRecord();
                 for(int run =0; run<1; run++) {
                     Configuration.D = DIM;
@@ -26,9 +31,9 @@ public class Test {
                     Configuration.max_nfes = 10000 * DIM;
                     //Rand rand = new Rand(seeds.getSeed(Configuration.nF));
                     Configuration.rand = new Rand();
-                    //benchmark benchmark = new benchmark();
-                    //test_func test_func = benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
-                    //Configuration.benchmark = test_func;
+                    //com.benchmark.cec.cec05.benchmark com.benchmark.cec.cec05.benchmark = new com.benchmark.cec.cec05.benchmark();
+                    //com.benchmark.cec.cec05.test_func com.benchmark.cec.cec05.test_func = com.benchmark.cec.cec05.benchmark.testFunctionFactory(Configuration.nF, Configuration.D);
+                    //Configuration.com.benchmark.cec.cec05.benchmark = com.benchmark.cec.cec05.test_func;
                    // System.out.println("Fun: "+ F + "Run: " + run + "DIM: " + DIM);
                     LSHADEND algorithm = new LSHADEND();
                     algorithm.execute();

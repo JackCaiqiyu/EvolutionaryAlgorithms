@@ -6,11 +6,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="CEC05-Benchmark" />
     <orderEntry type="module" module-name="Utils" />
     <orderEntry type="module" module-name="Benchmark" />
-    <orderEntry type="module" module-name="CEC15-Benchmark" />
+    <orderEntry type="module" module-name="AllBenchmarks" />
   </component>
 </module>

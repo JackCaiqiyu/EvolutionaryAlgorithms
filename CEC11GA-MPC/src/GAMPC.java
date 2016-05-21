@@ -15,8 +15,8 @@ public class GAMPC {
     float[][] archive;
     int[] best;
 
-  //  benchmark benchmark = new benchmark();
-   // test_func aTestFunc;
+  //  com.benchmark.cec.cec05.benchmark com.benchmark.cec.cec05.benchmark = new com.benchmark.cec.cec05.benchmark();
+   // com.benchmark.cec.cec05.test_func aTestFunc;
 
     public GAMPC(){
         archive = new float[Configuration.popSize/2][Configuration.dim];

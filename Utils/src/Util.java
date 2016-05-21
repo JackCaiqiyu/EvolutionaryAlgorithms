@@ -1,3 +1,8 @@
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.correlation.Covariance;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -575,6 +580,28 @@ public class Util {
         return indexs;
     }
 
+    public static int [] sortDescend(int [] array){
+        int [] indexs = new int[array.length];
+        for(int i=0; i<indexs.length; i++)
+            indexs[i] = i;
+
+        for(int i=0; i<array.length; i++){
+            for(int j=i+1; j<array.length; j++){
+                if(array[i] < array[j]){
+                    int tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
+
+                    int tmpi = indexs[i];
+                    indexs[i] = indexs[j];
+                    indexs[j] = tmpi;
+                }
+            }
+        }
+
+        return indexs;
+    }
+
 
     public static double [] sortNewArray(double [] array){
         double [] new_array = Util.copyArray(array);
@@ -796,6 +823,17 @@ public class Util {
         }
         return  array;
     }
+
+
+
+    static double [][] listVectorToArray(List<double[]> list){
+        double [][] array = new double[list.size()][];
+        for(int i=0; i<array.length; i++){
+            array[i] = Util.copyArray(list.get(i));
+        }
+        return  array;
+    }
+
 
 
     static boolean contains(int [] array, int n){

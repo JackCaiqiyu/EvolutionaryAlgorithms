@@ -26,7 +26,7 @@ public class LSHADE {
 
     public LSHADE(){
         pop_size = Configuration.pop_size;
-        optimum = bias.getBias(Configuration.F);
+        optimum = Configuration.benchmark.bias();
         epsilon = Configuration.epsilon;
         problem_size = Configuration.N;
         max_num_evaluations = Configuration.MAX_FES;
@@ -142,7 +142,7 @@ public class LSHADE {
         int plan_pop_size;
 
         //main loop
-        while (nfes < max_num_evaluations && bsf_fitness - optimum > Configuration.epsilon)
+        while (nfes < max_num_evaluations &&  bsf_fitness - optimum  > Configuration.epsilon)
         {
             for (int i = 0; i < pop_size; i++)
             {
@@ -269,7 +269,7 @@ public class LSHADE {
                         bsf_solution[j] = children[i][j];
                     }
                 }
-                System.out.println("Value: " + bsf_fitness + " at: " + nfes);
+                //System.out.println("Value: " + (bsf_fitness - optimum) + " at: " + nfes);
 
                 // if (nfes % 1000 == 0) {
                 // //      cout << nfes << " " << bsf_fitness - optimum << endl;
@@ -410,7 +410,8 @@ public class LSHADE {
                 }
             }
         }
-
+        System.out.println("FUN: " + Configuration.F);
+        System.out.println("Value: " + (bsf_fitness - optimum) + " at: " + nfes);
         return bsf_fitness - optimum;
     }
 
@@ -453,7 +454,7 @@ public class LSHADE {
     private double [] makeNewIndividual(){
         double [] individual = new double[problem_size];
         for(int j=0; j<problem_size; j++){
-            individual[j] = Bounds.getLowerBound(Configuration.F) + Configuration.rand.getFloat()* (Bounds.getUpperBound(Configuration.F) - Bounds.getLowerBound(Configuration.F));
+            individual[j] = Configuration.benchmark.lbound() + Configuration.rand.getFloat()* (Configuration.benchmark.ubound() - Configuration.benchmark.lbound());
         }
 
         return individual;
@@ -471,8 +472,8 @@ public class LSHADE {
 
     void modifySolutionWithParentMedium(double [] child, double [] parent) {
         int l_problem_size = problem_size;
-        double l_min_region = Bounds.getLowerBound(Configuration.F);
-        double l_max_region = Bounds.getUpperBound(Configuration.F);
+        double l_min_region = Configuration.benchmark.lbound();
+        double l_max_region = Configuration.benchmark.ubound();
 
         for (int j = 0; j < l_problem_size; j++) {
             if (child[j] < l_min_region) {

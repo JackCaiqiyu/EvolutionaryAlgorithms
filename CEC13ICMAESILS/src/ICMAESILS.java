@@ -112,7 +112,7 @@ public class ICMAESILS {
                 x[n] = xinit[n];
             }
             //
-            //test_func(x, f, dim,1,Configuration.getProblemID());
+            //com.benchmark.cec.cec05.test_func(x, f, dim,1,Configuration.getProblemID());
             f = Configuration.benchmark.f(x);
             liaofirstforxinit = f;
             liaoevalscount++;
@@ -138,7 +138,7 @@ public class ICMAESILS {
             cma.options.stopFitness = Bounds.Ter_Err;       // optional setting
             cma.options.stopMaxFunEvals = 10000 * dim;
             cma.setPopulationSize(lambda);
-            //cma.setBounds(Bounds.getUpperBound(Configuration.F), Bounds.getLowerBound(Configuration.F));
+            //cma.setBounds(com.benchmark.cec.cec05.Bounds.getUpperBound(Configuration.F), com.benchmark.cec.cec05.Bounds.getLowerBound(Configuration.F));
             double [] x_in_bounds = new double[Configuration.DIM];
 
             Boundary_transformation.cmaes_boundary_transformation_init(Bounds.getLowerBound(Configuration.F), Bounds.getUpperBound(Configuration.F), 1);
@@ -155,7 +155,7 @@ public class ICMAESILS {
                 for (i = 0; i < pop.length; ++i) {
                     Boundary_transformation.cmaes_boundary_transformation(pop[i],x_in_bounds, Configuration.DIM );
 
-                    //pop[i] = inbound(Bounds.getLowerBound(Configuration.F), Bounds.getUpperBound(Configuration.F), pop[i], dim);
+                    //pop[i] = inbound(com.benchmark.cec.cec05.Bounds.getLowerBound(Configuration.F), com.benchmark.cec.cec05.Bounds.getUpperBound(Configuration.F), pop[i], dim);
                     while (!inbound(Bounds.getLowerBound(Configuration.F), Bounds.getUpperBound(Configuration.F),x_in_bounds, Configuration.DIM)) {     //   not located on (or very close to) the domain boundary,
                         pop[i] = cma.resampleSingle(i);
                         Boundary_transformation.cmaes_boundary_transformation(pop[i], x_in_bounds, Configuration.DIM);
@@ -163,7 +163,7 @@ public class ICMAESILS {
                     /*for (int n = 0; n < dim; n++) {
                         x[n] = pop[i][n];
                     }*/
-                    //test_func(x, f, dim, 1, Configuration.getProblemID());
+                    //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                     f = Configuration.benchmark.f(x_in_bounds);
                     long_fitness = f;
                     liaoevalscount++;
@@ -240,7 +240,7 @@ public class ICMAESILS {
 
             x[n] = xk[n];
         }
-        //test_func(x, f, dim, 1, Configuration.getProblemID());
+        //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
         f = Configuration.benchmark.f(x);
         liaofirstforxinitmtsls1 = f;
         liaoevalsmtsls1count++;
@@ -282,7 +282,7 @@ public class ICMAESILS {
                         for (int n = 0; n < dim; n++) {
                             x[n] = xk[n];
                         }
-                        //test_func(x, f, dim, 1, Configuration.getProblemID());
+                        //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                         f = Configuration.benchmark.f(x);
                         before1 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
 
@@ -307,7 +307,7 @@ public class ICMAESILS {
                         for (int n = 0; n < dim; n++) {
                             x[n] = xk[n];
                         }
-                        //test_func(x, f, dim, 1, Configuration.getProblemID());
+                        //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                         f = Configuration.benchmark.f(x);
                         after1 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
 
@@ -341,7 +341,7 @@ public class ICMAESILS {
 
                                     x[n] = xk[n];
                                 }
-                                //test_func(x, f, dim, 1, Configuration.getProblemID());
+                                //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                                 f = Configuration.benchmark.f(x);
                                 after2 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
 
@@ -452,7 +452,7 @@ public class ICMAESILS {
                 matrix[i][a]= minmaxrand();
                 x[a] = matrix[i][a];
             }
-           // test_func(x, f, Configuration.getProblemDimension(), 1, Configuration.getProblemID());
+           // com.benchmark.cec.cec05.test_func(x, f, Configuration.getProblemDimension(), 1, Configuration.getProblemID());
             f = Configuration.benchmark.f(x);
             initevalscout++;
             matrix[i][Configuration.DIM] = f;
