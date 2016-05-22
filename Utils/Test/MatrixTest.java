@@ -21,8 +21,16 @@ public class MatrixTest {
         double [][] m2 = {{1, 2, 3} , {-1, -2, -3}};
         double [] a = {3, 3, 3};
 
-        double [][] b= {{3, 3}, {2,2}};
-        double [][] algo = Matrix.multiplies(m2, b);
+
+
+        double [][] b= {{3, 3}, {2,2}, {1,1}};
+        double [][] e = {{1,2}, {2,1}};
+        double [][] c = {{1, 2, 3} , {-1, -2, -3}};
+        double [][] d= {{3, 3}, {2,2}, {1,1}};
+
+        double [][] algo = Matrix.multiplies_nx1x1xn(a, a);
+        algo = Matrix.multiplies(m2, Matrix.transpose(m2));
+        algo = Matrix.multiplies(e, Matrix.transpose(b));
        // b = Matrix.multiplies(m, a);
 
 //        assertEquals(String.valueOf(18.0), String.valueOf(b[0]));

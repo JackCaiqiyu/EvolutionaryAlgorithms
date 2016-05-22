@@ -1,7 +1,9 @@
+package com.benchmark.cec.cec11;
+
 /**
  * Created by framg on 02/05/2016.
  */
-public class CEC11benchmark {
+public class CEC11Benchmark {
 
     static double function1(double [] x){
         double theta=2* Math.PI/100;

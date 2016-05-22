@@ -845,7 +845,13 @@ public class Util {
         return  false;
     }
 
-
+    static double [] sqrt(double [] a){
+        double [] aNew = new double[a.length];
+        for(int i=0;i < a.length; i++){
+            aNew[i] = Math.sqrt(a[i]);
+        }
+        return aNew;
+    }
 
 
 
@@ -862,17 +868,6 @@ public class Util {
 
 
 
-    static double [][] triu(double [][] A, int k){
-        double [][] m = Util.copyMatrix(A);
 
-        for(int i=0; i<A.length; i++){
-            for(int j=0; j<A[0].length; j++){
-                if( i < j + k){
-                    m[i][j] = 0;
-                }
-            }
-        }
-        return m;
-    }
 
 }

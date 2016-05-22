@@ -39,7 +39,13 @@ public class Matrix {
     public static double [][] multiplies (double [][] m, double[][] a){
         RealMatrix mReal = new Array2DRowRealMatrix(m);
         RealMatrix aReal = new Array2DRowRealMatrix(a);
-        return mReal.transpose().multiply(aReal).getData();
+        return mReal.multiply(aReal).getData();
+    }
+
+    public static double [][] multiplies_nx1x1xn (double [] m, double[] a){
+        RealMatrix mReal = new Array2DRowRealMatrix(m);
+        RealMatrix aReal = new Array2DRowRealMatrix(a);
+        return mReal.multiply(aReal.transpose()).getData();
     }
 
 
@@ -51,6 +57,18 @@ public class Matrix {
         }
         for(int i=0; i<aNew.length; i++){
             aNew[i] = a1[i] *  a2[i];
+        }
+        return aNew;
+    }
+
+    public static double [] add(double [] a1, double [] a2){
+        double [] aNew = new double [a1.length];
+        if(a1.length != a2.length){
+            System.err.println("Array addition different sizes.");
+            System.exit(0);
+        }
+        for(int i=0; i<aNew.length; i++){
+            aNew[i] = a1[i] +  a2[i];
         }
         return aNew;
     }
@@ -102,4 +120,44 @@ public class Matrix {
         }
         return m_new;
     }
+
+    public static double [] multipliesByElement(double [] a1, double  value){
+        double [] aNew = new double [a1.length];
+        for(int i=0; i<aNew.length; i++){
+            aNew[i] = a1[i] *  value;
+        }
+        return aNew;
+    }
+
+
+
+    public static double [][] multipliesByElement(double [][] m1, double value){
+        double [][] aNew = new double [m1.length][m1[0].length];
+
+        for(int i=0; i<aNew.length; i++){
+            for(int j=0; j<aNew[0].length; j++) {
+                aNew[i][j] = m1[i][j] * value;
+            }
+        }
+        return aNew;
+    }
+
+    public static double [][] dividesByElement(double [][] m1, double value){
+        double [][] aNew = new double [m1.length][m1[0].length];
+
+        for(int i=0; i<aNew.length; i++){
+            for(int j=0; j<aNew[0].length; j++) {
+                aNew[i][j] = m1[i][j] / value;
+            }
+        }
+        return aNew;
+    }
+
+    public static double [][] transpose(double [][] m){
+        RealMatrix mReal = new Array2DRowRealMatrix(m);
+        return mReal.transpose().getData();
+    }
+
+
+
 }
