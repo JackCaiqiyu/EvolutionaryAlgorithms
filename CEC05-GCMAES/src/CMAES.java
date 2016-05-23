@@ -38,11 +38,11 @@ public class CMAES {
 	public static int runs;
 
 	public static void main(String[] args) {
-		runs = 25;
-		benchmark("CEC05");
+		runs = AllBenchmarks.runs();
+		//benchmark("CEC05");
 		//benchmark("CEC13");
 		//benchmark("CEC14");
-		//benchmark("CEC15");
+		benchmark("CEC15");
 	}
 
 

@@ -16,16 +16,24 @@ public class CEC11Benchmark {
         return f;
     }
 
-   /* static double function2(double [] x){
-        //The bifunctional catalyst blend optimal control problem
-                tol=1.0e-01;// tol is a matter of concern. decreasing it make algo fast.
-                tspan=[0 0.78];// check for the range
-        yo =[1 0 0 0 0 0 0];
-        u=x;//u should be passed here.
-                options = odeset('RelTol',tol);
-        [T,Y] = ode45(@(t,y) diffsolv(t,y,u),tspan,yo,options);
-        w=size(Y);
-        f=Y(w(1),w(2))*1e+003;
-    }*/
+    static double function2(double [] x){
+//
+//        int p= x.length;
+//        int n=p/3;
+//
+//        x=reshape(x,3,n)';
+//        v=0;
+//        a=ones(n,n);
+//        b=repmat(2,n,n);
+//        //double [][] r = new double[n][]
+//        for i=1:(n-1)
+//        for j=(i+1):n
+//        r(i,j)=sqrt(sum((x(i,:)-x(j,:)).^2));
+//        v=v+(a(i,j)/r(i,j)^12-b(i,j)/r(i,j)^6);
+//        end
+//                end
+//        f=v;
+        return 0;
+    }
 
 }

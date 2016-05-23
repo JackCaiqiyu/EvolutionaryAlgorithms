@@ -38,7 +38,7 @@ public class GAAPPADE {
         gbest = Util.min(vall);
     }
 
-    public void execute(){
+    public double execute(){
 
 
 
@@ -290,6 +290,7 @@ public class GAAPPADE {
         }
         Configuration.records.endRun(Math.abs(Configuration.benchmark.bias() - Util.min(vall)), I_nfeval, Configuration.max_fes);
         System.out.println("Eval: " + Math.abs(Configuration.benchmark.bias() - Util.min(vall)) + " at: " + I_nfeval);
+        return Math.abs(Configuration.benchmark.bias() - Util.min(vall));
 
     }
 

@@ -148,7 +148,7 @@ improved parameter setting for large populations [3] and an (initially) diagonal
 The latter is particularly useful for large dimension, e.g. larger 100. 
 The default population size is small [1]. An
 independent restart procedure with increasing population size [4]
-is implemented in class <code>{@link cmaes.examples.CMAExample2}</code>.</P>
+is implemented in class <code>{}</code>.</P>
 
  * <P><B>Practical hint</B>: In order to solve an optimization problem in reasonable time it needs to be 
  * reasonably encoded. In particular the domain width of variables should be 
@@ -2393,7 +2393,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
      * @see #getPrintLine() 
      */
     public void println(String s) {
-        System.out.println(s);
+        //System.out.println(s);
         if (options.writeDisplayToFile > 0)
             writeToFile(options.outputFileNamesPrefix + "disp" + ".dat", s, 1);
     }
