@@ -170,7 +170,7 @@ public class CEC14Benchmark extends AllBenchmarks {
             if (FUN>=17&&FUN<=22)
             {
                 fpt =  readFile(files +"shuffle_data_"+FUN+"_D"+nx+".txt"); //new File(files +"shuffle_data_"+FUN+"_D"+nx+".txt");
-                //sprintf(FileName, "input_data/shuffle_data_%d_D%d.txt", func_num, nx);
+                //sprintf(FileName, "cec15.input_data/shuffle_data_%d_D%d.txt", func_num, nx);
                 //fpt = fopen(FileName,"r");
                 try {
                     input = new Scanner(fpt);
@@ -193,7 +193,7 @@ public class CEC14Benchmark extends AllBenchmarks {
             }
             else if (FUN==29||FUN==30)
             {
-                //sprintf(FileName, "input_data/shuffle_data_%d_D%d.txt", func_num, nx);
+                //sprintf(FileName, "cec15.input_data/shuffle_data_%d_D%d.txt", func_num, nx);
                 fpt =  readFile(files +"shuffle_data_"+FUN+"_D"+nx+".txt"); //new File(files +"shuffle_data_"+FUN+"_D"+nx+".txt");
                 //fpt = fopen(FileName,"r");
                 try {

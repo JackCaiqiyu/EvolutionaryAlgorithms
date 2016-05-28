@@ -16,7 +16,7 @@ public class CEC13Benchmark extends AllBenchmarks {
 
     public CEC13Benchmark(int DIM, int FUN) {
         super(DIM, FUN, 28);
-        //URL url = getClass().getResource("input_data/");
+        //URL url = getClass().getResource("cec15.input_data/");
        // files = url.getPath();
         init_flag = true;
     }

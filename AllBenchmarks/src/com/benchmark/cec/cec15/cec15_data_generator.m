@@ -4,7 +4,7 @@
 %
 % Usage:
 % Please run this to generate data first and replace the data files in
-% "input_data" with the generated files
+% "cec15.input_data" with the generated files
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Shift data

@@ -195,7 +195,7 @@ public class testfunc14 {
 			if (func_num>=17&&func_num<=22)
 			{
 				fpt = new File("input_data/shuffle_data_"+func_num+"_D"+nx+".txt");
-				//sprintf(FileName, "input_data/shuffle_data_%d_D%d.txt", func_num, nx);
+				//sprintf(FileName, "cec15.input_data/shuffle_data_%d_D%d.txt", func_num, nx);
 				//fpt = fopen(FileName,"r");
 				input = new Scanner(fpt);
 				if (!fpt.exists())
@@ -214,7 +214,7 @@ public class testfunc14 {
 			}
 			else if (func_num==29||func_num==30)
 			{
-				//sprintf(FileName, "input_data/shuffle_data_%d_D%d.txt", func_num, nx);
+				//sprintf(FileName, "cec15.input_data/shuffle_data_%d_D%d.txt", func_num, nx);
 				fpt = new File("input_data/shuffle_data_"+func_num+"_D"+nx+".txt");
 				//fpt = fopen(FileName,"r");
 				input = new Scanner(fpt);

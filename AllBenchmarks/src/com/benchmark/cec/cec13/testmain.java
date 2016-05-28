@@ -10,7 +10,7 @@ public class testmain {
 		int i,j,k,n,m,func_num;
 		double[] x;
 		double[] f;
-		File fpt = new File("Benchmark/src/CEC13-Benchmark/src/input_data/shift_data.txt");
+		File fpt = new File("Benchmark/src/CEC13-Benchmark/src/cec15.input_data/shift_data.txt");
 		
 		m=2;
 		n=10;
