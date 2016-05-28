@@ -319,7 +319,8 @@ public class CEC15Benchmark extends AllBenchmarks {
         File file = null;
         String resource = name;
         // URL url = getClass().getClassLoader().getResource("com/benchmark/cec/cec05/supportData/fbias_data.txt");
-
+//        System.out.println("Working Directory = " +
+//                System.getProperty("user.dir"));
         URL res = getClass().getResource(resource);
 
         if(res != null) {

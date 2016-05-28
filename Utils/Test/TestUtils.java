@@ -43,6 +43,8 @@ public class TestUtils {
         index = Util.sort(a);
 
 
+        double aa = 5.0 * 3.0 / 2.0 ;
+        double bb = 3.0 / 2.0 * 5.0 ;
         assertEquals(String.valueOf(0.0), String.valueOf(a[0]));
         assertEquals( 12,index[0]);
     }

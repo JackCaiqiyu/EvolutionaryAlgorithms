@@ -5,6 +5,7 @@ package com.benchmark.cec.cec15;/*
 */
 
 
+import com.benchmark.AllBenchmarks;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
 import java.io.File;
@@ -507,6 +508,33 @@ public class testfunc15L {
         return sum;
     }
 
+    DerivativeStructure ellips_func_diff_ds_part(double[] x, int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Ellipsoidal */ {
+        int i;
+
+        sr_func(x, z, nx, Os, Mr, 1.0, s_flag, r_flag);/*shift and rotate*/
+        double[] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            g[i] = 0;
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+        DerivativeStructure sum = diffs[0].getField().getZero();
+        for (i = 0; i < nx; i++) {
+            //DerivativeStructure diff = new DerivativeStructure(1, 2, 0, z[i]);
+            //for(int j=0; j<10; j++){
+            sum = sum.add(diffs[i].pow(2).multiply(Math.pow(10.0, 6.0 * i / (nx - 1))));
+
+            //}
+            // g[i] = diff.getPartialDerivative(1);
+        }
+
+
+
+        return sum;
+    }
+
     double bent_cigar_func(double[] x, double f, int nx, double[] Os, double[] Mr, int s_flag, int r_flag) /* Bent_Cigar */ {
         int i;
         sr_func(x, z, nx, Os, Mr, 1.0, s_flag, r_flag);/*shift and rotate*/
@@ -678,6 +706,38 @@ public class testfunc15L {
         return sum;
     }
 
+
+    DerivativeStructure rosenbrock_func_diff_ds_part(double[] x, int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Rosenbrock's */ {
+        int i;
+        // double tmp1, tmp2;
+        //f = 0.0;
+        sr_func(x, z, nx, Os, Mr, 2.048 / 100.0, s_flag, r_flag);/*shift and rotate*/
+        double[] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+
+            g[i] = 0;
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+        diffs[0] = diffs[0].add(1.0);
+        DerivativeStructure sum = diffs[0].getField().getZero();
+        for (i = 0; i < nx - 1; i++) {
+            diffs[i+1] = diffs[i+1].add(1.0);
+            DerivativeStructure tmp1 = diffs[i].pow(2).subtract(diffs[i+1]);
+            DerivativeStructure tmp2 = diffs[i].subtract(1.0);
+            sum = sum.add(tmp2.pow(2).add(tmp1.pow(2).multiply(100.0)));
+        }
+
+
+
+
+        return sum;
+    }
+
+
+
     double ackley_func(double[] x, double f, int nx, double[] Os, double[] Mr, int s_flag, int r_flag) /* Ackley's  */ {
         int i;
         double sum1, sum2;
@@ -716,7 +776,7 @@ public class testfunc15L {
 
         sum1 = sum1.divide(nx).sqrt().multiply(-0.2);
         sum2 = sum2.divide(nx);
-        DerivativeStructure diff = sum1.exp().multiply(20.0).subtract(sum2.exp().add(20.0)).subtract(E);
+        DerivativeStructure diff = sum1.exp().multiply(20.0).negate().subtract(sum2.exp()).add(20.0).add(E);
 
         if(diff_enabled) {
             for (i = 0; i < nx; i++) {
@@ -750,7 +810,7 @@ public class testfunc15L {
 
         sum1 = sum1.divide(nx).sqrt().multiply(-0.2);
         sum2 = sum2.divide(nx);
-        DerivativeStructure diff = sum1.exp().multiply(20.0).subtract(sum2.exp().add(20.0)).subtract(E);
+        DerivativeStructure diff = sum1.exp().multiply(20.0).negate().subtract(sum2.exp()).add(20.0).add(E);
 
 
         return diff;
@@ -798,15 +858,18 @@ public class testfunc15L {
         k_max = 20;
         //f = 0.0;
         double sum2 = 0;
+        DerivativeStructure sum = diffs[0].getField().getZero();
         DerivativeStructure f = diffs[0].getField().getZero();
         for (i = 0; i < nx; i++) {
-            DerivativeStructure sum = diffs[0].getField().getZero();
-            //DerivativeStructure sum2 = diffs[0].getField().getZero();
+
+            sum = diffs[0].getField().getZero();
             sum2 = 0;
+
             for (j = 0; j <= k_max; j++) {
                // sum += Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j) * (z[i] + 0.5));
                 sum2 += Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j) * 0.5);
-                sum = sum.add(diffs[i].add(0.5).multiply(Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j))));
+                //sum = sum.add(diffs[i].add(0.5).multiply(Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j))));
+                sum = sum.add(diffs[i].add(0.5).multiply(2.0 * PI * Math.pow(b, j)).cos().multiply(Math.pow(a, j)));
                 //sum2 = sum2.add(diffs[i])
             }
             f = f.add(sum);
@@ -833,7 +896,7 @@ public class testfunc15L {
         double  a, b;
 
         sr_func(x, z, nx, Os, Mr, 0.5 / 100.0, s_flag, r_flag);/*shift and rotate*/
-        double [] g = new double[nx];
+
         DerivativeStructure[] diffs = new DerivativeStructure[nx];
         for (i = 0; i < nx; i++) {
             diffs[i] = new DerivativeStructure(nx, 2, i, z[i]);
@@ -845,32 +908,61 @@ public class testfunc15L {
         k_max = 20;
         //f = 0.0;
         double sum2 = 0;
+        DerivativeStructure sum = diffs[0].getField().getZero();
         DerivativeStructure f = diffs[0].getField().getZero();
         for (i = 0; i < nx; i++) {
-            DerivativeStructure sum = diffs[0].getField().getZero();
-            //DerivativeStructure sum2 = diffs[0].getField().getZero();
+
+            sum = diffs[0].getField().getZero();
             sum2 = 0;
+
             for (j = 0; j <= k_max; j++) {
-                // sum += Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j) * (z[i] + 0.5));
                 sum2 += Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j) * 0.5);
-                sum = sum.add(diffs[i].add(0.5).multiply(Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j))));
-                //sum2 = sum2.add(diffs[i])
+                sum = sum.add(diffs[i].add(0.5).multiply(2.0 * PI * Math.pow(b, j)).cos().multiply(Math.pow(a, j)));
             }
             f = f.add(sum);
         }
-        // f -= nx * sum2;
         f = f.subtract(nx * sum2);
 
 
-//        if(diff_enabled) {
-//            for (i = 0; i < nx; i++) {
-//                int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//                indexs[i] = 1;
-//                g[i] = f.getPartialDerivative(indexs);
-//            }
-//        }else{
-//            g[0] = f.getValue();
-//        }
+
+        return f;
+    }
+
+
+    DerivativeStructure weierstrass_func_diff_ds_part(double[] x, int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Weierstrass's  */ {
+        int i, j, k_max;
+        double  a, b;
+
+        sr_func(x, z, nx, Os, Mr, 0.5 / 100.0, s_flag, r_flag);/*shift and rotate*/
+
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+
+        a = 0.5;
+        b = 3.0;
+        k_max = 20;
+        //f = 0.0;
+        double sum2 = 0;
+        DerivativeStructure sum = diffs[0].getField().getZero();
+        DerivativeStructure f = diffs[0].getField().getZero();
+        for (i = 0; i < nx; i++) {
+
+            sum = diffs[0].getField().getZero();
+            sum2 = 0;
+
+            for (j = 0; j <= k_max; j++) {
+                sum2 += Math.pow(a, j) * Math.cos(2.0 * PI * Math.pow(b, j) * 0.5);
+                sum = sum.add(diffs[i].add(0.5).multiply(2.0 * PI * Math.pow(b, j)).cos().multiply(Math.pow(a, j)));
+            }
+            f = f.add(sum);
+        }
+        f = f.subtract(nx * sum2);
+
+
 
         return f;
     }
@@ -903,7 +995,7 @@ public class testfunc15L {
             diffs[i] = new DerivativeStructure(nx, 2, i, z[i]);
         }
         DerivativeStructure s = diffs[0].getField().getZero();
-        DerivativeStructure p = diffs[0].getField().getZero();
+        DerivativeStructure p = diffs[0].getField().getOne();
        // s = 0.0;
        // p = 1.0;
         for (i = 0; i < nx; i++) {
@@ -932,6 +1024,8 @@ public class testfunc15L {
         return g;
     }
 
+
+    //TODO ESTA MAL
     DerivativeStructure griewank_func_diff_ds(double[] x,  int nx, double[] Os, double[] Mr, int s_flag, int r_flag, boolean diff_enabled) /* Griewank's  */ {
         int i;
         //double s, p;
@@ -968,6 +1062,30 @@ public class testfunc15L {
 //        }else{
 //            g[0] = diff.getValue();
 //        }
+
+        return diff;
+    }
+
+    DerivativeStructure griewank_func_diff_ds_part(double[] x,  int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Griewank's  */ {
+        int i;
+
+        sr_func(x, z, nx, Os, Mr, 600.0 / 100.0, s_flag, r_flag);/*shift and rotate*/
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+        DerivativeStructure s = diffs[0].getField().getZero();
+        DerivativeStructure p = diffs[0].getField().getOne();
+        for (i = 0; i < nx; i++) {
+            s = s.add(diffs[i].pow(2));
+            p = p.multiply(diffs[i].divide(Math.sqrt(1.0 + i)).cos());
+        }
+
+        DerivativeStructure diff = s.divide(4000.0).subtract(p).add(1.0);
+        for(i = 0; i<nx; i++){
+
+        }
 
         return diff;
     }
@@ -1062,6 +1180,41 @@ public class testfunc15L {
         return sum;
     }
 
+
+    DerivativeStructure rastrigin_func_diff_ds_part(double[] x, int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Rastrigin's  */ {
+        int i;
+
+
+
+		/*for (int j=0;j<nx;j++)
+		{
+			System.out.println(Os[j]);
+		}*/
+
+        sr_func(x, z, nx, Os, Mr, 5.12 / 100.0, s_flag, r_flag);/*shift and rotate*/
+
+//        for (i = 0; i < nx; i++) {
+//            f += (z[i] * z[i] - 10.0 * Math.cos(2.0 * PI * z[i]) + 10.0);
+//        }
+        double [] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+        DerivativeStructure sum = diffs[0].getField().getZero();
+        for (i = 0; i < nx; i++) {
+            sum = sum.add(diffs[i].pow(2).subtract(diffs[i].multiply(PI*2.0).cos().multiply(10.0)).add(10));
+        }
+
+
+
+        return sum;
+    }
+
+
+
     double schwefel_func(double[] x, double f, int nx, double[] Os, double[] Mr, int s_flag, int r_flag) /* Schwefel's  */ {
         int i;
         double tmp;
@@ -1096,34 +1249,49 @@ public class testfunc15L {
         double [] g = new double[nx];
         DerivativeStructure[] diffs = new DerivativeStructure[nx];
         for (i = 0; i < nx; i++) {
-            z[i] += 4.209687462275036e+002;
+            //z[i] += 4.209687462275036e+002;
             diffs[i] = new DerivativeStructure(nx, 2, i, z[i]);
         }
 
-        DerivativeStructure sum = diffs[0].getField().getZero();
+        DerivativeStructure f = diffs[0].getField().getZero();
         for (i = 0; i < nx; i++) {
             //z[i] += 4.209687462275036e+002;
            // DerivativeStructure diff = new DerivativeStructure(1, 2, 0, z[i]);
+            diffs[i]  = diffs[i].add(4.209687462275036e+002);
+            if (diffs[i].getValue() > 500) {
 
-            if (z[i] > 500) {
-                sum = sum.subtract(diffs[i].remainder(500).subtract(500.0).negate()).multiply((diffs[i].remainder(500).subtract(500).negate().pow(0.5)).sin());
-                sum = sum.add((diffs[i].subtract(500.0).divide(100)).pow(2).divide(nx));
+                f = f.subtract(AllBenchmarks.mod(diffs[i], 500.0).negate().add(500.0).multiply(AllBenchmarks.mod(diffs[i], 500.0).negate().add(500.0).pow(0.5).sin()));
+                DerivativeStructure tmp = diffs[i].subtract(500.0).divide(100.0);
+                f = f.add(tmp.pow(2).divide(nx));
+
+//                sum = sum.subtract(diffs[i].remainder(500).subtract(500.0).negate()).multiply((diffs[i].remainder(500).subtract(500).negate().pow(0.5)).sin());
+//                sum = sum.add((diffs[i].subtract(500.0).divide(100)).pow(2).divide(nx));
+
+
+
 //                f -= (500.0 - (z[i] % 500)) * Math.sin(Math.pow(500.0 - (z[i] % 500), 0.5));
 //                tmp = (z[i] - 500.0) / 100;
 //                f += tmp * tmp / nx;
                // diffs[i].
-            } else if (z[i] < -500) {
-                sum = sum.subtract(diffs[i].abs().remainder(500).subtract(500.0)).multiply((diffs[i].abs().remainder(500).subtract(500).negate().pow(0.5)).sin());
-                sum = sum.add((diffs[i].add(500.0).divide(100)).pow(2).divide(nx));
+            } else if (diffs[i].getValue() < -500) {
+                f = f.subtract(AllBenchmarks.mod(diffs[i].abs(), 500.0).subtract(500.0).multiply(AllBenchmarks.mod(diffs[i].abs(), 500.0).negate().add(500).pow(0.5).sin()));
+                DerivativeStructure tmp = diffs[i].add(500.0).divide(100.0);
+                f = f.add(tmp.pow(2).divide(nx));
+
+//                sum = sum.subtract(diffs[i].abs().remainder(500).subtract(500.0)).multiply((diffs[i].abs().remainder(500).subtract(500).negate().pow(0.5)).sin());
+//                sum = sum.add((diffs[i].add(500.0).divide(100)).pow(2).divide(nx));
               //  f -= (-500.0 + (Math.abs(z[i]) % 500)) * Math.sin(Math.pow(500.0 - (Math.abs(z[i]) % 500), 0.5));
                 //tmp = (z[i] + 500.0) / 100;
               //  f += tmp * tmp / nx;
             } else{
-                sum = sum.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
+                f = f.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
+
+               // sum = sum.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
             }
               //  f -= z[i] * Math.sin(Math.pow(Math.abs(z[i]), 0.5));
         }
-        DerivativeStructure diff = sum.add(nx * 4.189828872724338e+002);
+        f = f.add(nx * 4.189828872724338e+002);
+        //DerivativeStructure diff = sum.add(nx * 4.189828872724338e+002);
 
 
       //  f = 4.189828872724338e+002 * nx + f;
@@ -1131,12 +1299,12 @@ public class testfunc15L {
             for (i = 0; i < nx; i++) {
                 int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                 indexs[i] = 1;
-                g[i] = diff.getPartialDerivative(indexs);
+                g[i] = f.getPartialDerivative(indexs);
             }
 
             return g;
         }else{
-            g[0] = diff.getValue();
+            g[0] = f.getValue();
 
             return g;
         }
@@ -1150,39 +1318,113 @@ public class testfunc15L {
         double [] g = new double[nx];
         DerivativeStructure[] diffs = new DerivativeStructure[nx];
         for (i = 0; i < nx; i++) {
-            z[i] += 4.209687462275036e+002;
+            //z[i] += 4.209687462275036e+002;
             diffs[i] = new DerivativeStructure(nx, 2, i, z[i]);
         }
 
-        DerivativeStructure sum = diffs[0].getField().getZero();
+        DerivativeStructure f = diffs[0].getField().getZero();
         for (i = 0; i < nx; i++) {
             //z[i] += 4.209687462275036e+002;
             // DerivativeStructure diff = new DerivativeStructure(1, 2, 0, z[i]);
+            diffs[i]  = diffs[i].add(4.209687462275036e+002);
+            if (diffs[i].getValue() > 500) {
 
-            if (z[i] > 500) {
-                sum = sum.subtract(diffs[i].remainder(500).subtract(500.0).negate()).multiply((diffs[i].remainder(500).subtract(500).negate().pow(0.5)).sin());
-                sum = sum.add((diffs[i].subtract(500.0).divide(100)).pow(2).divide(nx));
+                f = f.subtract(AllBenchmarks.mod(diffs[i], 500.0).negate().add(500.0).multiply(AllBenchmarks.mod(diffs[i], 500.0).negate().add(500.0).pow(0.5).sin()));
+                DerivativeStructure tmp = diffs[i].subtract(500.0).divide(100.0);
+                f = f.add(tmp.pow(2).divide(nx));
+
+//                sum = sum.subtract(diffs[i].remainder(500).subtract(500.0).negate()).multiply((diffs[i].remainder(500).subtract(500).negate().pow(0.5)).sin());
+//                sum = sum.add((diffs[i].subtract(500.0).divide(100)).pow(2).divide(nx));
+
+
+
 //                f -= (500.0 - (z[i] % 500)) * Math.sin(Math.pow(500.0 - (z[i] % 500), 0.5));
 //                tmp = (z[i] - 500.0) / 100;
 //                f += tmp * tmp / nx;
                 // diffs[i].
-            } else if (z[i] < -500) {
-                sum = sum.subtract(diffs[i].abs().remainder(500).subtract(500.0)).multiply((diffs[i].abs().remainder(500).subtract(500).negate().pow(0.5)).sin());
-                sum = sum.add((diffs[i].add(500.0).divide(100)).pow(2).divide(nx));
+            } else if (diffs[i].getValue() < -500) {
+                f = f.subtract(AllBenchmarks.mod(diffs[i].abs(), 500.0).subtract(500.0).multiply(AllBenchmarks.mod(diffs[i].abs(), 500.0).negate().add(500).pow(0.5).sin()));
+                DerivativeStructure tmp = diffs[i].add(500.0).divide(100.0);
+                f = f.add(tmp.pow(2).divide(nx));
+
+//                sum = sum.subtract(diffs[i].abs().remainder(500).subtract(500.0)).multiply((diffs[i].abs().remainder(500).subtract(500).negate().pow(0.5)).sin());
+//                sum = sum.add((diffs[i].add(500.0).divide(100)).pow(2).divide(nx));
                 //  f -= (-500.0 + (Math.abs(z[i]) % 500)) * Math.sin(Math.pow(500.0 - (Math.abs(z[i]) % 500), 0.5));
                 //tmp = (z[i] + 500.0) / 100;
                 //  f += tmp * tmp / nx;
             } else{
-                sum = sum.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
+                f = f.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
+
+                // sum = sum.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
             }
             //  f -= z[i] * Math.sin(Math.pow(Math.abs(z[i]), 0.5));
         }
-        DerivativeStructure diff = sum.add(nx * 4.189828872724338e+002);
+        f = f.add(nx * 4.189828872724338e+002);
+        //DerivativeStructure diff = sum.add(nx * 4.189828872724338e+002);
 
 
         //  f = 4.189828872724338e+002 * nx + f;
-        return diff;
+        return f;
     }
+
+    DerivativeStructure schwefel_func_diff_ds_part(double[] x,  int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Schwefel's  */ {
+        int i;
+
+        sr_func(x, z, nx, Os, Mr, 1000.0 / 100.0, s_flag, r_flag);/*shift and rotate*/
+
+        double [] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            //z[i] += 4.209687462275036e+002;
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+        DerivativeStructure f = diffs[0].getField().getZero();
+        for (i = 0; i < nx; i++) {
+            //z[i] += 4.209687462275036e+002;
+            // DerivativeStructure diff = new DerivativeStructure(1, 2, 0, z[i]);
+            diffs[i]  = diffs[i].add(4.209687462275036e+002);
+            if (diffs[i].getValue() > 500) {
+
+                f = f.subtract(AllBenchmarks.mod(diffs[i], 500.0).negate().add(500.0).multiply(AllBenchmarks.mod(diffs[i], 500.0).negate().add(500.0).pow(0.5).sin()));
+                DerivativeStructure tmp = diffs[i].subtract(500.0).divide(100.0);
+                f = f.add(tmp.pow(2).divide(nx));
+
+//                sum = sum.subtract(diffs[i].remainder(500).subtract(500.0).negate()).multiply((diffs[i].remainder(500).subtract(500).negate().pow(0.5)).sin());
+//                sum = sum.add((diffs[i].subtract(500.0).divide(100)).pow(2).divide(nx));
+
+
+
+//                f -= (500.0 - (z[i] % 500)) * Math.sin(Math.pow(500.0 - (z[i] % 500), 0.5));
+//                tmp = (z[i] - 500.0) / 100;
+//                f += tmp * tmp / nx;
+                // diffs[i].
+            } else if (diffs[i].getValue() < -500) {
+                f = f.subtract(AllBenchmarks.mod(diffs[i].abs(), 500.0).subtract(500.0).multiply(AllBenchmarks.mod(diffs[i].abs(), 500.0).negate().add(500).pow(0.5).sin()));
+                DerivativeStructure tmp = diffs[i].add(500.0).divide(100.0);
+                f = f.add(tmp.pow(2).divide(nx));
+
+//                sum = sum.subtract(diffs[i].abs().remainder(500).subtract(500.0)).multiply((diffs[i].abs().remainder(500).subtract(500).negate().pow(0.5)).sin());
+//                sum = sum.add((diffs[i].add(500.0).divide(100)).pow(2).divide(nx));
+                //  f -= (-500.0 + (Math.abs(z[i]) % 500)) * Math.sin(Math.pow(500.0 - (Math.abs(z[i]) % 500), 0.5));
+                //tmp = (z[i] + 500.0) / 100;
+                //  f += tmp * tmp / nx;
+            } else{
+                f = f.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
+
+                // sum = sum.subtract(diffs[i].multiply(diffs[i].abs().pow(0.5).sin()));
+            }
+            //  f -= z[i] * Math.sin(Math.pow(Math.abs(z[i]), 0.5));
+        }
+        f = f.add(nx * 4.189828872724338e+002);
+        //DerivativeStructure diff = sum.add(nx * 4.189828872724338e+002);
+
+
+        //  f = 4.189828872724338e+002 * nx + f;
+        return f;
+    }
+
 
 //    DerivativeStructure schwefel_func_diff(double[] x,  int nx, double[] Os, double[] Mr, int s_flag, int r_flag) /* Schwefel's  */ {
 //        int i;
@@ -1323,22 +1565,16 @@ public class testfunc15L {
 
         DerivativeStructure r2 = diffs[0].getField().getZero();
         DerivativeStructure sum_z = diffs[0].getField().getZero();
-//        r2 = 0.0;
-//        sum_z = 0.0;
-        //f = 0.0;
         for (i = 0; i < nx; i++) {
-//            z[i] = z[i] - 1.0; //shift to orgin
-//            r2 += z[i] * z[i];
-//            sum_z += z[i];
             diffs[i] = diffs[i].subtract(1.0);
             r2 = r2.add(diffs[i].pow(2));
             sum_z = sum_z.add(diffs[i]);
 
         }
-        //f = Math.pow(Math.abs(r2 - nx), 2 * alpha) + (0.5 * r2 + sum_z) / nx + 0.5;
 
-        DerivativeStructure f = r2.subtract(nx).abs().pow(2*alpha).add(r2.multiply(0.5).add(sum_z).divide(nx + 0.5));
-
+        DerivativeStructure f1 = r2.subtract(nx).abs().pow(2*alpha);
+        DerivativeStructure f2 = r2.multiply(0.5).add(sum_z).divide(nx).add(0.5);
+        DerivativeStructure f = f1.add(f2);
         return f;
     }
 
@@ -1444,6 +1680,42 @@ public class testfunc15L {
 
     }
 
+    DerivativeStructure hgbat_func_diff_ds_part(double[] x,int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_nx)
+	/*HGBat, provided by Hans-Georg Beyer (HGB)*/
+	/*original global optimum: [-1,-1,...-1]*/ {
+        int i;
+        double alpha;
+        alpha = 1.0 / 4.0;
+
+        sr_func(x, z, nx, Os, Mr, 5.0 / 100.0, s_flag, r_flag); /* shift and rotate */
+
+        double [] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_nx, z[i]);
+            current_nx++;
+        }
+
+        DerivativeStructure r2 = diffs[0].getField().getZero();
+        DerivativeStructure sum_z = diffs[0].getField().getZero();
+        // r2 = 0.0;
+        // sum_z = 0.0;
+        for (i = 0; i < nx; i++) {
+//            z[i] = z[i] - 1.0;//shift to orgin
+//            r2 += z[i] * z[i];
+//            sum_z += z[i];
+            diffs[i] = diffs[i].subtract(1.0);
+            r2 = r2.add(diffs[i].pow(2));
+            sum_z = sum_z.add(diffs[i]);
+
+        }
+        //f = Math.pow(Math.abs(Math.pow(r2, 2.0) - Math.pow(sum_z, 2.0)), 2 * alpha) + (0.5 * r2 + sum_z) / nx + 0.5;
+        DerivativeStructure f = r2.pow(2).subtract(sum_z.pow(2)).abs().pow(2*alpha).add(r2.multiply(0.5).add(sum_z).divide(nx).add(0.5));
+        return f;
+
+    }
+
+
     double grie_rosen_func(double[] x, double f, int nx, double[] Os, double[] Mr, int s_flag, int r_flag) /* Griewank-Rosenbrock  */ {
         int i;
         double temp, tmp1, tmp2;
@@ -1514,6 +1786,53 @@ public class testfunc15L {
 
         return f;
     }
+
+    DerivativeStructure grie_rosen_func_diff_ds_part(double[] x, int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Griewank-Rosenbrock  */ {
+        int i;
+        //    double temp, tmp1, tmp2;
+
+        sr_func(x, z, nx, Os, Mr, 5.0 / 100.0, s_flag, r_flag); /* shift and rotate */
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+        DerivativeStructure f = diffs[0].getField().getZero();
+        //DerivativeStructure sum_z = diffs[0].getField().getZero();
+
+        //f = 0.0;
+
+
+        // z[0] += 1.0; //shift to orgin
+        DerivativeStructure tmp1, tmp2, temp;
+        diffs[0] = diffs[0].add(1.0);
+        for (i = 0; i < nx - 1; i++) {
+            diffs[i+1] = diffs[i+1].add(1.0);
+            tmp1 = diffs[i].pow(2).subtract(diffs[i+1]);
+            tmp2 = diffs[i].subtract(1.0);
+            temp = tmp1.pow(2).multiply(100.0).add(tmp2.pow(2));
+            f = f.add(temp.pow(2).divide(4000.0).subtract(temp.cos()).add(1.0));
+//            z[i + 1] += 1.0; //shift to orgin
+//            tmp1 = z[i] * z[i] - z[i + 1];
+//            tmp2 = z[i] - 1.0;
+//            temp = 100.0 * tmp1 * tmp1 + tmp2 * tmp2;
+//            f += (temp * temp) / 4000.0 - Math.cos(temp) + 1.0;
+        }
+        tmp1 = diffs[nx-1].pow(2).subtract(diffs[0]);
+        tmp2 = diffs[nx-1].subtract(1.0);
+        temp = tmp1.pow(2).multiply(100.0).add(tmp2.pow(2));
+        f = f.add(temp.pow(2).divide(4000.0).subtract(temp.cos()).add(1.0));
+//        tmp1 = z[nx - 1] * z[nx - 1] - z[0];
+//        tmp2 = z[nx - 1] - 1.0;
+//        temp = 100.0 * tmp1 * tmp1 + tmp2 * tmp2;
+//
+//        f += (temp * temp) / 4000.0 - Math.cos(temp) + 1.0;
+
+
+        return f;
+    }
+
 
     double escaffer6_func(double[] x, double f, int nx, double[] Os, double[] Mr, int s_flag, int r_flag) /* Expanded Scaffer��s F6  */ {
         int i;
@@ -1637,6 +1956,37 @@ public class testfunc15L {
         return f;
     }
 
+
+    DerivativeStructure escaffer6_func_diff_ds_part(double[] x,  int nx, double[] Os, double[] Mr, int s_flag, int r_flag, int real_nx, int current_index) /* Expanded Scaffer��s F6  */ {
+        int i;
+        //    double temp1, temp2;
+
+        sr_func(x, z, nx, Os, Mr, 1.0, s_flag, r_flag); /* shift and rotate */
+        double [] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        for (i = 0; i < nx; i++) {
+            diffs[i] = new DerivativeStructure(real_nx, 2, current_index, z[i]);
+            current_index++;
+        }
+
+        DerivativeStructure f = diffs[0].getField().getZero();
+
+        //  f = 0.0;
+        for (i = 0; i < nx - 1; i++) {
+            DerivativeStructure temp1 = diffs[i].pow(2).add(diffs[i+1].pow(2)).sqrt().sin();
+            temp1 = temp1.pow(2);
+            DerivativeStructure temp2 = diffs[i].pow(2).add(diffs[i+1].pow(2)).multiply(0.001).add(1.0);
+            f = f.add(temp1.subtract(0.5).divide(temp2.pow(2)).add(0.5));
+        }
+        DerivativeStructure temp1 = diffs[0].pow(2).add(diffs[nx -1].pow(2)).sqrt().sin();
+        temp1 = temp1.pow(2);
+        DerivativeStructure temp2 = diffs[0].pow(2).add(diffs[nx-1].pow(2)).multiply(0.001).add(1.0);
+        f = f.add(temp1.subtract(0.5).divide(temp2.pow(2)).add(0.5));
+
+
+        return f;
+    }
+
     double hf01(double[] x, double f, int nx, double[] Os, double[] Mr, int[] S, int s_flag, int r_flag) /* Hybrid Function 1 */ {
         int i, tmp, cf_num = 3;
         double[] fit = new double[3];
@@ -1712,6 +2062,12 @@ public class testfunc15L {
         double[] Gp = {0.3, 0.3, 0.4};
         double []g = new double[nx];
 
+        //  DerivativeStructure[] diffs = new DerivativeStructure[nx];
+        //  for (i = 0; i < nx; i++) {
+
+        //  }
+
+
         tmp = 0;
         for (i = 0; i < cf_num - 1; i++) {
             G_nx[i] = (int) Math.ceil(Gp[i] * nx);
@@ -1727,7 +2083,8 @@ public class testfunc15L {
 
         for (i = 0; i < nx; i++) {
             y[i] = z[S[i] - 1];
-           // g[i] = 0;
+            //      diffs[i] = new DerivativeStructure(nx, 2, i, y[i]);
+            // g[i] = 0;
         }
 
 
@@ -1737,41 +2094,59 @@ public class testfunc15L {
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
         tM = new double[G_nx[i]];
+        // DerivativeStructure[] diffs_g1 = new DerivativeStructure[G_nx[i]];
         for (int ii = 0; ii < G_nx[i]; ii++) {
+            //    diffs_g1[ii] = diffs[ii];
             ty[ii] = y[ii];
             tO[ii] = Os[ii];
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = schwefel_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g1 = schwefel_func_diff(ty, G_nx[i], tO, tM,0,0,diff_enabled);
+        DerivativeStructure g1 = schwefel_func_diff_ds_part(ty, G_nx[i], tO, tM,0,0,nx, 0);
 
         i = 1;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
         tM = new double[G_nx[i]];
+        //   DerivativeStructure[] diffs_g2 = new DerivativeStructure[G_nx[i]];
         for (int ii = 0; ii < G_nx[i]; ii++) {
+            //    diffs_g2[ii] = diffs[G_nx[i - 1] + ii];
             ty[ii] = y[G_nx[i - 1] + ii];
             tO[ii] = Os[G_nx[i - 1] + ii];
             tM[ii] = Mr[i * nx + ii];
         }
-       // fit[i] = rastrigin_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g2 = rastrigin_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-
+        // fit[i] = rastrigin_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
+        // double [] g2 = rastrigin_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g2 = rastrigin_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1]);
         i = 2;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
         tM = new double[G_nx[i]];
+        // DerivativeStructure[] diffs_g3 = new DerivativeStructure[G_nx[i]];
         for (int ii = 0; ii < G_nx[i]; ii++) {
+            //diffs_g3[ii] = diffs[]
             ty[ii] = y[G_nx[i - 2] + G_nx[i - 1] + ii];
             tO[ii] = Os[G_nx[i - 2] + G_nx[i - 1] + ii];
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = ellips_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g3 = ellips_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        //double [] g3 = ellips_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g3 = ellips_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 2] + G_nx[i - 1]);
 
+//        for (i = 0; i < nx; i++) {
+//            int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//            indexs[i] = 1;
+//            g[i] = f.getPartialDerivative(indexs);
+//        }
 
-        for (i = 0; i < nx; i++) {
-           g[i] = g1[i] + g2[i] + g3[i];
+        if(diff_enabled) {
+            for (i = 0; i < nx; i++) {
+                int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                indexs[i] = 1;
+                g[i] = g1.getPartialDerivative(indexs) + g2.getPartialDerivative(indexs) + g3.getPartialDerivative(indexs);;
+            }
+        }else{
+            g[0] = g1.getValue() + g2.getValue() + g3.getValue();
         }
         return g;
     }
@@ -1784,6 +2159,12 @@ public class testfunc15L {
         double[] Gp = {0.3, 0.3, 0.4};
         double []g = new double[nx];
 
+      //  DerivativeStructure[] diffs = new DerivativeStructure[nx];
+      //  for (i = 0; i < nx; i++) {
+
+      //  }
+
+
         tmp = 0;
         for (i = 0; i < cf_num - 1; i++) {
             G_nx[i] = (int) Math.ceil(Gp[i] * nx);
@@ -1799,6 +2180,7 @@ public class testfunc15L {
 
         for (i = 0; i < nx; i++) {
             y[i] = z[S[i] - 1];
+      //      diffs[i] = new DerivativeStructure(nx, 2, i, y[i]);
             // g[i] = 0;
         }
 
@@ -1809,42 +2191,48 @@ public class testfunc15L {
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
         tM = new double[G_nx[i]];
+       // DerivativeStructure[] diffs_g1 = new DerivativeStructure[G_nx[i]];
         for (int ii = 0; ii < G_nx[i]; ii++) {
+        //    diffs_g1[ii] = diffs[ii];
             ty[ii] = y[ii];
             tO[ii] = Os[ii];
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = schwefel_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        DerivativeStructure g1 = schwefel_func_diff_ds(ty, G_nx[i], tO, tM,0,0,diff_enabled);
+        DerivativeStructure g1 = schwefel_func_diff_ds_part(ty, G_nx[i], tO, tM,0,0,nx, 0);
 
         i = 1;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
         tM = new double[G_nx[i]];
+     //   DerivativeStructure[] diffs_g2 = new DerivativeStructure[G_nx[i]];
         for (int ii = 0; ii < G_nx[i]; ii++) {
+        //    diffs_g2[ii] = diffs[G_nx[i - 1] + ii];
             ty[ii] = y[G_nx[i - 1] + ii];
             tO[ii] = Os[G_nx[i - 1] + ii];
             tM[ii] = Mr[i * nx + ii];
         }
         // fit[i] = rastrigin_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
        // double [] g2 = rastrigin_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g2 = rastrigin_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g2 = rastrigin_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1]);
         i = 2;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
         tM = new double[G_nx[i]];
+       // DerivativeStructure[] diffs_g3 = new DerivativeStructure[G_nx[i]];
         for (int ii = 0; ii < G_nx[i]; ii++) {
+            //diffs_g3[ii] = diffs[]
             ty[ii] = y[G_nx[i - 2] + G_nx[i - 1] + ii];
             tO[ii] = Os[G_nx[i - 2] + G_nx[i - 1] + ii];
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = ellips_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
         //double [] g3 = ellips_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g3 = ellips_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g3 = ellips_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 2] + G_nx[i - 1]);
 
-//        for (i = 0; i < nx; i++) {
-//            g[i] = g1[i] + g2[i] + g3[i];
-//        }
+
+
+
         return g1.add(g2).add(g3);
     }
 
@@ -1968,7 +2356,8 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = griewank_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g1 = griewank_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        //double [] g1 = griewank_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g1 = griewank_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, 0);
         i = 1;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -1979,7 +2368,8 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = weierstrass_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g2 = weierstrass_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        // double [] g2 = weierstrass_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g2 = weierstrass_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1]);
         i = 2;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -1990,7 +2380,8 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         // fit[i] = rosenbrock_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g3 = rosenbrock_func_diff(ty,  G_nx[i], tO, tM, 0, 0, diff_enabled);
+        //double [] g3 = rosenbrock_func_diff(ty,  G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g3 = rosenbrock_func_diff_ds_part(ty,  G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2]);
 
         i = 3;
         ty = new double[G_nx[i]];
@@ -2002,16 +2393,31 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = escaffer6_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g4 = escaffer6_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        //double [] g4 = escaffer6_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g4 = escaffer6_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0,  nx, G_nx[i - 1] + G_nx[i - 2] + G_nx[i - 3]);
         double [] g = new double[nx];
-        for (i = 0; i < cf_num; i++) {
-            //f += fit[i];
-            g[i] = g1[i] + g2[i] + g3[i] + g4[i];
+
+
+    //    for (i = 0; i < nx; i++) {
+//            int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//            indexs[i] = 1;
+//            g[i] = f.getPartialDerivative(indexs);
+//        }
+
+
+        if(diff_enabled) {
+            for (i = 0; i < nx; i++) {
+                int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                indexs[i] = 1;
+                g[i] = g1.getPartialDerivative(indexs) + g2.getPartialDerivative(indexs) + g3.getPartialDerivative(indexs) + g4.getPartialDerivative(indexs);
+            }
+        }else{
+            g[0] = g1.getValue() + g2.getValue() + g3.getValue() + g4.getValue();
         }
         return g;
 
     }
-    DerivativeStructure hf02_dff_ds(double[] x,  int nx, double[] Os, double[] Mr, int[] S, int s_flag, int r_flag, boolean diff_enabled) /* Hybrid Function 2 */ {
+    DerivativeStructure hf02_diff_ds(double[] x,  int nx, double[] Os, double[] Mr, int[] S, int s_flag, int r_flag, boolean diff_enabled) /* Hybrid Function 2 */ {
         int i, tmp, cf_num = 4;
         //double[] fit = new double[4];
         int[] G_nx = new int[4];
@@ -2050,7 +2456,7 @@ public class testfunc15L {
         }
         //fit[i] = griewank_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
         //double [] g1 = griewank_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g1 = griewank_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g1 = griewank_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, 0);
         i = 1;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2062,7 +2468,7 @@ public class testfunc15L {
         }
         //fit[i] = weierstrass_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
        // double [] g2 = weierstrass_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g2 = weierstrass_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g2 = weierstrass_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1]);
         i = 2;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2074,7 +2480,7 @@ public class testfunc15L {
         }
         // fit[i] = rosenbrock_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
         //double [] g3 = rosenbrock_func_diff(ty,  G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g3 = rosenbrock_func_diff_ds(ty,  G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g3 = rosenbrock_func_diff_ds_part(ty,  G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2]);
 
         i = 3;
         ty = new double[G_nx[i]];
@@ -2087,7 +2493,7 @@ public class testfunc15L {
         }
         //fit[i] = escaffer6_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
         //double [] g4 = escaffer6_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g4 = escaffer6_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g4 = escaffer6_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0,  nx, G_nx[i - 1] + G_nx[i - 2] + G_nx[i - 3]);
         double [] g = new double[nx];
 //        for (i = 0; i < cf_num; i++) {
 //            //f += fit[i];
@@ -2195,7 +2601,7 @@ public class testfunc15L {
 
     double [] hf03_diff(double[] x, int nx, double[] Os, double[] Mr, int[] S, int s_flag, int r_flag, boolean diff_enabled) /* Hybrid Function 3 */ {
         int i, tmp, cf_num = 5;
-       // double[] fit = new double[5];
+        // double[] fit = new double[5];
         int[] G = new int[5];
         int[] G_nx = new int[5];
         double[] Gp = {0.1, 0.2, 0.2, 0.2, 0.3};
@@ -2233,7 +2639,8 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = escaffer6_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g1 = escaffer6_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        // double [] g1 = escaffer6_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g1 = escaffer6_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, 0);
         i = 1;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2244,7 +2651,8 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = hgbat_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g2 = hgbat_func_diff(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
+        // double [] g2 = hgbat_func_diff(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
+        DerivativeStructure g2 = hgbat_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0,nx, G_nx[i - 1]);
         i = 2;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2256,7 +2664,8 @@ public class testfunc15L {
         }
 
         //fit[i] = rosenbrock_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g3 = rosenbrock_func_diff(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
+        //double [] g3 = rosenbrock_func_diff(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
+        DerivativeStructure g3 = rosenbrock_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2]);
         i = 3;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2267,7 +2676,8 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = schwefel_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g4 = schwefel_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        // double [] g4 = schwefel_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g4 = schwefel_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2] + G_nx[i - 3]);
         i = 4;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2278,16 +2688,25 @@ public class testfunc15L {
             tM[ii] = Mr[i * nx + ii];
         }
         //fit[i] = ellips_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
-        double [] g5 = ellips_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        //double [] g5 = ellips_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g5 = ellips_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2] + G_nx[i - 3] + G_nx[i - 4]);
 
         //for(i=0;i<cf_num;i++){
         //	System.out.println("fithf05["+i+"]"+"="+fit[i]);
         //}
 
         double [] g = new double[nx];
-        for (i = 0; i < cf_num; i++) {
-            //f += fit[i];
-            g[i] = g1[i] + g2[i] + g3[i] + g4[i] + g5[i];
+
+        if(diff_enabled) {
+            for (i = 0; i < cf_num; i++) {
+                int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                indexs[i] = 1;
+                //g[i] = g1.getPartialDerivative(indexs) + g2.getPartialDerivative(indexs) + g3.getPartialDerivative(indexs) + g4.getPartialDerivative(indexs);
+                g[i] = g1.getPartialDerivative(indexs) + g2.getPartialDerivative(indexs) + g3.getPartialDerivative(indexs) + g4.getPartialDerivative(indexs) + g5.getPartialDerivative(indexs);
+            }
+        }else{
+            i=0;
+            g[i] = g1.getValue() + g2.getValue() + g3.getValue() + g4.getValue() + g5.getValue();
         }
         return g;
 
@@ -2334,7 +2753,7 @@ public class testfunc15L {
         }
         //fit[i] = escaffer6_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
        // double [] g1 = escaffer6_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g1 = escaffer6_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g1 = escaffer6_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, 0);
         i = 1;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2346,7 +2765,7 @@ public class testfunc15L {
         }
         //fit[i] = hgbat_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
        // double [] g2 = hgbat_func_diff(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
-        DerivativeStructure g2 = hgbat_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
+        DerivativeStructure g2 = hgbat_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0,nx, G_nx[i - 1]);
         i = 2;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2359,7 +2778,7 @@ public class testfunc15L {
 
         //fit[i] = rosenbrock_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
         //double [] g3 = rosenbrock_func_diff(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
-        DerivativeStructure g3 = rosenbrock_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0,diff_enabled);
+        DerivativeStructure g3 = rosenbrock_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2]);
         i = 3;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2371,7 +2790,7 @@ public class testfunc15L {
         }
         //fit[i] = schwefel_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
        // double [] g4 = schwefel_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g4 = schwefel_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g4 = schwefel_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2] + G_nx[i - 3]);
         i = 4;
         ty = new double[G_nx[i]];
         tO = new double[G_nx[i]];
@@ -2383,7 +2802,7 @@ public class testfunc15L {
         }
         //fit[i] = ellips_func(ty, fit[i], G_nx[i], tO, tM, 0, 0);
         //double [] g5 = ellips_func_diff(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
-        DerivativeStructure g5 = ellips_func_diff_ds(ty, G_nx[i], tO, tM, 0, 0, diff_enabled);
+        DerivativeStructure g5 = ellips_func_diff_ds_part(ty, G_nx[i], tO, tM, 0, 0, nx, G_nx[i - 1] + G_nx[i - 2] + G_nx[i - 3] + G_nx[i - 4]);
 
         //for(i=0;i<cf_num;i++){
         //	System.out.println("fithf05["+i+"]"+"="+fit[i]);
@@ -2576,7 +2995,7 @@ public class testfunc15L {
             tSS[j] = SS[i * nx + j];
         }
         //fit[i] = hf02(x, fit[i], nx, tOs, tMr, tSS, 1, r_flag);
-        g[i]= hf02_dff_ds(x,  nx, tOs, tMr, tSS, 1, r_flag,diff_enabled);
+        g[i]= hf02_diff_ds(x,  nx, tOs, tMr, tSS, 1, r_flag,diff_enabled);
 
 
         i = 2;
@@ -2953,7 +3372,7 @@ DerivativeStructure [] g = new DerivativeStructure[cf_num];
             tSS[j] = SS[i * nx + j];
         }
         //fit[i] = hf03(x, fit[i], nx, tOs, tMr, tSS, 1, r_flag);
-        g[i] = hf01_diff_ds(x, nx, tOs, tMr, tSS, 1, r_flag, diff_enabled);
+        g[i] = hf03_diff_ds(x, nx, tOs, tMr, tSS, 1, r_flag, diff_enabled);
         i = 1;
         for (j = 0; j < nx; j++) {
             tOs[j] = Os[i * nx + j];
@@ -3606,59 +4025,49 @@ DerivativeStructure [] g = new DerivativeStructure[cf_num];
     double [] cf_cal_diff(double[] x, int nx, double[] Os, double[] delta, double[] bias, DerivativeStructure [] fit,  int cf_num, boolean diff_enabled) {
         int i, j;
 
-       // double[] w;
         double w_max = 0;//, w_sum = 0;
-       // w = new double[cf_num];
         DerivativeStructure [] w = new DerivativeStructure[cf_num];
-        double [] g = new double[nx];
-        DerivativeStructure[] diffs_x = new DerivativeStructure[nx];
+        DerivativeStructure w_sum = fit[0].getField().getZero();
+//        double [] g = new double[nx];
+        DerivativeStructure[] diffs = new DerivativeStructure[nx];
         for (i = 0; i < nx; i++) {
-            diffs_x[i] = new DerivativeStructure(nx, 2, i, x[i]);
+            diffs[i] = new DerivativeStructure(nx, 2, i, x[i]);
         }
-
-
-//        g1 = g1.add(bias[0]);
-//        g2 = g2.add(bias[1]);
-//        g3 = g3.add(bias[2]);
-
         for (i = 0; i < cf_num; i++) {
             fit[i] = fit[i].add(bias[i]);
-            //fit[i] += bias[i];
-            //w[i] = 0;
-            w[i] = diffs_x[0].getField().getZero();
+            w[i] = fit[i].getField().getZero();
             for (j = 0; j < nx; j++) {
                 //w[i] += Math.pow(x[j] - Os[i * nx + j], 2.0);
-                w[i] = w[i].add(diffs_x[j].subtract(Os[i * nx + j]).pow(2));
+                w[i]  = w[i].add(diffs[j].subtract( Os[i * nx + j]).pow(2));
             }
-            if (!w[i].equals(diffs_x[0].getField().getZero()))
+            if (w[i].getValue() != 0){
                 //w[i] = Math.pow(1.0 / w[i], 0.5) * Math.exp(-w[i] / 2.0 / nx / Math.pow(delta[i], 2.0));
-                w[i] = w[i].pow(-1).pow(0.5).multiply(w[i].negate().divide(2.0).divide(nx).divide(Math.pow(delta[i], 2.0)).exp());
-            else
-                //w[i] = INF;
-                w[i] = diffs_x[0].getField().getOne().multiply(INF);
-            if (w[i].getValue() > w_max)
+                w[i] = w[i].pow(-1).pow(0.5).multiply(w[i].negate().divide(2).divide(nx).divide(Math.pow(delta[i], 2.0)).exp());
+            }else{
+                w[i] = fit[i].getField().getOne().multiply(INF);
+            }
+            if(w_max < w[i].getValue()){
                 w_max = w[i].getValue();
+            }
         }
 
-        DerivativeStructure w_sum = diffs_x[0].getField().getZero();
-        for (i = 0; i < cf_num; i++) {
-            //w_sum = w_sum + w[i];
+        for(i=0; i<cf_num; i++){
             w_sum = w_sum.add(w[i]);
         }
-        if (w_max == 0) {
-            for (i = 0; i < cf_num; i++)
-                w[i] = diffs_x[0].getField().getOne();
-            w_sum = diffs_x[0].getField().getOne().multiply(cf_num);
+
+        if(w_max == 0){
+            for(i = 0; i<cf_num; i++){
+                w[i] = fit[0].getField().getOne();
+            }
+            w_sum = fit[0].getField().getOne().multiply(cf_num);
         }
-        DerivativeStructure f = diffs_x[0].getField().getZero();
-       // f = 0.0;
+
+        DerivativeStructure f = diffs[0].getField().getZero();
+
         for (i = 0; i < cf_num; i++) {
-            //f = f + w[i] / w_sum * fit[i];
-//        f = f.add(w[i].divide(w_sum.multiply(g1)));
-//        f = f.add(w[i].divide(w_sum.multiply(g2)));
-//        f = f.add(w[i].divide(w_sum.multiply(g3)));
-            f = f.add(w[i].divide(w_sum.multiply(fit[i])));
+            f = f.add(w[i].divide(w_sum).multiply(fit[i]));
        }
+        double [] g = new double[nx];
         if(diff_enabled) {
             for (i = 0; i < nx; i++) {
                 int[] indexs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -3672,6 +4081,7 @@ DerivativeStructure [] g = new DerivativeStructure[cf_num];
 
             return g;
         }
+
 
     }
 

@@ -1,3 +1,4 @@
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -867,7 +868,18 @@ public class Util {
 
 
 
-
+    public static DerivativeStructure mod(DerivativeStructure a, double b){
+        //double aa = Math.abs(a);
+        DerivativeStructure aa = a.abs();
+        double bb = Math.abs(b);
+        //double cc = aa - Math.floor(aa/bb)*bb;
+        DerivativeStructure cc = aa.subtract(aa.divide(bb).floor().multiply(bb));
+        if(aa.getValue() < 0 ){
+            return cc.negate();
+        }else{
+            return cc;
+        }
+    }
 
 
 }

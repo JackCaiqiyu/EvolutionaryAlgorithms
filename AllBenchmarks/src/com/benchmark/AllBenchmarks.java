@@ -1,5 +1,7 @@
 package com.benchmark;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+
 /**
  * Created by framg on 26/03/2016.
  */
@@ -27,5 +29,18 @@ public abstract class AllBenchmarks {
     public abstract double lbound();
     public abstract double ubound();
 
+
+    public static DerivativeStructure mod(DerivativeStructure a, double b){
+        //double aa = Math.abs(a);
+        DerivativeStructure aa = a.abs();
+        double bb = Math.abs(b);
+        //double cc = aa - Math.floor(aa/bb)*bb;
+        DerivativeStructure cc = aa.subtract(aa.divide(bb).floor().multiply(bb));
+        if(a.getValue() < 0 ){
+            return cc.negate();
+        }else{
+            return cc;
+        }
+    }
 
 }
