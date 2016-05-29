@@ -73,6 +73,15 @@ public class Matrix {
         return aNew;
     }
 
+    public static double [] addByElement(double [] a1, double a){
+        double [] aNew = new double [a1.length];
+        for(int i=0; i<aNew.length; i++){
+            aNew[i] = a1[i] +  a;
+        }
+        return aNew;
+    }
+
+
     public static double [][] multipliesElementByElement(double [][] m1, double [][] m2){
         double [][] aNew = new double [m1.length][m1[0].length];
         if(m1.length != m2.length){

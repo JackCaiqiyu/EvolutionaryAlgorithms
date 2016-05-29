@@ -25,9 +25,11 @@ public abstract class AllBenchmarks {
     }
 
     public abstract double f(double[] x);
+    public abstract double [] g(double[] x);
     public abstract double bias();
     public abstract double lbound();
     public abstract double ubound();
+
 
 
     public static DerivativeStructure mod(DerivativeStructure a, double b){

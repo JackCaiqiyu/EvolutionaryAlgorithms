@@ -33,7 +33,7 @@ public class TestCEC15 {
 //        System.out.println(AllBenchmarks.mod(diff, m).getValue());
 
         System.out.println(5.0/3.0 * 8.0);
-
+        System.out.println( 1.d-15 );
     }
 
     public double mod(double a, double b){

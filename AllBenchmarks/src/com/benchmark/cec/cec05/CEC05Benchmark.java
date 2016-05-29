@@ -34,6 +34,11 @@ public class CEC05Benchmark extends AllBenchmarks {
     }
 
     @Override
+    public double[] g(double[] x) {
+        return null;
+    }
+
+    @Override
     public double bias() {
         return bias.getBias(FUN);
     }

@@ -1,3 +1,4 @@
+import com.benchmark.AllBenchmarks;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -7,7 +8,14 @@ import org.apache.commons.math3.linear.*;
 /**
  * Created by framg on 15/05/2016.
  */
-public class Matlab {
+public final class Matlab {
+
+
+    private Matlab(){
+
+    }
+
+
     static double [][] eigV(double [][] m){
         RealMatrix CRealMatrix = new Array2DRowRealMatrix(m);
         EigenDecomposition eigenDecomposition = new EigenDecomposition(CRealMatrix);
@@ -64,5 +72,17 @@ public class Matlab {
     static double det(double [][] m){
         RealMatrix matrix = new Array2DRowRealMatrix(m);
         return new LUDecomposition(matrix).getDeterminant();
+    }
+
+    static fminconOutput fmincon(AllBenchmarks fun, double [] x, int FEsAllowed){
+        fminconOutput out = new fminconOutput();
+        return out;
+    }
+
+
+    public static class fminconOutput {
+        public double [] x;
+        public double fit;
+        public int evals;
     }
 }

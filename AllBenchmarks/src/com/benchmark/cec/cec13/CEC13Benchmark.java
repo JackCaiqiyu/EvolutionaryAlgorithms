@@ -173,6 +173,11 @@ public class CEC13Benchmark extends AllBenchmarks {
     }
 
     @Override
+    public double[] g(double[] x) {
+        return  null;
+    }
+
+    @Override
     public double bias() {
         switch (FUN) {
             case 1:

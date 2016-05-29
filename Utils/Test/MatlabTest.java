@@ -3,6 +3,7 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import org.apache.commons.math3.linear.LUDecomposition;
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 /**
@@ -27,5 +28,17 @@ public class MatlabTest {
         assertEquals(-6, (int)Matlab.det(a));
         assertEquals(115, (int)Matlab.det(b));
 
+    }
+
+    @Test
+    public void fminconTest(){
+        Matlab.fminconOutput output1 = new Matlab.fminconOutput();
+        output1.evals = 4;
+
+        Matlab.fminconOutput output2 = new Matlab.fminconOutput();
+        output2.evals = 5;
+
+
+        Assert.assertNotEquals(output1.evals, output2.evals);
     }
 }
