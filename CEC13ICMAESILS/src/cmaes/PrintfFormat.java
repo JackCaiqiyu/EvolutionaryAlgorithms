@@ -1,4 +1,4 @@
-//
+package cmaes;//
 // (c) 2000 Sun Microsystems, Inc.
 // ALL RIGHTS RESERVED
 // 

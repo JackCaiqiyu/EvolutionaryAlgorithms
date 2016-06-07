@@ -1,4 +1,4 @@
-import com.benchmark.AllBenchmarks;
+
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -74,7 +74,7 @@ public final class Matlab {
         return new LUDecomposition(matrix).getDeterminant();
     }
 
-    static fminconOutput fmincon(AllBenchmarks fun, double [] x, int FEsAllowed){
+    static fminconOutput fmincon(FminconFunction fun, double [] x, int FEsAllowed){
         fminconOutput out = new fminconOutput();
         return out;
     }
@@ -84,5 +84,10 @@ public final class Matlab {
         public double [] x;
         public double fit;
         public int evals;
+        public double oox;
+    }
+
+    public static abstract class FminconFunction{
+        public abstract double f(double [] x);
     }
 }

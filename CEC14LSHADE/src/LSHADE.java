@@ -72,7 +72,9 @@ public class LSHADE {
         /////////////////////////////////////////////////////////////////////////
         for (int i = 0; i < pop_size; i++)
         {
+
             nfes++;
+            Configuration.records.newRecord(fitness[i], nfes);
 
             if ((fitness[i] - optimum) < epsilon)
             {
@@ -252,7 +254,7 @@ public class LSHADE {
             for (int i = 0; i < pop_size; i++)
             {
                 nfes++;
-
+                Configuration.records.newRecord(children_fitness[i], nfes);
                 //following the rules of CEC 2014 real parameter competition,
                 //if the gap between the error values of the best solution found and the optimal solution was 10^{−8} or smaller,
                 //the error was treated as 0
@@ -412,6 +414,7 @@ public class LSHADE {
         }
         System.out.println("FUN: " + Configuration.F);
         System.out.println("Value: " + (bsf_fitness - optimum) + " at: " + nfes);
+        Configuration.records.endRun(Math.abs(bsf_fitness - optimum), nfes, Configuration.MAX_FES);
         return bsf_fitness - optimum;
     }
 

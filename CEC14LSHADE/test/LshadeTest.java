@@ -29,7 +29,7 @@ public class LshadeTest {
         Configuration.g_memory_size = 6;
         Configuration.g_p_best_rate = 0.11;
 
-
+        Configuration.records.startRecord();
         LSHADE lshade = new LSHADE();
         return lshade.execute();
     }

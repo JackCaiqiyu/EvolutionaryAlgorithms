@@ -18,6 +18,8 @@ public class MatlabTest {
 
         Matlab.diag(algo);
 
+        System.out.println((long)1e299);
+
     }
 
     @Test

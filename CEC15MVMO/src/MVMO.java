@@ -8,7 +8,7 @@ import sun.security.provider.SHA;
 public class MVMO {
     Xt xt;
     Ps ps;
-    Proc proc;
+    static Proc proc;
     Paramater parameter;
     Table table;
 
@@ -68,7 +68,7 @@ public class MVMO {
     double [][] shape;
     double [][] Shape_dyn;
     int [] izm;
-    int [] izz;
+    //int [] izz;
     int [] no_in;
     int [] no_inin;
 
@@ -76,8 +76,8 @@ public class MVMO {
     double delta_Shape_dyn;
     double delta_Shape_dyn0;
     double delta_Shape_dyn1;
-    double ffx;
-    double oox;
+  //  double ffx;
+ //   double oox;
 
 
 
@@ -98,11 +98,11 @@ public class MVMO {
 
         for (int iijj = 0; iijj < parameter.n_par; iijj++) {
             for (int jjkk = 0; jjkk < ps.D; jjkk++) {
-                xx[iijj][jjkk] = ps.x_min[jjkk] + Configuration.rand.getFloat() * (ps.x_max[jjkk] - ps.x_min[jjkk]);
+                xx[iijj][jjkk] = ps.x_min + Configuration.rand.getFloat() * (ps.x_max - ps.x_min);
             }
 
             for (int i = 0; i < ps.D; i++) {
-                x_norm[iijj][i] = (xx[iijj][i] - ps.x_min). / parameter.scaling; //TODO scaling es otro array?? todos mentirosos
+                x_norm[iijj][i] = (xx[iijj][i] - ps.x_min) / parameter.scaling; //TODO scaling es otro array?? todos mentirosos
             }
         }
 
@@ -253,7 +253,7 @@ public class MVMO {
         table = new Table();
     }
 
-    public void execute(){
+    public double execute(){
         while(true){
             ff = proc.i_eval / n_eval;
             ff2 = ff *ff;
@@ -282,7 +282,7 @@ public class MVMO {
                     considered[ipp][i] = false;
                 }
 
-                x_normalized[ipp] = Util.copyArray(Util.multiplyArray(x_normalized[ipp], ps.x_min + parameter.scaling));
+                x_normalized[ipp] = Matrix.addByElement(Matrix.multipliesByElement(x_normalized[ipp], parameter.scaling), ps.x_min);
                 if(local_search[ipp] && local_i < local_max && local_search0 > 0) {
                     //TODO tiene pinta de ser el record
                     /*
@@ -292,27 +292,23 @@ public class MVMO {
                                         rcond_value0=str2num(msgstr(81:end-1));
                                     end
                      */
-                    //TODO implementar [ffx,oox,~,x_normalized(ipp,:),FEVALS] = LocalSearchMVMOSH(fhd,iii,jjj,kkk,args,x_normalized(ipp,:),proc.n_eval-proc.i_eval); %Local search
+                    Matlab.fminconOutput outfmin = LocalSearchMVMOSH(x_normalized[ipp], proc.n_eval - proc.i_eval);
+                    x_normalized[ipp] = Util.copyArray(outfmin.x);
                     local_search[ipp] = false;
                     local_i++;
                     local_search_called++;
-                    xt.fitness = ffx;
-                    xt.objective = oox;
+                    xt.fitness = outfmin.fit;
+                    xt.objective = Configuration.PPL;
 
                     if (xt.fitness == xt.objective) {
                         xt.feasibility = true;
                     }else{
                         xt.feasibility = false;
                     }
-                    //TODO mas warnings de las narices
-                    /*
-                    [~, msgid1] = lastwarn;
-                    TFrcond1 = strcmp('MATLAB:nearlySingularMatrix',msgid1);
-                     */
                 }else{
-                    //TODO eval de la funcion objetivo? [ffx,oox,~,x_normalized(ipp,:)]=feval(fhd,iii,jjj,kkk,args,x_normalized(ipp,:));
+                    double ffx = TestFunction.testFuction(x_normalized[ipp]);
                     xt.fitness=ffx;
-                    xt.objective=oox;
+                    xt.objective=Configuration.PPL;
                     if (xt.fitness == xt.objective) {
                         xt.feasibility = true;
                     }else{
@@ -320,8 +316,9 @@ public class MVMO {
                     }
                 }
 
-                //TODO aqui condicion de parada break
-
+                if(proc.finish){
+                    return proc.best_value;
+                }
 
                 x_normalized[ipp] = Util.divideArray(Util.subArray(x_normalized[ipp], ps.x_min), parameter.scaling);
 
@@ -329,15 +326,15 @@ public class MVMO {
                 meann_app[ipp] = Util.copyArray(meann[ipp]);
                 if(proc.i_eval > indepent_runs){
                     if (changed_best || firsttime) {
-                        for(int I=0; I<n_par; I++){
-                            A[I] = table.fitness[0][I];
+                        for(int i=0; i<n_par; i++){
+                            A[i] = table.fitness[0][i];
                         }
                         if (firsttime) {
                             amax = 0.;
                             firsttime = false;
                         }
                         for (int ia = 0; ia < n_par; ia++) {
-                            if (!table.feasibility[0][ia]){
+                            if (!table.feasibility[0][ia]){ //TODO puede ser comprobar toda la columna check
                                 A[ia] = A[ia] + amax;
                             }
                         }
@@ -364,11 +361,11 @@ public class MVMO {
                         beta1 = alpha*3.0*bbb*((1.0+2.5*ff2)*Configuration.rand.getFloat() - (1.0-ff2)*0.30);
                         beta10=0.0;
 
-                        if(beta1 != beta10 ){ //TODO pensar mejor sistema de comparar dos doubles
+                        while (beta1 != beta10 ){ //TODO pensar mejor sistema de comparar dos doubles
                             beta10 = beta1;
                             for(int jx=0; jx<ps.D; jx++){
                                 ccc=table.bests[0][jx][bestp]-table.bests[0][jx][worstp];
-                                if (Math.abs(ccc) >  1.d-15) { //TODO que es 1.d?????????
+                                if (Math.abs(ccc) >  1.0e-15) {
                                     x_normalized[ipp][jx] = table.bests[0] [jx] [onep1] + beta1 * ccc;
                                 }else{
                                     x_normalized[ipp][jx] = table.bests[0] [jx] [onep1];
@@ -382,7 +379,7 @@ public class MVMO {
                                         worstp = returnObject[2];
 
                                         ccc = table.bests[0] [jx] [bestp] - table.bests[0] [jx][worstp];
-                                        if (Math.abs(ccc) > 1.d - 15) {
+                                        if (Math.abs(ccc) > 1.0e-15) {
                                             bbb = 1.1 + (Configuration.rand.getFloat() - 0.5)*2.0;
                                             beta1 = alpha * 3.0 * bbb * ((1.0 + 2.5 * ff2)*Configuration.rand.getFloat() - (1.0- ff2)*0.3);
                                             x_normalized[ipp] [jx] = table.bests[0] [jx] [onep1] + beta1 * ccc;
@@ -393,12 +390,12 @@ public class MVMO {
                                 }else if(table.bests[0][jx][bestp] > 0.85 || table.bests[0][jx][bestp] < 0.15 && Configuration.rand.getFloat() < 0.15 ){
                                     while (x_normalized[ipp][jx] > 1.0 ||  x_normalized[ipp][jx] < 0.0) {
 
-                                        returnObject = must();
+                                        returnObject = must(); //TODO no le pasamos el IX?
                                         bestp = returnObject[0];
                                         onep1 = returnObject[1];
                                         worstp = returnObject[2];
                                         ccc = table.bests[0] [jx][bestp] - table.bests[0] [jx] [worstp];
-                                        if (Math.abs(ccc) > 1.d - 15) {
+                                        if (Math.abs(ccc) > 1.e-15) {
                                             bbb = 1.1 + (Configuration.rand.getFloat() - 0.5)*2.0;
                                             beta1 = alpha * 3.0 * bbb * ((1.0 + 2.5 * ff2)* Configuration.rand.getFloat() - (1.0 - ff2)*0.30);
                                             x_normalized[ipp][jx] = table.bests[0] [jx] [onep1] + beta1 * ccc;
@@ -423,10 +420,10 @@ public class MVMO {
                                 x_normalized[ipp][i]=0.999 * table.bests[0][i][ipp]+0.0010 * table.bests[0][i][verybest];
                         }else{
                             for(int i=0; i<ps.D; i++){
-                                x_normalized[ipp][i]=0.999 * table.bests[1][i][ipp]+0.001 * table.bests[0][i][verybest];
+                                x_normalized[ipp][i]=0.999 * table.bests[1][i][ipp]+0.0010 * table.bests[0][i][verybest];
                             }
                         }
-                        int irandom=Math.round(Configuration.rand.getFloat()*(border_gute-1))+ 1;
+                        int irandom=Math.round(Configuration.rand.getFloat()*(border_gute-1)); //TODO puede dar fallo de segmentacion
                         for (int jxx=0; jxx < ps.D; jxx++){
                             meann_app[ipp][jxx] = meann[irandom][jxx];
                         }
@@ -502,47 +499,27 @@ public class MVMO {
         }
     }
 
-    /*function [ffx,oox,ggx,xn_out,FEVALS] = LocalSearchMVMOSH(testcase,iii,jjj,kkk,args,xx_yy,FEsAllowed)
-    global PPL GGL
-    if FEsAllowed <= 0, return, end
-            options=optimset('Display','off','algorithm','interior-point','UseParallel','never','MaxFunEvals',FEsAllowed,'FinDiffType','central' ) ;
-    [Xsqp, FUN , ~ , output]=...
-    fmincon(@(xx_yy)LSearch(xx_yy,testcase,iii,jjj,kkk,args),xx_yy,[],[],[],[],ps.x_min,ps.x_max,[],options);
 
+    public Matlab.fminconOutput LocalSearchMVMOSH(double [] x, int FEsAllowed){
+        FminconFunction fminconFuction = new FminconFunction();
+        Matlab.fminconOutput output =  Matlab.fmincon(fminconFuction, x, FEsAllowed );
 
-    FEVALS=output.funcCount  ;
-    for nvar=1:size(xx_yy,2)
-    if isnan(Xsqp(1,nvar))
-    Xsqp=xx_yy;
-    break;
-    end
-            end
-
-    xn_out = Xsqp;
-    ffx=FUN;
-    oox=PPL;
-    ggx=GGL;
-    end*/
-    public double LocalSearchMVMOSH(int n){
-        if(n <= 0){
-            //TODO terminar
+        for(int i=0; i<output.x.length; i++){
+            if(Double.isNaN(output.x[i])){
+                output.x = Util.copyArray(x);
+                break;
+            }
         }
 
+        return output;
     }
 
-    /*
-        function J=LSearch(xx_yy2,testcase,iii,jjj,kkk,args)
-        global PPL GGL
-        [J,PPL,GGL,~] = feval(testcase,iii,jjj,kkk,args,xx_yy2);
 
-    end
-     */
-
-    public double LSearch(){
-        double f = Configuration.benchmark.f(x_normalized[ipp]);
-        proc.i_eval++;
-        return f;
-    }
+//    public double LSearch(){
+//        double f = Configuration.benchmark.f(x_normalized[ipp]);
+//        proc.i_eval++;
+//        return f;
+//    }
 
 
     //Evacuated h-function
@@ -555,9 +532,52 @@ public class MVMO {
 
     }
 
+    public double [] mv_noneq(int nnnnnn, double [] values, double vmean, double vshape, double vvqq){
+        int iz = 0;
+        double [] values_noeq = new double[ps.D];
+        values_noeq[iz] = values[0];
+
+        for(int ii_jj=1; ii_jj<nnnnnn; ii_jj++){
+            int izz = iz;
+            boolean gleich = false;
+            for(int kk_ii=0; kk_ii<izz; ii_jj++){
+                if(Math.abs(values_noeq[kk_ii] - values[ii_jj]) < vvqq){
+                    gleich = true;
+                    break;
+                }
+            }
+            if(!gleich){
+                iz++;
+                values_noeq[iz] = values[ii_jj];
+            }
+        }
+        if(iz > 0){
+            vmean = 0.8 * vmean+0.2* Util.summatory(Util.range(values_noeq, 0, iz))/iz;
+            for(int i=0; i<iz; i++){
+                values_noeq[i] = values_noeq[i] - vmean;
+            }
+        }
+        if(iz > 0){
+            double vv = Util.summatory(Util.range(values_noeq, 0, iz))/iz;
+            if(vv > 1e-50){
+                vshape = -Math.log(vv);
+            }
+        }
+
+        double [] output = new double[2];
+        output[0] = vmean;
+        output[1] = vshape;
+
+        return output;
+    }
+
     public void VariableSelect1() {
         int n_var = ps.D;
-        int inn = -1;
+
+
+
+
+        int inn= -1;
         izm[ipp]=izm[ipp]-1;
         if (izm[ipp]< 1) {
             izm[ipp] = n_var;
@@ -578,39 +598,27 @@ public class MVMO {
     }
 
     public void Fill_solution_archive(){
-        no_in[ipp] = no_in[ipp]+1;
+        no_in[ipp] ++;
         boolean changed = false;
         changed_best=false;
         int i_position = 0;
 
         if(no_in[ipp] == 1){
             for(int i=0; i<n_to_save; i++) {
-               // for(int j=0; j<table.fitness[i].length; j++) {
-                    table.fitness[i][ipp] = 1.e222;
-              //  }
+                table.fitness[i][ipp] = 1.e200;
             }
 
             for(int i=0; i<n_to_save; i++) {
-               // for(int j=0; j<table.feasibility[i].length; j++) {
-                    table.feasibility[i][ipp] = false;
-            //    }
+                table.feasibility[i][ipp] = false;
             }
 
             for(int i=0; i<table.bests[0].length; i++){
                 table.bests[0][i][ipp] = x_normalized[ipp][i];
             }
-
-           // for(int i=0; i<table.fitness[0].length; i++){
                 table.fitness[0][ipp] = xt.fitness;
-         //   }
-
-         //   for(int i=0; i<table.objective[0].length; i++){
                 table.objective[0][ipp] = xt.objective;
-         //   }
-
-         //   for(int i=0; i<table.feasibility[0].length; i++){
                 table.feasibility[0][ipp] = xt.feasibility;
-        //    }
+
 
             no_inin[ipp]++;
             changed_best = true;
@@ -639,16 +647,19 @@ public class MVMO {
             if (no_inin[ipp] < n_to_save) {
                 nnnnnn = no_inin[ipp];
             }
-            //TODO que carajo es esto?
-           // isdx = nnnnnn:-1:i_position + 1;
-            for(int i=0; i<table.bests[isdx].length; i++) {
-                table.bests[isdx][i][ipp] = table.bests[isdx - 1][i][ipp];
+            // isdx = nnnnnn:-1:i_position + 1;
+            for(int isdx=nnnnnn-1; isdx>=i_position; isdx--){
+                table.fitness[isdx][ipp]=table.fitness[isdx - 1][ipp];
+                table.objective[isdx][ipp]=table.objective[isdx - 1][ipp];
+                table.feasibility[isdx][ipp]=table.feasibility[isdx - 1][ipp];
+                for(int i=0; i<ps.D; i++) {
+                    table.bests[isdx][i][ipp] = table.bests[isdx - 1][i][ipp];
+                }
             }
-            table.fitness[isdx][ipp]=table.fitness[isdx - 1][ipp];
-            table.objective[isdx][ipp]=table.objective[isdx - 1][ipp];
-            table.feasibility[isdx][ipp]=table.feasibility[isdx - 1][ipp];
 
-            for(int i=0; i<table.bests[i_position].length; i++) {
+
+
+            for(int i=0; i<ps.D; i++) {
                 table.bests[i_position][i][ipp] = x_normalized[ipp][i];
             }
             table.fitness[i_position][ipp]=xt.fitness;
@@ -657,9 +668,14 @@ public class MVMO {
 
             if ((no_inin[ipp] >= n_to_save)) {
                 for (int ivvar = 1; ivvar < D; ivvar++) {
-                    [meann(ipp, ivvar), shape(ipp, ivvar)]=mv_noneq(nnnnnn, table.bests(1:nnnnnn, ivvar, ipp), meann(ipp, ivvar), shape(ipp, ivvar), vvqq); //TODO implementar
-
-
+                    //[meann(ipp, ivvar), shape(ipp, ivvar)]=mv_noneq(nnnnnn, table.bests(1:nnnnnn, ivvar, ipp), meann(ipp, ivvar), shape(ipp, ivvar), vvqq); //TODO implementar
+                    double [] input = new double[nnnnnn];
+                    for(int i=0; i<nnnnnn; i++){
+                        input[i] = table.bests[i][ivvar][ipp];
+                    }
+                    double [] output = mv_noneq(nnnnnn, input, meann[ipp][ivvar], shape[ipp][ivvar], vvqq);
+                    meann[ipp][ivvar] = output[0];
+                    shape[ipp][ivvar] = output[1];
                 }
             }
         }
@@ -690,6 +706,5 @@ public class MVMO {
 
         return returnObject;
     }
-
 
 }

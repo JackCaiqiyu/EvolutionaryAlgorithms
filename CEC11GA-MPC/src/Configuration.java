@@ -1,3 +1,7 @@
+import com.benchmark.AllBenchmarks;
+import com.benchmark.Rand;
+import com.benchmark.Records;
+
 public class Configuration {
     public static int popSize= 90;
     public static int max_eval;

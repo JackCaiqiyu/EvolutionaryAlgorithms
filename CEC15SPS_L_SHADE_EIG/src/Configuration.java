@@ -9,6 +9,7 @@ public class Configuration {
     public static AllBenchmarks benchmark;
     public static Records records;
     public static int nF;
+    public static boolean isRecordsActive;
 
 
     public static String ConstraintHandling;

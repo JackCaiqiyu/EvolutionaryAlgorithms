@@ -1,8 +1,12 @@
+import com.benchmark.AllBenchmarks;
 import com.benchmark.Rand;
 import com.benchmark.Records;
+import com.benchmark.cec.cec05.CEC05Benchmark;
 import com.benchmark.cec.cec05.benchmark;
 import com.benchmark.cec.cec05.test_func;
+import com.benchmark.cec.cec13.CEC13Benchmark;
 import com.benchmark.cec.cec14.CEC14Benchmark;
+import com.benchmark.cec.cec15.CEC15Benchmark;
 import com.benchmark.seeds;
 
 /**
@@ -11,10 +15,42 @@ import com.benchmark.seeds;
 public class Test {
     public static void main(String [] args) {
 
-        for (int F = 11; F <= 11; F++) {
-            for (int DIM = 10; DIM <= 10; DIM += 20) {
-                Configuration.records = new Records();
-                for (int run = 0; run < 1; run++) {
+
+        //run("CEC05",20,CEC05Benchmark.nProblems());
+        //run("CEC13",21, 28);
+       // run("CEC14",21,30);
+        run("CEC15",11,15);
+    }
+
+    public static void run(String benchmark, int start_problem, int finish_problem){
+        int nProblems = finish_problem;
+        int runs = AllBenchmarks.runs();
+        Configuration.records = new Records(runs);
+
+        for(int F = start_problem; F <= finish_problem; F++) {
+            for(int DIM = 10; DIM <= 50; DIM += 20) {
+                switch (benchmark) {
+                    case "CEC05":
+                        Configuration.benchmark = new CEC05Benchmark(DIM, F);
+                        break;
+                    case "CEC13":
+                        Configuration.benchmark = new CEC13Benchmark(DIM, F);
+                        break;
+                    case "CEC14":
+                        Configuration.benchmark = new CEC14Benchmark(DIM, F);
+                        break;
+                    case "CEC15":
+                        Configuration.benchmark = new CEC15Benchmark(DIM, F);
+                        break;
+                    default:
+                        System.err.println("No benchmark avaiable.");
+                        System.exit(0);
+                        break;
+                }
+
+                Configuration.records.startRecord();
+                System.out.println("FUN " + F + " DIM " + DIM);
+                for(int run=0; run < runs; run++) {
                     Configuration.MAX_FES = 10000 * DIM;
                     Configuration.F = F;
                     Configuration.N = DIM;
@@ -22,10 +58,6 @@ public class Test {
                     Configuration.epsilon = 10e-8;;
                     Rand rand = new Rand(seeds.getSeed(Configuration.F));
                     Configuration.rand = rand;
-                    Configuration.benchmark = new CEC14Benchmark(DIM, F);
-                   // benchmark benchmark = new benchmark();
-                    //test_func aTestFunc = benchmark.testFunctionFactory(F, DIM);
-                   // Configuration.benchmark = aTestFunc;
                     Configuration.pop_size = Math.round(DIM * 18);
                     Configuration.g_memory_size = 6;
                     Configuration.g_p_best_rate = 0.11;
@@ -33,11 +65,11 @@ public class Test {
 
                     LSHADE lshade = new LSHADE();
                     lshade.execute();
-
-
                 }
+                Configuration.records.endRecord(F, DIM);
             }
         }
+        Configuration.records.exportExcel("LSHADE" + "-" + "P" +nProblems + "-" + benchmark);
     }
 
 }

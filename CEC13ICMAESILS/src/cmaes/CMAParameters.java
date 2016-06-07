@@ -1,4 +1,4 @@
-/*
+package cmaes;/*
     Copyright 2003, 2005, 2007 Nikolaus Hansen 
     e-mail: hansen .AT. bionik.tu-berlin.de
             hansen .AT. lri.fr
@@ -17,6 +17,8 @@
 
   Last change: $Date: 2010-12-02 23:57:21 +0100 (Thu, 02 Dec 2010) $
 */
+
+import javax.security.auth.login.Configuration;
 
 /**
  * Interface to strategy parameters for the CMA Evolution
@@ -168,9 +170,9 @@ public class CMAParameters implements java.io.Serializable {
 
 		// set parameters to their default if they were not set before
 		if (lambda <= 0)
-			lambda = (int) (4.0 + Configuration.tunea * Math.log(N));
+			lambda = (int) (4.0 +  CmaesConfiguration.tunea * Math.log(N));
 		if (mu <= 0)
-			mu = (int) Math.floor(lambda/Configuration.tuneb);
+			mu = (int) Math.floor(lambda/ CmaesConfiguration.tuneb);
 
 		if (weights == null)
 			setWeights(mu, recombinationType);
@@ -252,11 +254,11 @@ public class CMAParameters implements java.io.Serializable {
 	 * alias lambda, use setPopulationSize() for outside use.
 	 * 
 	 * @param lambda  set population size
-	 * @see #setPopulationSize() 
+	 * @see
 	 */
 	void setLambda(int lambda) {
-		//if (locked != 0)
-		//	error("parameters cannot be set anymore");
+		if (locked != 0)
+			error("parameters cannot be set anymore");
 		this.lambda = lambda; 
 	}
 	/** @see #getLambda() */
@@ -341,7 +343,10 @@ public class CMAParameters implements java.io.Serializable {
 
 	/** normalizes recombination weights vector and sets mueff **/
 	protected void setWeights(double[] weights) {
-		assert locked == 0;
+		if(locked == 0){
+			System.err.print("Assert locked == 0");
+			System.exit(0);
+		}
 		double sum = 0;
 		for (int i = 0; i < weights.length; ++i)
 			sum += weights[i];

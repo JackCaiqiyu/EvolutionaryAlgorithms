@@ -1,3 +1,5 @@
+package cmaes;
+
 import java.util.*;
 
 /* 
@@ -96,7 +98,7 @@ import java.util.*;
  * <p>The main functionality is provided by the methods <code>double[][] {@link #samplePopulation()}</code> and 
  * <code>{@link #updateDistribution(double[])}</code> or <code>{@link #updateDistribution(double[][], double[])}</code>. 
  * Here is an example code snippet, see file 
- * <tt>Test.java</tt> for a similar example, and
+ * <tt>CMAES.java</tt> for a similar example, and
  *   <tt>CMAExample2.java</tt> for a more extended example with multi-starts implemented.
  *   <pre>
         // new a CMA-ES and set some initial values
@@ -148,7 +150,7 @@ improved parameter setting for large populations [3] and an (initially) diagonal
 The latter is particularly useful for large dimension, e.g. larger 100. 
 The default population size is small [1]. An
 independent restart procedure with increasing population size [4]
-is implemented in class .</P>
+is implemented in class <code>{}</code>.</P>
 
  * <P><B>Practical hint</B>: In order to solve an optimization problem in reasonable time it needs to be 
  * reasonably encoded. In particular the domain width of variables should be 
@@ -578,30 +580,19 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
     	setDimension(dimension);
     	return init();
     }
-
-
-	/*private double ub;
-	private double lb;
-	public void setBounds (double ub, double lb){
-		this.ub = ub;
-		this.lb = lb;
-	}*/
-
-
-
-	/**
+    /** 
      * @see #init(int, double[], double[])
      * */
     public double[] init() {
     	int i;
     	if (N <= 0)
     		error("dimension needs to be determined, use eg. setDimension() or setInitialX()");
-    //	if (state >= 0)
-    //		error("init() cannot be called twice");
+    	if (state >= 0)
+    		error("init() cannot be called twice");
     	if (state == 0) // less save variant 
     		return new double[sp.getLambda()]; 
-    //	if (state > 0)
-    //		error("init() cannot be called after the first population was sampled");
+    	if (state > 0)  
+    		error("init() cannot be called after the first population was sampled");
 
     	sp = parameters; /* just in case the user assigned parameters */
     	if (sp.supplemented == 0) // a bit a hack
@@ -814,7 +805,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
 //        if (fileName.equals(""))
 //            return properties;
         try {
-            java.io.FileInputStream fis = new java.io.FileInputStream("CMAES/" + fileName);
+            java.io.FileInputStream fis = new java.io.FileInputStream(fileName);
             properties.load(fis);
             fis.close();
         } 
@@ -825,14 +816,6 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         setFromProperties(properties);
         return properties;
     }
-
-	public void setPopulationSize(int n){
-		sp.setPopulationSize(n);
-	}
-
-	public int getPopulationSize(){
-		return sp.getPopulationSize();
-	}
 
     /** reads properties from Properties class 
      * input and sets options and parameters accordingly
@@ -869,8 +852,6 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         }
         if ((s = properties.getProperty("populationSize")) != null) {
             sp.setPopulationSize(Integer.parseInt(options.getFirstToken(s)));
-			//System.out.println("Dimension: " + getDimension());
-			//sp.setPopulationSize((int)(4 + Math.floor(3*Math.log(getDimension()))));
         }
         if ((s = properties.getProperty("cCov")) != null) {
             sp.setCcov(Double.parseDouble(options.getFirstToken(s)));
@@ -1612,7 +1593,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
     }
 
 	/** update of the search distribution from a population and its 
-	 * function values, see updateDistribution(double[][], double[], 0).
+	 * function values, see {@link #updateDistribution(double[][], double[], 0)}. 
 	 * This might become updateDistribution(double[][], double[], popsize)
      * in future. 
      * 
@@ -2110,6 +2091,10 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         return counteval = c;
     }
 
+	public void setPopulation(int n){
+		sp.setPopulationSize(n);
+	}
+
 /** search space dimensions must be set before the optimization is started. */
     public void setDimension(int n) {
         if ((lockDimension > 0 || state >= 0) && N != n)
@@ -2410,9 +2395,9 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
      * @see #getPrintLine() 
      */
     public void println(String s) {
-        System.out.println(s);
-        if (options.writeDisplayToFile > 0)
-            writeToFile(options.outputFileNamesPrefix + "disp" + ".dat", s, 1);
+        //System.out.println(s);
+       // if (options.writeDisplayToFile > 0)
+            //writeToFile(options.outputFileNamesPrefix + "disp" + ".dat", s, 1);
     }
 
     /** calls println(getPrintLine()) 
@@ -2625,11 +2610,11 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         }
 
         long firsttime = System.currentTimeMillis();
-        writeToFile(fileNamePrefix + "fit.dat", getDataRowFitness(), 1);
-        writeToFile(fileNamePrefix + "xmean.dat", getDataRowXMean(), 1);
-        writeToFile(fileNamePrefix + "xrecentbest.dat", getDataRowXRecentBest(), 1);
-        writeToFile(fileNamePrefix + "stddev.dat", getDataRowStddev(), 1); // sigma*sqrt(diag(C))
-        writeToFile(fileNamePrefix + "axlen.dat", getDataRowAxlen(), 1);
+        //writeToFile(fileNamePrefix + "fit.dat", getDataRowFitness(), 1);
+        //writeToFile(fileNamePrefix + "xmean.dat", getDataRowXMean(), 1);
+        //writeToFile(fileNamePrefix + "xrecentbest.dat", getDataRowXRecentBest(), 1);
+       // writeToFile(fileNamePrefix + "stddev.dat", getDataRowStddev(), 1); // sigma*sqrt(diag(C))
+       // writeToFile(fileNamePrefix + "axlen.dat", getDataRowAxlen(), 1);
         timings.writedefaultfiles += System.currentTimeMillis() - firsttime;
 //        System.out.println(timings.writedefaultfiles + " " 
 //                + (System.currentTimeMillis()-timings.start)  + " " + opts.maxTimeFractionForWriteToDefaultFiles);
@@ -2644,7 +2629,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
      * @param flgAppend == 0 means overwrite files,  == 1 means append to files
      */
     public void writeToDefaultFilesHeaders(int flgAppend) {
-        writeToDefaultFilesHeaders(options.outputFileNamesPrefix, flgAppend);
+        //writeToDefaultFilesHeaders(options.outputFileNamesPrefix, flgAppend);
     }
     /** 
      * Writes headers (column annotations) to files <prefix>fit.dat, ...xmean.dat

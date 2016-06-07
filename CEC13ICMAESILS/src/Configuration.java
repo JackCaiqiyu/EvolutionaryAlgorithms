@@ -1,3 +1,7 @@
+import com.benchmark.AllBenchmarks;
+import com.benchmark.Rand;
+import com.benchmark.Records;
+
 /**
  * Created by framg on 16/04/2016.
  */
@@ -8,7 +12,7 @@ public class Configuration {
     public static Records records;
     public static Rand rand;
     public static AllBenchmarks benchmark;
-
+    public static int max_fes;
 
     public static double tunea;
     public static double tuneb;
@@ -17,7 +21,7 @@ public class Configuration {
     public static double tunee;
     public static double tunef;
     public static double tuneg;
-    public  static double FLT_MAX = 999999999;
+    public  static double FLT_MAX = 1E+37;
     public static double getlearn_perbudget;
     public static double getmtsls1per_ratedim;
     public static double getmtsls1_initstep_rate;

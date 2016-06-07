@@ -1,11 +1,28 @@
 
 public class AutoConfigure {
     double [][] X;
+    int DIM;
+    int F;
 
+    public AutoConfigure(int DIM, int F){
+        this.DIM = DIM;
+        this.F = F;
+    }
+
+    public void auto_configure(){
+        Configuration.EarlyStop = "auto";
+        Configuration.ConstraintHandling ="Interpolation";
+        Configuration.noise = false;
+        Configuration.Xinitial = null;
+        Configuration.isRecordsActive = false;
+        int best = optimizeDE();
+        selectConfiguration(best);
+    }
     
-    
-    
-    public void optimizeDE () {
+    private int optimizeDE () {
+
+        Configuration.D = DIM;
+        Configuration.nF = F;
         int D = Configuration.D;
         double[] lb = {
                 0,        // NP - NPmin
@@ -84,16 +101,16 @@ public class AutoConfigure {
         //options.NP = NP;
         //options.initial.X = repmat(lb, 1, NP) + repmat(ub - lb, 1, NP) .* rand(numel(prior1), NP);
 
-        double [][] initialX = new double[NP][15];
+        X = new double[NP][15];
         for(int i=0; i<NP; i++){
             for(int j=0; j<params_n; j++){
-                initialX[i][j] = lb[j] + ((ub[j] - lb[j]) * Configuration.rand.getDouble());
+                X[i][j] = lb[j] + ((ub[j] - lb[j]) * Configuration.rand.getDouble());
             }
         }
 
 
-        initialX[0] = Util.copyArray(prior1);
-        initialX[1] = Util.copyArray(prior2);
+        X[0] = Util.copyArray(prior1);
+        X[1] = Util.copyArray(prior2);
 
         //options.initial.X(:, 1) = prior1;
         //options.initial.X(:, 2) = prior2;
@@ -106,7 +123,23 @@ public class AutoConfigure {
         //boolean Noise	= true;
 
         double best_fit = Util.inf;
-        int best_index;
+        int best_index = -1;
+
+        switch (D){
+            case 10:
+                Configuration.maxfunevals = 6000;
+                break;
+            case 30:
+                Configuration.maxfunevals = 2000;
+                break;
+            case 50:
+                Configuration.maxfunevals = 1200;
+                break;
+            default:
+                System.err.print("Not valid dimension.");
+                System.exit(0);
+        }
+
 
         for(int t=0; t<params_n; t++){
             selectConfiguration(t);
@@ -118,11 +151,11 @@ public class AutoConfigure {
             }
         }
 
-
+        return best_index;
 
     }
 
-    public void selectConfiguration(int t){
+    private void selectConfiguration(int t){
         Configuration.NP = (int)Math.round(X[t][0]) + (int)Math.round(X[t][12]);
         Configuration.F = X[t][1];
         Configuration.CR = X[t][2];
@@ -139,7 +172,6 @@ public class AutoConfigure {
         Configuration.crw = X[t][13];
         Configuration.fw = X[t][14];
     }
-
 
 
     

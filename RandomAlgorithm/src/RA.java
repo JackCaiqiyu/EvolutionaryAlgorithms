@@ -6,18 +6,30 @@ import com.benchmark.cec.cec13.CEC13Benchmark;
 import com.benchmark.cec.cec14.CEC14Benchmark;
 import com.benchmark.cec.cec15.CEC15Benchmark;
 
+import java.util.ArrayList;
+
 /**
  * Created by framg on 11/05/2016.
  */
+
 public class RA {
+
 
 
     public static void main(String[] args) {
         long start = System.nanoTime();
-        ra("CEC05", true);
+
+        CEC15Benchmark benchmark = new CEC15Benchmark(10, 1);
+        double [] x = {1,2,3,4,5,6,7,8,9,10};
+        benchmark.g(x);
+
+
+        //ra("CEC05", true);
+        //ra("CEC05", true);
         //ra("CEC13", false);
       // ra("CEC14", false);
-       // ra("CEC15", false);
+       // ra("CEC15", false);M =M
+
         long elapsedTime = System.nanoTime() - start;
         System.out.println("TIEMPO TRANSCURRIDO: " + elapsedTime);
     }

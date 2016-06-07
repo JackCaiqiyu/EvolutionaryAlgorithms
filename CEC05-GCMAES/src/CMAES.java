@@ -39,10 +39,10 @@ public class CMAES {
 
 	public static void main(String[] args) {
 		runs = AllBenchmarks.runs();
-		//benchmark("CEC05");
+		benchmark("CEC05");
 		//benchmark("CEC13");
 		//benchmark("CEC14");
-		benchmark("CEC15");
+		//benchmark("CEC15");
 	}
 
 
@@ -71,7 +71,7 @@ public class CMAES {
 				break;
 		}
 
-		for(int F = 1; F <= nProblems; F++) {
+		for(int F = 1; F <= 1; F++) {
 			for(int DIM = 10; DIM <= 50; DIM += 20) {
 				//records.createWorbook(String dim)
 				switch (name) {
@@ -98,12 +98,12 @@ public class CMAES {
 				}
 
 				double stop_fitness = 10e-8;
-				double best_fmin = Util.inf;
 				records.startRecord();
 				System.out.println("F: " + F + ", DIM: " + DIM);
 				for (int run = 0; run < runs; run++) {
 					int pop_size = 4 + (int) Math.floor(3 * Math.log(DIM));
 					double fmin = Util.inf;
+					double best_fmin = Util.inf;
 					max_values = 10000 * DIM;
 					while ((max_values > pop_size) && (fmin - benchmarks.bias() > stop_fitness)) {
 						CMAES(DIM, F, pop_size);
@@ -114,11 +114,11 @@ public class CMAES {
 							best_fmin = fmin;
 						}
 					}
-					records.endRun(fmin - benchmarks.bias(), last_eval, max_values);
+					records.endRun(best_fmin - benchmarks.bias(), last_eval, 10000 * DIM);
 				}
 				//records.write(DIM, F, "G-CMAES", false);
 				records.endRecord(F, DIM);
-				System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
+				//System.out.println("BEST FITNESS: " + (best_fmin - benchmarks.bias()));
 			}
 		}
 

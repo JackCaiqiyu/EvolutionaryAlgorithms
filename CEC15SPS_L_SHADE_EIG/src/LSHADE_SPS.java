@@ -264,7 +264,8 @@ public class LSHADE_SPS {
 
         int []fidx = Util.sort(fx);
         X = Util.sortByIndexs(X, fidx);
-        Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
+        if(Configuration.isRecordsActive)
+            Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
 
         Util.assignArray(MF, Configuration.F);
         Util.assignArray(MCR, Configuration.CR);
@@ -645,9 +646,10 @@ public class LSHADE_SPS {
             X = Util.sortByIndexs(X, indexs);
             FC = Util.sortByIndexs(FC, indexs);
             //Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF), counteval);
-            Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
+            if(Configuration.isRecordsActive)
+                Configuration.records.newRecord(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval);
             //   System.out.println(fx[0]);
-            System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
+           // System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
 
 
             NP = (int)Math.round(NPinitAux - (NPinitAux - NPminAux) * countevalAux / maxfunevalsAux);
@@ -688,10 +690,11 @@ public class LSHADE_SPS {
                 countstagnation = 0;
 
         }
-        System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
+       // System.out.println("Eval: " + (Math.abs(Configuration.benchmark.bias() - fx[0])) + " at: " + counteval);
         // Configuration.records.newRecord(fx[0] - bias.getBias(Configuration.nF));
         // Configuration.records.endRun(fx[0] - bias.getBias(Configuration.nF), counteval, Configuration.maxfunevals);
-        Configuration.records.endRun(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval, Configuration.maxfunevals);
+        if(Configuration.isRecordsActive)
+            Configuration.records.endRun(Math.abs(Configuration.benchmark.bias() - fx[0]), counteval, Configuration.maxfunevals);
         return Math.abs(Configuration.benchmark.bias() - fx[0]);
     }
 

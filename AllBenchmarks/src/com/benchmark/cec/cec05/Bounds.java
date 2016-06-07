@@ -22,24 +22,5 @@ public class Bounds {
         n = dimension
 
      */
-    public static void han_boun(float [][] x, int n, int I_fno, int i, Rand rand){
-        /*
-                for j=1: n
-            if( x(i,j) <xmin (j))
-                x(i,j)=   xmin (j) +rand*(xmax(j)-xmin(j));
-            else if ( x(i,j)>xmax (j))
-                    x(i,j)=   xmin (j) +rand*(xmax(j)-xmin(j));
-                end
-            end
-        end
-         */
 
-        for(int j=0; j<n; j++){
-            if(x[i][j] < getLowerBound(I_fno)){
-                x[i][j] = getLowerBound(I_fno) + rand.getFloat()* (getUpperBound(I_fno) - getLowerBound(I_fno));
-            }else if( x[i][j] > getUpperBound(I_fno)){
-                x[i][j] = getLowerBound(I_fno) + rand.getFloat() * (getUpperBound(I_fno) - getLowerBound(I_fno));
-            }
-        }
-    }
 }

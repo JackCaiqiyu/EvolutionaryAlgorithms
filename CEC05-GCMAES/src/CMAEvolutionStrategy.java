@@ -2394,8 +2394,8 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
      */
     public void println(String s) {
         //System.out.println(s);
-        if (options.writeDisplayToFile > 0)
-            writeToFile(options.outputFileNamesPrefix + "disp" + ".dat", s, 1);
+       // if (options.writeDisplayToFile > 0)
+            //writeToFile(options.outputFileNamesPrefix + "disp" + ".dat", s, 1);
     }
 
     /** calls println(getPrintLine()) 
@@ -2608,11 +2608,11 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         }
 
         long firsttime = System.currentTimeMillis();
-        writeToFile(fileNamePrefix + "fit.dat", getDataRowFitness(), 1);
-        writeToFile(fileNamePrefix + "xmean.dat", getDataRowXMean(), 1);
-        writeToFile(fileNamePrefix + "xrecentbest.dat", getDataRowXRecentBest(), 1);
-        writeToFile(fileNamePrefix + "stddev.dat", getDataRowStddev(), 1); // sigma*sqrt(diag(C))
-        writeToFile(fileNamePrefix + "axlen.dat", getDataRowAxlen(), 1);
+        //writeToFile(fileNamePrefix + "fit.dat", getDataRowFitness(), 1);
+        //writeToFile(fileNamePrefix + "xmean.dat", getDataRowXMean(), 1);
+        //writeToFile(fileNamePrefix + "xrecentbest.dat", getDataRowXRecentBest(), 1);
+       // writeToFile(fileNamePrefix + "stddev.dat", getDataRowStddev(), 1); // sigma*sqrt(diag(C))
+       // writeToFile(fileNamePrefix + "axlen.dat", getDataRowAxlen(), 1);
         timings.writedefaultfiles += System.currentTimeMillis() - firsttime;
 //        System.out.println(timings.writedefaultfiles + " " 
 //                + (System.currentTimeMillis()-timings.start)  + " " + opts.maxTimeFractionForWriteToDefaultFiles);
@@ -2627,7 +2627,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
      * @param flgAppend == 0 means overwrite files,  == 1 means append to files
      */
     public void writeToDefaultFilesHeaders(int flgAppend) {
-        writeToDefaultFilesHeaders(options.outputFileNamesPrefix, flgAppend);
+        //writeToDefaultFilesHeaders(options.outputFileNamesPrefix, flgAppend);
     }
     /** 
      * Writes headers (column annotations) to files <prefix>fit.dat, ...xmean.dat

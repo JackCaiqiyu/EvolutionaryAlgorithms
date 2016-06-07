@@ -72,7 +72,7 @@ public class LSHADEND {
     }
 
 
-    public void execute(){
+    public double execute(){
 
         int n = Configuration.D;
         double [] mu_sf, mu_cr;
@@ -339,7 +339,8 @@ public class LSHADEND {
             System.out.println("x" + i + ": " + pop[loc][i]);
         }*/
         Configuration.records.endRun(best_value, nfes, Configuration.max_nfes);
-        System.out.println("value " + best_value + " nfes: " +  nfes);
+     //   System.out.println("value " + best_value + " nfes: " +  nfes);
+        return best_value;
       //  System.out.println("value " + Configuration.com.benchmark.cec.cec05.benchmark.f(pop[loc]));
     }
 

@@ -1,3 +1,8 @@
+import cmaes.CMAEvolutionStrategy;
+import com.benchmark.AllBenchmarks;
+import com.benchmark.Rand;
+import com.benchmark.seeds;
+
 import java.util.*;
 
 public class ICMAESILS {
@@ -19,7 +24,7 @@ public class ICMAESILS {
         x = new double[Configuration.DIM];
     }
 
-    public void execute() {
+    public double execute() {
         int dim = Configuration.DIM;
         mtsls1solfitness = new double[dim + 2];
         icmaessolfitness = new double[dim + 2];
@@ -34,24 +39,33 @@ public class ICMAESILS {
         // competition phase
 
         for (relaynum = 0; relaynum < 1; relaynum++) {
-            icmaes(10000 * dim * Configuration.getlearn_perbudget, mtsls1solfitness);
+            icmaes(Configuration.max_fes * Configuration.getlearn_perbudget, mtsls1solfitness);
         }
         icmaes_train_reward = Util.copyArray(icmaessolfitness);
         for (int i = 0; i < dim; i++) {
             icmaessolfitness[i] = mtsls1solfitness[i];
         }
-        ILSmtsls1(10000 * dim * Configuration.getlearn_perbudget, Configuration.getmtsls1per_ratedim * dim, icmaessolfitness);
+        ILSmtsls1(Configuration.max_fes * Configuration.getlearn_perbudget, Configuration.getmtsls1per_ratedim * dim, icmaessolfitness);
         mtsls1_train_reward = Util.copyArray(mtsls1solfitness);
 
+
+        double [] solution;
         // deployment phase
         if (icmaes_train_reward[dim] > mtsls1_train_reward[dim]) {
-            ILSmtsls1(10000 * dim * (1 - Configuration.getlearn_perbudget * 2), Configuration.getmtsls1per_ratedim * dim, mtsls1_train_reward);
+            solution = ILSmtsls1(Configuration.max_fes * (1 - Configuration.getlearn_perbudget * 2), Configuration.getmtsls1per_ratedim * dim, mtsls1_train_reward);
+            System.out.println("Fit1: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
+
         } else {
             icmaes_train_reward[dim + 1] = mtsls1_train_reward[dim + 1];
-            icmaes(10000 * dim * (1 - Configuration.getlearn_perbudget * 2), icmaes_train_reward);
+            solution=icmaes(Configuration.max_fes * (1 - Configuration.getlearn_perbudget * 2), icmaes_train_reward);
+            System.out.println("Fit2: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
         }
 
-
+//        for(int i=0; i<icmaessolfitness.length; i++){
+//            //System.out.println("FIT: " + icmaessolfitness[i]);
+//        }
+     //   //System.out.println("Fit4: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
+        return Math.abs(solution[dim] - Configuration.benchmark.bias());
     }
 
     public final double[] icmaes(double maxfevalsforicmaes, double[] mtsls1feedback) {
@@ -59,11 +73,10 @@ public class ICMAESILS {
         // Cmaes cmaes ;
         //cmaes_t evo = new cmaes_t();
         double[][] pop;
-        double[] fitvals;
+        double[] fitvals = null;
         double fbestever = 0;
         double[] xbestever = null;
         double fmean;
-        int i;
         int irun;
         int lambda = 0;
         int countevals = 0;
@@ -102,11 +115,11 @@ public class ICMAESILS {
                 }
             } else {
                 for (int j = 0; j < dim; j++) {
-                    xinit[j] = (Bounds.getUpperBound(Configuration.F) - Bounds.getLowerBound(Configuration.F)) * Configuration.rand.getFloat() + Bounds.getLowerBound(Configuration.F);
+                    xinit[j] = (Configuration.benchmark.ubound() - Configuration.benchmark.lbound()) * Configuration.rand.getDouble() + Configuration.benchmark.lbound();
                 }
             }
             for (int j = 0; j < dim; j++) {
-                stddev[j] = Configuration.tunec * ((Bounds.getUpperBound(Configuration.F)) - Bounds.getLowerBound(Configuration.F));
+                stddev[j] = Configuration.tunec * ((Configuration.benchmark.ubound()) - Configuration.benchmark.lbound());
             }
             for (int n = 0; n < dim; n++) {
                 x[n] = xinit[n];
@@ -116,14 +129,19 @@ public class ICMAESILS {
             f = Configuration.benchmark.f(x);
             liaofirstforxinit = f;
             liaoevalscount++;
+
+       //     //System.out.println("EVAL: " + f + " at: " + liaoevalscount);
+
             if (liaobestvalue - liaofirstforxinit > 1e-30) {
                 if (liaoevalscount <= countmaxevalsforicmaes) {
                     liaobestvalue = liaofirstforxinit;
-                   /* if (liaobestvalue <= 1e-8) {
-                        System.out.printf("%.0f %le\n", liaoevalscount, liaobestvalue);
-                    } else {
-                        System.out.printf("%.0f %le\n", liaoevalscount, liaobestvalue);
-                    }*/
+                    if(liaobestvalue<=1e-8)
+                    {
+                        //System.out.println("Eval: " + liaoevalscount +" fit: " +liaobestvalue);
+                    }
+                    else{
+                        //System.out.println("Eval: " + liaoevalscount +" fit: " +liaobestvalue);
+                    }
                     for (int j = 0; j < dim; j++) {
                         icmaeskeepbestxk[j] = xinit[j];
                     }
@@ -131,73 +149,76 @@ public class ICMAESILS {
             }
 
             CMAEvolutionStrategy cma = new CMAEvolutionStrategy();
-            cma.setDimension(dim);
+
+            cma.parameters.setPopulationSize(lambda);
+
+            cma.setDimension(Configuration.DIM);
             cma.setInitialX(xinit);
-            cma.setSeed(Configuration.seed);
-            cma.setInitialStandardDeviation(stddev[0]); // also a mandatory setting
-            cma.options.stopFitness = Bounds.Ter_Err;       // optional setting
-            cma.options.stopMaxFunEvals = 10000 * dim;
-            cma.setPopulationSize(lambda);
-            //cma.setBounds(com.benchmark.cec.cec05.Bounds.getUpperBound(Configuration.F), com.benchmark.cec.cec05.Bounds.getLowerBound(Configuration.F));
-            double [] x_in_bounds = new double[Configuration.DIM];
+          //  cma.setInitialStandardDeviation(0.5*(Configuration.benchmark.ubound() - Configuration.benchmark.lbound()));
 
-            Boundary_transformation.cmaes_boundary_transformation_init(Bounds.getLowerBound(Configuration.F), Bounds.getUpperBound(Configuration.F), 1);
-            //String filename = "initials.par";
-            //fitvals = cmaes_init(evo, Configuration.getProblemDimension(), xinit, stddev, 0, lambda, filename);
-            fitvals = cma.init();
-            lambda = cma.getPopulationSize();
-            double bestValue = 999999999;
+            cma.options.stopMaxFunEvals = (long)1e299;
+            cma.options.stopMaxIter =(long)1e299;
+            cma.options.stopTolUpXFactor = 1e3;
+            cma.options.stopFitness = Configuration.benchmark.bias() + 10e-8;
+            cma.setInitialStandardDeviation(stddev[0]);
 
-            while ((cma.getCountEval() < cma.options.stopMaxFunEvals) && (bestValue - bias.getBias(Configuration.F) > cma.options.stopFitness)){
-            //while ((stop = cmaes_TestForTermination(evo)) == 0) {
-                //pop = cmaes_SamplePopulation(evo);
+            fitvals = cma.init();  // new double[cma.parameters.getPopulationSize()];
+            lambda = cma.parameters.getLambda();
+
+            while(cma.stopConditions.getNumber() == 0){
+
+                // --- core iteration step ---
                 pop = cma.samplePopulation();
-                for (i = 0; i < pop.length; ++i) {
-                    Boundary_transformation.cmaes_boundary_transformation(pop[i],x_in_bounds, Configuration.DIM );
+                for(int i = 0; i < pop.length; ++i) {
 
-                    //pop[i] = inbound(com.benchmark.cec.cec05.Bounds.getLowerBound(Configuration.F), com.benchmark.cec.cec05.Bounds.getUpperBound(Configuration.F), pop[i], dim);
-                    while (!inbound(Bounds.getLowerBound(Configuration.F), Bounds.getUpperBound(Configuration.F),x_in_bounds, Configuration.DIM)) {     //   not located on (or very close to) the domain boundary,
-                        pop[i] = cma.resampleSingle(i);
-                        Boundary_transformation.cmaes_boundary_transformation(pop[i], x_in_bounds, Configuration.DIM);
-                    }
-                    /*for (int n = 0; n < dim; n++) {
+                    inbound(Configuration.benchmark.lbound(), Configuration.benchmark.ubound(), pop[i], Configuration.DIM);
+                    for(int n=0; n<Configuration.DIM; n++){
                         x[n] = pop[i][n];
-                    }*/
-                    //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
-                    f = Configuration.benchmark.f(x_in_bounds);
+                    }
+
+                    f = Configuration.benchmark.f(pop[i]);
+                    while(Double.isNaN(f)){
+                        pop[i] = cma.resampleSingle(i);
+                        f = Configuration.benchmark.f(pop[i]);
+                    }
+
                     long_fitness = f;
+                   // //System.out.println("Fit3: " + long_fitness + " at: " + cma.getCountEval());
                     liaoevalscount++;
 
-                    if (long_fitness <= Configuration.FLT_MAX) {
+                    if(long_fitness <= Configuration.FLT_MAX){
                         fitvals[i] = long_fitness;
-                    } else {
+                    }else{
                         fitvals[i] = Configuration.FLT_MAX;
                     }
 
-                    if (liaobestvalue - fitvals[i] > 1e-30) {
-                        if (liaoevalscount <= countmaxevalsforicmaes) {
+                    if(liaobestvalue - fitvals[i] > 1e-30){
+                        if(liaoevalscount <= countmaxevalsforicmaes){
                             liaobestvalue = fitvals[i];
-                            /*if (liaobestvalue <= 1e-8) {
-                                System.out.printf("%.0f %le\n", liaoevalscount, liaobestvalue);
-                            } else {
-                                System.out.printf("%.0f %le\n", liaoevalscount, liaobestvalue);
-                            }*/
+                            if(liaobestvalue<=1e-8)
+                            {
+                                //System.out.println("Eval: " + liaoevalscount + " fit: " + liaobestvalue);
+                            }
+                            else{
+                                //System.out.println("Eval: " + liaoevalscount + " fit: " + liaobestvalue);
+                            }
                             for (int j = 0; j < dim; j++) {
-                                icmaeskeepbestxk[j] = pop[i][j];
+                                icmaeskeepbestxk[j]=pop[i][j];
                             }
                         }
                     }
 
+
                 }
+
+
+
                 cma.updateDistribution(fitvals);
-                bestValue = cma.getBestFunctionValue();
-                Configuration.records.newRecord(bestValue - bias.getBias(Configuration.F), (int)cma.getCountEval());
-              // System.out.println("Value: " + bestValue + " at: " + cma.getCountEval() );
-                //cmaes_UpdateDistribution(evo, fitvals);
-                //fflush(stdout);
+                Configuration.records.newRecord((cma.getBestFunctionValue() - Configuration.benchmark.bias()), (int)cma.getCountEval());
             }
 
-            lambda = (int)Configuration.tuned * cma.getPopulationSize();
+
+            lambda = (int) Configuration.tuned * cma.parameters.getLambda();
             if (lambda > 200) {
                 lambda = 200;
             }
@@ -208,8 +229,6 @@ public class ICMAESILS {
         }
         icmaessolfitness[dim] = liaobestvalue;
         icmaessolfitness[dim + 1] = countmaxevalsforicmaes;
-
-        Configuration.records.newRecord(liaobestvalue - bias.getBias(Configuration.F));
 
         return Util.copyArray(icmaessolfitness);
     }
@@ -224,8 +243,8 @@ public class ICMAESILS {
         liaoevalsmtsls1count = icmaesfeedback[dim + 1];
         maxmtsls1fevals = (int) (maxmtsls1fevals + icmaesfeedback[dim + 1]);
 
-        double lsmin = Bounds.getLowerBound(Configuration.F);
-        double lsmax = Bounds.getUpperBound(Configuration.F);
+        double lsmin = Configuration.benchmark.lbound();
+        double lsmax = Configuration.benchmark.ubound();
         double[] xk = new double[dim];
         double[] mtsls1keepbestxk = new double[dim];
 
@@ -240,13 +259,13 @@ public class ICMAESILS {
 
             x[n] = xk[n];
         }
-        //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
         f = Configuration.benchmark.f(x);
+
         liaofirstforxinitmtsls1 = f;
         liaoevalsmtsls1count++;
         if (liaobestmtsls1value - liaofirstforxinitmtsls1 > 1e-30) {
             liaobestmtsls1value = liaofirstforxinitmtsls1;
-           // System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaofirstforxinitmtsls1);
+            //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " + liaofirstforxinitmtsls1);
         }
 
         double s;
@@ -273,7 +292,7 @@ public class ICMAESILS {
                                     convergence = true;
                                 }
                             }
-                            s = ((0.6 - 0.3) * Configuration.rand.getFloat() + 0.3) * (lsmax - lsmin);
+                            s = ((0.6 - 0.3) * Configuration.rand.getDouble() + 0.3) * (lsmax - lsmin);
                         }
                     }
                     improve = false;
@@ -282,19 +301,18 @@ public class ICMAESILS {
                         for (int n = 0; n < dim; n++) {
                             x[n] = xk[n];
                         }
-                        //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                         f = Configuration.benchmark.f(x);
                         before1 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
-
+                    //    //System.out.println("Fit5: " + Math.abs(liaobestmtsls1value - Configuration.benchmark.bias()) + " at: " + liaoevalsmtsls1count);
                         liaoevalsmtsls1count++;
                         if (liaobestmtsls1value - before1 > 1e-30) {
                             if (liaoevalsmtsls1count <= maxmtsls1fevals) {
                                 liaobestmtsls1value = before1;
-                               /* if (liaobestmtsls1value <= 1e-8) {
-                                    System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaobestmtsls1value);
+                                if (liaobestmtsls1value <= 1e-8) {
+                                    //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " +liaobestmtsls1value);
                                 } else {
-                                    System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaobestmtsls1value);
-                                }*/
+                                    //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " +liaobestmtsls1value);
+                                }
 
                                 for (int j = 0; j < dim; j++) {
                                     mtsls1keepbestxk[j] = xk[j];
@@ -316,11 +334,11 @@ public class ICMAESILS {
                             if (liaoevalsmtsls1count <= maxmtsls1fevals) {
                                 liaobestmtsls1value = after1;
 
-                                /*if (liaobestmtsls1value <= 1e-8) {
-                                    System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaobestmtsls1value);
+                                if (liaobestmtsls1value <= 1e-8) {
+                                    //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " +  liaobestmtsls1value);
                                 } else {
-                                    System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaobestmtsls1value);
-                                }*/
+                                    //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " +  liaobestmtsls1value);
+                                }
                                 for (int j = 0; j < dim; j++) {
                                     mtsls1keepbestxk[j] = xk[j];
                                 }
@@ -349,11 +367,11 @@ public class ICMAESILS {
                                 if (liaobestmtsls1value - after2 > 1e-30) {
                                     if (liaoevalsmtsls1count <= maxmtsls1fevals) {
                                         liaobestmtsls1value = after2;
-                                        /*if (liaobestmtsls1value <= 1e-8) {
-                                            System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaobestmtsls1value);
+                                        if (liaobestmtsls1value <= 1e-8) {
+                                            //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " + liaobestmtsls1value);
                                         } else {
-                                            System.out.printf("%.0f %le\n", liaoevalsmtsls1count, liaobestmtsls1value);
-                                        }*/
+                                            //System.out.println("Eval: " + liaoevalsmtsls1count + " fit: " + liaobestmtsls1value);
+                                        }
                                         for (int j = 0; j < dim; j++) {
                                             mtsls1keepbestxk[j] = xk[j];
                                         }
@@ -381,8 +399,8 @@ public class ICMAESILS {
             if (liaoevalsmtsls1count < maxmtsls1fevals) {
                 if (acceptbefore - liaobestmtsls1value < 1e-20) {
                     for (int i = 0; i < dim; i++) {
-                        double srand = (lsmax - lsmin) * Configuration.rand.getFloat() + lsmin;
-                        xk[i] = srand + ((1 - Configuration.getmtsls1_iterbias_choice) * Configuration.rand.getFloat() + Configuration.getmtsls1_iterbias_choice) * (mtsls1keepbestxk[i] - srand);
+                        double srand = (lsmax - lsmin) * Configuration.rand.getDouble() + lsmin;
+                        xk[i] = srand + ((1 - Configuration.getmtsls1_iterbias_choice) * Configuration.rand.getDouble() + Configuration.getmtsls1_iterbias_choice) * (mtsls1keepbestxk[i] - srand);
                     }
                 }
 
@@ -446,20 +464,21 @@ public class ICMAESILS {
     public final void initialization() {
         initkeepbestx = new double[Configuration.DIM];
         int intipopsize = 1 * Configuration.DIM;
-        matrix = new double[intipopsize][Configuration.DIM + 1];
+        matrix = new double[intipopsize][];
         for (int i = 0; i < intipopsize; i++) {
+            matrix[i] = new double[Configuration.DIM + 1];
             for (int a = 0; a < Configuration.DIM; a++) {
                 matrix[i][a]= minmaxrand();
                 x[a] = matrix[i][a];
             }
-           // com.benchmark.cec.cec05.test_func(x, f, Configuration.getProblemDimension(), 1, Configuration.getProblemID());
+
             f = Configuration.benchmark.f(x);
             initevalscout++;
             matrix[i][Configuration.DIM] = f;
             if (initbestvalue - matrix[i][Configuration.DIM]>1e-30)
             {
                 initbestvalue = matrix[i][Configuration.DIM];
-                //System.out.printf("%.0f %le\n", initevalscout, initbestvalue);
+                //System.out.println("Val: " +  initevalscout +" fit: " + initbestvalue);
                 for (int j = 0; j < Configuration.DIM; j++) {
                     initkeepbestx[j] = matrix[i][j];
                 }
@@ -468,7 +487,7 @@ public class ICMAESILS {
     }
 
     public final double minmaxrand() {
-        return (double) (Bounds.getLowerBound(Configuration.F) + (Bounds.getUpperBound(Configuration.F) - Bounds.getLowerBound(Configuration.F)) * Configuration.rand.getFloat());
+        return (Configuration.benchmark.lbound() + (Configuration.benchmark.ubound() - Configuration.benchmark.lbound()) * Configuration.rand.getDouble());
     }
 
 

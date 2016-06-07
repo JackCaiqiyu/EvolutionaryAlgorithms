@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 public class GaappadeTest {
     final double zero = AllBenchmarks.objective();
     final int dim = 10;
-    final int n_tries = 2;
+    final int n_tries = 3;
 
     public double algorithm(int F, int DIM){
         Configuration.records = new Records();

@@ -12,14 +12,17 @@ import com.benchmark.seeds;
  */
 public class Test {
     public static void main(String [] args) {
-
+        run("CEC05");
+       // run("CEC13");
+      //  run("CEC14");
+      //  run("CEC15");
 
     }
 
 
     public static void run(String benchmark){
         int nProblems = 0;
-        int runs = AllBenchmarks.runs();
+        int runs = 25;// AllBenchmarks.runs();
         Configuration.records = new Records(runs);
 
         switch (benchmark){
@@ -42,8 +45,8 @@ public class Test {
         }
 
 
-        for(int F = 1; F <= nProblems; F++) {
-            for(int DIM = 10; DIM <= 50; DIM += 20) {
+        for(int F = 6; F <= 6; F++) {
+            for(int DIM = 10; DIM <= 10; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
                         Configuration.benchmark = new CEC05Benchmark(DIM, F);
@@ -68,6 +71,7 @@ public class Test {
                 }
 
                 Configuration.records.startRecord();
+                System.out.println("FUN " + F + " DIM " + DIM);
                 for(int run=0; run < runs; run++) {
                     Configuration.benchmark = new CEC14Benchmark(DIM, F);
                     Configuration.random = new Rand(seeds.getSeed(F));
@@ -75,7 +79,6 @@ public class Test {
                     Configuration.FVr_minbound = Configuration.benchmark.lbound();
                     Configuration.FVr_maxbound = Configuration.benchmark.ubound();
                     Configuration.D = DIM;
-                    System.out.println("FUN " + F + " DIM " + DIM);
                     GAAPPADE gaappade = new GAAPPADE();
                     gaappade.execute();
                 }

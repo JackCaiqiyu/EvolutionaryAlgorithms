@@ -4,4 +4,6 @@
 public class Proc {
     int i_eval;
     int n_eval;
+    boolean finish;
+    double best_value = 1e300;
 }

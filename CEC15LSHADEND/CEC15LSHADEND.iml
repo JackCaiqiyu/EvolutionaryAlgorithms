@@ -9,7 +9,7 @@
     <orderEntry type="jdk" jdkName="1.7" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="module" module-name="Benchmark" />
     <orderEntry type="module" module-name="AllBenchmarks" />
+    <orderEntry type="library" name="junit-4.12" level="project" />
   </component>
 </module>

@@ -1,3 +1,5 @@
+package cmaes;
+
 /** solution point in search space, single-objective case
      *  
      * */

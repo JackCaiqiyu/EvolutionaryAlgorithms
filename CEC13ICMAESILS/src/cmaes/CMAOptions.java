@@ -1,3 +1,5 @@
+package cmaes;
+
 import java.util.Properties;
 
 /*
@@ -80,16 +82,16 @@ public class CMAOptions implements java.io.Serializable {
          * and all solutions of the recent iteration 
          * become <= stopTolFun. Default = 1e-12. 
          * */
-        public double stopTolFun = Math.pow(10, Configuration.tunee);
+        public double stopTolFun = Math.pow(10, CmaesConfiguration.tunee);
         /** stop if the maximum function value difference of all iteration-best 
          * solutions of the last 10 +
          * 30*N/lambda iterations become smaller than
          * stopTolFunHist. Default = 1e-13. The measured objective
          * function value differences do not include repair
          * penalties. */
-        public double stopTolFunHist = Math.pow(10, Configuration.tunef); // used if non-null
+        public double stopTolFunHist = Math.pow(10, CmaesConfiguration.tunef); // used if non-null
         /** stop if search steps become smaller than stopTolX. Default = 0 */
-        public double stopTolX =Math.pow(10, Configuration.tuneg);
+        public double stopTolX =Math.pow(10, CmaesConfiguration.tuneg);
         /** stop if search steps become smaller than stopTolXFactor * initial step size. 
          * Default = 1e-11. */
         public double stopTolXFactor = 1e-11; // used if TolX is null

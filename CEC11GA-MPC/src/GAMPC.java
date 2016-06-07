@@ -1,3 +1,6 @@
+import com.benchmark.Rand;
+import com.benchmark.cec.cec05.Bounds;
+
 public class GAMPC {
 
     int current_eval = 0;
@@ -36,7 +39,7 @@ public class GAMPC {
     private void initializePoblation(){
         for(int i=0; i<Configuration.popSize; i++){
             for(int j=0; j<Configuration.dim; j++){
-                x[i][j] = Bounds.getLowerBound(Configuration.I_fno) + Configuration.rand.getFloat()* (Bounds.getUpperBound(Configuration.I_fno) - Bounds.getLowerBound(Configuration.I_fno));
+                x[i][j] = (float) (Configuration.benchmark.lbound() + Configuration.rand.getFloat()* (Configuration.benchmark.ubound() - Configuration.benchmark.lbound()));
             }
         }
 
@@ -55,7 +58,7 @@ public class GAMPC {
     }
 
     public void execute(){
-        while(current_eval < max_eval && fitx[0] - bias.getBias(Configuration.I_fno) > Configuration.Ter_Err){
+        while(current_eval < max_eval && fitx[0] - Configuration.benchmark.bias() > Configuration.Ter_Err){
             previous_eval = current_eval;
             current_eval = current_eval + Configuration.popSize;
             iter = iter + 1;
@@ -120,7 +123,7 @@ public class GAMPC {
             /************************************************************/
             //Si algun valor de x se sale fuera de rango se reinicializa
             for(int i=0; i<Configuration.popSize; i++){
-                Bounds.han_boun(offspring_individuals, Configuration.dim, Configuration.I_fno, i, Configuration.rand);
+                han_boun(offspring_individuals, Configuration.dim,  i);
             }
 
             /********************************STEP5**********************************/
@@ -161,7 +164,7 @@ public class GAMPC {
             }
 
          //   System.out.println("Best result: "+fitx[0]+" in eval: " +current_eval);
-            Configuration.records.newRecord(fitx[0] - bias.getBias(Configuration.I_fno), current_eval);
+            Configuration.records.newRecord(fitx[0] - Configuration.benchmark.bias(), current_eval);
 
 
 
@@ -183,7 +186,7 @@ public class GAMPC {
 
 
         }
-        Configuration.records.newRecord(fitx[0] - bias.getBias(Configuration.I_fno), current_eval, max_eval );
+        Configuration.records.endRun(fitx[0] - Configuration.benchmark.bias(), current_eval, max_eval );
     }
 
     private int min(int [] array, int tam){
@@ -263,6 +266,27 @@ public class GAMPC {
             aNew[i] = aOld[i];
         }
         return aNew;
+    }
+
+    public static void han_boun(float [][] x, int n, int i){
+        /*
+                for j=1: n
+            if( x(i,j) <xmin (j))
+                x(i,j)=   xmin (j) +rand*(xmax(j)-xmin(j));
+            else if ( x(i,j)>xmax (j))
+                    x(i,j)=   xmin (j) +rand*(xmax(j)-xmin(j));
+                end
+            end
+        end
+         */
+
+        for(int j=0; j<n; j++){
+            if(x[i][j] < Configuration.benchmark.lbound()){
+                x[i][j] = (float) (Configuration.benchmark.lbound() + Configuration.rand.getFloat()* (Configuration.benchmark.ubound() - Configuration.benchmark.lbound()));
+            }else if( x[i][j] > Configuration.benchmark.ubound()){
+                x[i][j] = (float) (Configuration.benchmark.lbound() + Configuration.rand.getFloat() * (Configuration.benchmark.ubound() - Configuration.benchmark.lbound()));
+            }
+        }
     }
 
 
