@@ -12,6 +12,7 @@ public class MVMO {
     Paramater parameter;
     Table table;
 
+    int r_select;
     double ff;
     double ff2;
     double vvqq;
@@ -31,8 +32,8 @@ public class MVMO {
     int n_eval;
     int ipp;
     double fs_factor0;
-    int fs_factor_start;
-    int fs_factor_end;
+    double fs_factor_start;
+    double fs_factor_end;
     int local_i;
     int local_max;
     double local_search0;
@@ -54,7 +55,7 @@ public class MVMO {
     int verybest;
     double shape_dyn_ini;
     double shape_ini;
-    int value_ini;
+    double value_ini;
 
 
     double [] A;
@@ -68,6 +69,7 @@ public class MVMO {
     double [][] shape;
     double [][] Shape_dyn;
     int [] izm;
+    double [] values_noeq;
     //int [] izz;
     int [] no_in;
     int [] no_inin;
@@ -82,19 +84,11 @@ public class MVMO {
 
 
     public void initialize() {
-        parameter.scaling = ps.x_max - ps.x_min; //TODO check realmente x_min es un array
+        parameter.scaling = ps.x_max - ps.x_min;
         indepent_runs = parameter.n_par * 2;
 
         double[][] xx = new double[parameter.n_par][ps.D];
         double[][] x_norm = new double[parameter.n_par][ps.D];
-
-        for (int i = 0; i < xx.length; i++)
-            for (int j = 0; j < xx[i].length; j++)
-                xx[i][j] = 0;
-
-        for (int i = 0; i < x_norm.length; i++)
-            for (int j = 0; j < x_norm[i].length; j++)
-                x_norm[i][j] = 0;
 
         for (int iijj = 0; iijj < parameter.n_par; iijj++) {
             for (int jjkk = 0; jjkk < ps.D; jjkk++) {
@@ -102,13 +96,11 @@ public class MVMO {
             }
 
             for (int i = 0; i < ps.D; i++) {
-                x_norm[iijj][i] = (xx[iijj][i] - ps.x_min) / parameter.scaling; //TODO scaling es otro array?? todos mentirosos
+                x_norm[iijj][i] = (xx[iijj][i] - ps.x_min) / parameter.scaling;
             }
         }
 
-        for (int i = 0; i < x_norm.length; i++)
-            for (int j = 0; j < x_norm[i].length; j++)
-                x_normalized[i][j] = x_norm[i][j];
+        x_normalized = Util.copyMatrix(x_norm);
 
         n_eval = proc.n_eval;
         n_par = parameter.n_par;
@@ -117,17 +109,13 @@ public class MVMO {
         fs_factor_start = parameter.fs_factor_start;
         fs_factor_end = parameter.fs_factor_end;
         Shape_dyn = new double[n_par][D];
-        Util.assignMatrix(Shape_dyn, 1);
         IX = new int[n_par];
-        Util.assignArray(IX, 1);
         shape = new double[n_par][D];
-        Util.assignMatrix(shape, 0);
         izm = new int[n_par];
-        Util.assignArray(izm, 0);
 
         for (int i = 0; i < n_par; i++) {
             IX[i] = i;
-            izm[i] = Math.round(Configuration.rand.getFloat() * (ps.D - 1)) + 1;
+            izm[i] = Math.round(Configuration.rand.getFloat() * (ps.D - 1));
             for (int k = 0; k < ps.D; k++) {
                 Shape_dyn[i][k] = shape_dyn_ini;
                 shape[i][k] = shape_ini;
@@ -167,10 +155,12 @@ public class MVMO {
         // izz = new int[n_par];
         //Util.assignArray(izz, 0);
         considered = new boolean[n_par][ps.D];
-        for (int i = 0; i < considered.length; i++)
-            for (int j = 0; j < considered[i].length; j++)
+        for (int i = 0; i < n_par; i++)
+            for (int j = 0; j <ps.D; j++)
                 considered[i][j] = true;
 
+        values_noeq = new double[n_to_save];
+        Util.assignArray(values_noeq, 0);
 
         if (n_randomly_last < 1) {
             n_randomly_last = 1;
@@ -251,6 +241,35 @@ public class MVMO {
         ps = new Ps();
         proc = new Proc();
         table = new Table();
+
+        ps.x_min = Configuration.benchmark.lbound();
+        ps.x_max = Configuration.benchmark.ubound();
+        ps.D = Configuration.DIM;
+
+        proc.n_eval = Configuration.max_fes;
+
+
+        parameter.n_par= Configuration.n_par;
+        parameter.n_tosave= Configuration.n_tosave;
+        parameter.fs_factor_start= (int)Configuration.fs_factor_start;
+        parameter.fs_factor_end= Configuration.fs_factor_end;
+        parameter.delta_Shape_dyn= Configuration.delta_Shape_dyn;
+        parameter.local_prob= Configuration.local_prob;
+        min_eval_LS = (int)Math.round(Configuration.min_eval_LS);
+        max_eval_LS = (int)Math.round(Configuration.max_eval_LS);
+        parameter.ratio_gute_max=Configuration.ratio_gute_max;
+        parameter.ratio_gute_min=Configuration.ratio_gute_min;
+        parameter.n_random_ini = Configuration.n_random_ini;
+        parameter.n_random_last= Configuration.n_random_last;
+        local_max= Configuration.local_max;
+        shape_ini=Configuration.shape_ini;
+        shape_dyn_ini=Configuration.shape_dyn_ini;
+        value_ini=Configuration.value_ini;
+        r_select=Configuration.r_select;
+        mappingST=Configuration.mappingST;
+
+
+        initialize();
     }
 
     public double execute(){
@@ -284,14 +303,6 @@ public class MVMO {
 
                 x_normalized[ipp] = Matrix.addByElement(Matrix.multipliesByElement(x_normalized[ipp], parameter.scaling), ps.x_min);
                 if(local_search[ipp] && local_i < local_max && local_search0 > 0) {
-                    //TODO tiene pinta de ser el record
-                    /*
-                                    [msgstr, msgid] = lastwarn ;
-                                    TFrcond = strcmp('MATLAB:nearlySingularMatrix',msgid); % Only informative from 'fmincon' function
-                                    if TFrcond~=0
-                                        rcond_value0=str2num(msgstr(81:end-1));
-                                    end
-                     */
                     Matlab.fminconOutput outfmin = LocalSearchMVMOSH(x_normalized[ipp], proc.n_eval - proc.i_eval);
                     x_normalized[ipp] = Util.copyArray(outfmin.x);
                     local_search[ipp] = false;
@@ -334,7 +345,7 @@ public class MVMO {
                             firsttime = false;
                         }
                         for (int ia = 0; ia < n_par; ia++) {
-                            if (!table.feasibility[0][ia]){ //TODO puede ser comprobar toda la columna check
+                            if (!table.feasibility[0][ia]){
                                 A[ia] = A[ia] + amax;
                             }
                         }
@@ -390,7 +401,7 @@ public class MVMO {
                                 }else if(table.bests[0][jx][bestp] > 0.85 || table.bests[0][jx][bestp] < 0.15 && Configuration.rand.getFloat() < 0.15 ){
                                     while (x_normalized[ipp][jx] > 1.0 ||  x_normalized[ipp][jx] < 0.0) {
 
-                                        returnObject = must(); //TODO no le pasamos el IX?
+                                        returnObject = must();
                                         bestp = returnObject[0];
                                         onep1 = returnObject[1];
                                         worstp = returnObject[2];
@@ -423,7 +434,7 @@ public class MVMO {
                                 x_normalized[ipp][i]=0.999 * table.bests[1][i][ipp]+0.0010 * table.bests[0][i][verybest];
                             }
                         }
-                        int irandom=Math.round(Configuration.rand.getFloat()*(border_gute-1)); //TODO puede dar fallo de segmentacion
+                        int irandom=Math.round(Configuration.rand.getFloat()*(border_gute-1));
                         for (int jxx=0; jxx < ps.D; jxx++){
                             meann_app[ipp][jxx] = meann[irandom][jxx];
                         }
@@ -534,13 +545,13 @@ public class MVMO {
 
     public double [] mv_noneq(int nnnnnn, double [] values, double vmean, double vshape, double vvqq){
         int iz = 0;
-        double [] values_noeq = new double[ps.D];
+        //double [] values_noeq = new double[ps.D];
         values_noeq[iz] = values[0];
 
         for(int ii_jj=1; ii_jj<nnnnnn; ii_jj++){
             int izz = iz;
             boolean gleich = false;
-            for(int kk_ii=0; kk_ii<izz; ii_jj++){
+            for(int kk_ii=0; kk_ii<izz; kk_ii++){
                 if(Math.abs(values_noeq[kk_ii] - values[ii_jj]) < vvqq){
                     gleich = true;
                     break;
@@ -579,15 +590,15 @@ public class MVMO {
 
         int inn= -1;
         izm[ipp]=izm[ipp]-1;
-        if (izm[ipp]< 1) {
-            izm[ipp] = n_var;
+        if (izm[ipp]< 0) {
+            izm[ipp] = n_var -1;
         }
         considered[ipp][izm[ipp]]=true;
         if (n_randomly > 1) {
             for (int ii = 0; ii < n_randomly - 1; ii++) {
                 boolean isrepeat = false;
                 while (!isrepeat) {
-                    inn = Math.round(Configuration.rand.getFloat() * (n_var - 1)) + 1;
+                    inn = Math.round(Configuration.rand.getFloat() * (n_var - 1));
                     if (!considered[ipp][inn]) {
                         isrepeat = true;
                     }
@@ -598,7 +609,7 @@ public class MVMO {
     }
 
     public void Fill_solution_archive(){
-        no_in[ipp] ++;
+        no_in[ipp]++;
         boolean changed = false;
         changed_best=false;
         int i_position = 0;
@@ -606,9 +617,6 @@ public class MVMO {
         if(no_in[ipp] == 1){
             for(int i=0; i<n_to_save; i++) {
                 table.fitness[i][ipp] = 1.e200;
-            }
-
-            for(int i=0; i<n_to_save; i++) {
                 table.feasibility[i][ipp] = false;
             }
 
@@ -626,13 +634,20 @@ public class MVMO {
         }else{
 
             for(int ij=0; ij<n_to_save; ij++){
-                if(xt.fitness < table.fitness[ij][ipp] && xt.feasibility == table.feasibility[0][ij] || (table.feasibility[ij][ipp] != xt.feasibility) ){
+                boolean part2 = true;
+                for(int i=0; i<n_par; i++){
+                    if(xt.feasibility != table.feasibility[ij][i]){
+                        part2 = false;
+                        break;
+                    }
+                }
+                if(xt.fitness < table.fitness[ij][ipp] && part2 || (table.feasibility[ij][ipp] == false && xt.feasibility == true) ){
                     i_position = ij;
                     changed = true;
                     if(ij < n_to_save){
                         no_inin[ipp] = no_inin[ipp] + 1;
                     }
-                    return;
+                    break;
                 }
             }
 
@@ -648,7 +663,10 @@ public class MVMO {
                 nnnnnn = no_inin[ipp];
             }
             // isdx = nnnnnn:-1:i_position + 1;
-            for(int isdx=nnnnnn-1; isdx>=i_position; isdx--){
+            for(int isdx=nnnnnn-1; isdx>i_position; isdx--){
+                if(isdx  <= 0 || isdx >= n_par){
+                    System.out.print("DEBUG");
+                }
                 table.fitness[isdx][ipp]=table.fitness[isdx - 1][ipp];
                 table.objective[isdx][ipp]=table.objective[isdx - 1][ipp];
                 table.feasibility[isdx][ipp]=table.feasibility[isdx - 1][ipp];
@@ -687,19 +705,22 @@ public class MVMO {
     public int [] must(){
         int [] returnObject = new int[3];
 
-        int iup = (int) (Math.round(5.0 * (1.0 - ff2)) + 1);
+        int iup = (int) (Math.round(5.0 * (1.0 - ff2)));
         int ilow = 1;
         int bestp = Math.round(Configuration.rand.getFloat() * (iup - ilow)) + ilow;
         int worstp = -1;
         iup = 15;
         ilow = 0;
-        while ((worstp <= bestp) || (worstp > n_par)){
+        while ((worstp <= bestp) || (worstp >= n_par)){
             worstp=Math.round(Configuration.rand.getFloat()*(iup-ilow))+ ilow;
             worstp = Math.round(border_gute + (worstp -3));
         }
         iup = worstp -1;
         ilow = bestp + 1;
         int onep1 = Math.round(Configuration.rand.getFloat() * (iup - ilow)) + ilow;
+        if(worstp >= n_par){
+            System.out.println("DEBUG");
+        }
         returnObject[1] = IX[onep1];
         returnObject[0] = IX[bestp];
         returnObject[2] = IX[worstp];

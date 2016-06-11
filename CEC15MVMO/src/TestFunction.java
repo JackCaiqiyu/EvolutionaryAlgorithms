@@ -8,6 +8,13 @@ public class TestFunction {
     public static double testFuction(double [] x){
         double f = Configuration.benchmark.f(x);
 
+        if(Double.isNaN(f)){
+            System.err.println("NAN value on fit.");
+            System.exit(1);
+        }
+
+        System.out.println("Fit: " + f + " at: " + MVMO.proc.i_eval);
+
         if(f < AllBenchmarks.objective()){
             f = 0;
         }
