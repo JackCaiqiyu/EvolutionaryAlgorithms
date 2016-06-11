@@ -56,7 +56,7 @@ public class Test {
                     Configuration.N = DIM;
                     Configuration.g_arc_rate = 2.6;
                     Configuration.epsilon = 10e-8;;
-                    Rand rand = new Rand(seeds.getSeed(Configuration.F));
+                    Rand rand = new Rand();
                     Configuration.rand = rand;
                     Configuration.pop_size = Math.round(DIM * 18);
                     Configuration.g_memory_size = 6;

@@ -1,6 +1,8 @@
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by framg on 09/04/2016.
@@ -269,8 +271,10 @@ public class LSHADEND {
                         memory_pos = 0;
                     }
                 }
+                int plan_pop_size2 = 0;
 
-                int plan_pop_size2 = (int)Math.round((((new BigDecimal(min_memory_size - 100)).divide(new BigDecimal(Configuration.max_nfes)).doubleValue()) * nfes) + 100);
+                plan_pop_size2 = (int) Math.round((((new BigDecimal(min_memory_size - 100)).divide(new BigDecimal(Configuration.max_nfes), 64, RoundingMode.HALF_UP).doubleValue()) * nfes) + 100);
+
                 if (m2 > plan_pop_size2){
                     int reduction_ind_num2 = m2 - plan_pop_size2;
                     if(m2 - reduction_ind_num2 < min_memory_size){
@@ -282,7 +286,7 @@ public class LSHADEND {
 
                 }
 
-                int plan_pop_size = (int)Math.ceil(((new BigDecimal(min_pop_size - max_pop_size).divide(new BigDecimal(Configuration.max_nfes)).doubleValue()) * nfes) + max_pop_size);
+                int plan_pop_size = (int)Math.ceil(((new BigDecimal(min_pop_size - max_pop_size).divide(new BigDecimal(Configuration.max_nfes), 64, RoundingMode.HALF_UP).doubleValue()) * nfes) + max_pop_size);
                 if(pop_size > plan_pop_size){
                     int reduction_ind_num = pop_size - plan_pop_size;
                     if (pop_size - reduction_ind_num < min_pop_size){

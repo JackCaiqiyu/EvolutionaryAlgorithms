@@ -76,6 +76,9 @@ public final class Matlab {
 
     static fminconOutput fmincon(FminconFunction fun, double [] x, int FEsAllowed){
         fminconOutput out = new fminconOutput();
+        out.fit = fun.f(x);
+        out.x = Util.copyArray(x);
+        out.evals = 1;
         return out;
     }
 

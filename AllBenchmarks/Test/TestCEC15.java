@@ -36,6 +36,20 @@ public class TestCEC15 {
         System.out.println( 1.d-15 );
     }
 
+    @Test
+    public void f13(){
+        double [] x10 = {1,2,3,4,5,6,7,8,9,10};
+        CEC15Benchmark benchmark = new CEC15Benchmark(10, 13);
+        assertEquals(String.valueOf(423731.111088), String.valueOf(benchmark.f(x10)));
+    }
+
+    @Test
+    public void f14(){
+        double [] x10 = {1,2,3,4,5,6,7,8,9,10};
+        CEC15Benchmark benchmark = new CEC15Benchmark(10, 14);
+        assertEquals(String.valueOf(43541.687640), String.valueOf(benchmark.f(x10)));
+    }
+
     public double mod(double a, double b){
         double aa = Math.abs(a);
         double bb = Math.abs(b);

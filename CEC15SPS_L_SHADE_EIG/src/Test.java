@@ -12,23 +12,65 @@ import com.benchmark.seeds;
  */
 public class Test {
 
-
+    static int debug = 0;
 
 
     public static void main(String [] args) {
-        run("CEC15", 4, 4);
+        String name_benchmark = null;
+        Integer start_function = null;
+        Integer finish_function = null;
+        for(int i=0; i<args.length; i++){
+            if(args[i].equals("-sF")){
+                start_function = Integer.valueOf(args[i+1]);
+            }
+            if(args[i].equals("-fF")){
+                finish_function = Integer.valueOf(args[i+1]);
+            }
+            if(args[i].equals("-b")){
+                name_benchmark = args[i+1];
+            }
+        }
+
+        if(name_benchmark != null) {
+            if (start_function == null) {
+                start_function = 1;
+            }
+            if (finish_function == null) {
+                switch (name_benchmark) {
+                    case "CEC05":
+                        finish_function = CEC05Benchmark.nProblems();
+                        break;
+                    case "CEC13":
+                        finish_function = CEC13Benchmark.nProblems();
+                        break;
+                    case "CEC14":
+                        finish_function = CEC14Benchmark.nProblems();
+                        break;
+                    case "CEC15":
+                        finish_function = CEC15Benchmark.nProblems();
+                        break;
+                    default:
+                        System.err.println("No benchmark avaiable.");
+                        System.exit(0);
+                        break;
+                }
+            }
+
+            run(name_benchmark, start_function, finish_function);
+        }
+
     }
 
 
 
     public static void run(String benchmark, int start_problem, int finish_problem){
         int nProblems = finish_problem;
-        int runs = 1;AllBenchmarks.runs();
+        int runs = AllBenchmarks.runs();
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
             Configuration.rand = new Rand(seeds.getSeed(F));
-            for(int DIM = 10; DIM <= 10; DIM += 20) {
+            for(int DIM = 10; DIM <= 50; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
                         Configuration.benchmark = new CEC05Benchmark(DIM, F);
@@ -70,7 +112,7 @@ public class Test {
                 Configuration.records.endRecord(F, DIM);
             }
         }
-        Configuration.records.exportExcel("LSHADEN" + "-" + "P" +nProblems + "-" + benchmark);
+        Configuration.records.exportExcel("SPS_L_SHADE_EIG" + "-" + "P" +nProblems + "-" + benchmark);
     }
 
 

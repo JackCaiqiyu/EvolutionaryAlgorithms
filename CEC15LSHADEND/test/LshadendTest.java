@@ -19,6 +19,7 @@ public class LshadendTest {
 
         do {
             double value = algorithm(F);
+            System.out.println("Fit: " + value);
             if (value <= mean + std) {
                 sucess = true;
             }

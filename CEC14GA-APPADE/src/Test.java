@@ -72,9 +72,9 @@ public class Test {
 
                 Configuration.records.startRecord();
                 System.out.println("FUN " + F + " DIM " + DIM);
+                Configuration.random = new Rand();
                 for(int run=0; run < runs; run++) {
                     Configuration.benchmark = new CEC14Benchmark(DIM, F);
-                    Configuration.random = new Rand(seeds.getSeed(F));
                     Configuration.max_fes = 10000 * DIM;
                     Configuration.FVr_minbound = Configuration.benchmark.lbound();
                     Configuration.FVr_maxbound = Configuration.benchmark.ubound();

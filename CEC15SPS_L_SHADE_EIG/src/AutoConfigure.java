@@ -101,7 +101,7 @@ public class AutoConfigure {
         //options.NP = NP;
         //options.initial.X = repmat(lb, 1, NP) + repmat(ub - lb, 1, NP) .* rand(numel(prior1), NP);
 
-        X = new double[NP][15];
+        X = new double[NP][params_n];
         for(int i=0; i<NP; i++){
             for(int j=0; j<params_n; j++){
                 X[i][j] = lb[j] + ((ub[j] - lb[j]) * Configuration.rand.getDouble());
@@ -122,8 +122,8 @@ public class AutoConfigure {
         //options.EarlyStop = 'auto';
         //boolean Noise	= true;
 
-        double best_fit = Util.inf;
-        int best_index = -1;
+        double best_fit = 2e300;
+        int best_index = 0;
 
         switch (D){
             case 10:
@@ -141,7 +141,7 @@ public class AutoConfigure {
         }
 
 
-        for(int t=0; t<params_n; t++){
+        for(int t=0; t<NP; t++){
             selectConfiguration(t);
             LSHADE_SPS algorithm = new LSHADE_SPS();
             double fit = algorithm.execute();

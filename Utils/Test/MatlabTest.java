@@ -18,8 +18,19 @@ public class MatlabTest {
 
         Matlab.diag(algo);
 
-        System.out.println((long)1e299);
 
+
+        double [][] fitness = {{2,4,3,1,7,8},{ 1,2,1,2,1,2},{ 3,3,3,4,4,4}};
+        fitness = Util.transposeMatrix(fitness);
+        int i_position = 2;
+        int nnnnnn = 3;
+        int ipp = 0;
+        for(int isdx=nnnnnn-1; isdx>=i_position; isdx--) {
+            fitness[isdx][ipp] = fitness[isdx - 1][ipp];
+        }
+
+
+        System.out.println((long)1e299);
     }
 
     @Test

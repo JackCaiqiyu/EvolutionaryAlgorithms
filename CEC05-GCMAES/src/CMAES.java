@@ -37,59 +37,38 @@ public class CMAES {
 	public static boolean debug = false;
 	public static int runs;
 
+	public static Rand rand;
 	public static void main(String[] args) {
 		runs = AllBenchmarks.runs();
-		benchmark("CEC05");
-		//benchmark("CEC13");
+		//benchmark("CEC05");
+		benchmark("CEC13",20, 28);
 		//benchmark("CEC14");
 		//benchmark("CEC15");
 	}
 
 
 
-	public static void benchmark(String name){
+	public static void benchmark(String name, int start_problem, int finish_problem){
 		//int DIM = 10;
-		int nProblems = 0;
+		int nProblems = finish_problem;
 		records = new Records(runs);
 
-		switch (name){
-			case "CEC05":
-				nProblems = CEC05Benchmark.nProblems();
-				break;
-			case "CEC13":
-				nProblems = CEC13Benchmark.nProblems();
-				break;
-			case "CEC14":
-				nProblems = CEC14Benchmark.nProblems();
-				break;
-			case "CEC15":
-				nProblems = CEC15Benchmark.nProblems();
-				break;
-			default:
-				System.err.println("No benchmark avaiable.");
-				System.exit(0);
-				break;
-		}
-
-		for(int F = 1; F <= 1; F++) {
+		for(int F = start_problem; F <= nProblems; F++) {
+			rand = new Rand(seeds.getSeed(F));
 			for(int DIM = 10; DIM <= 50; DIM += 20) {
 				//records.createWorbook(String dim)
 				switch (name) {
 					case "CEC05":
 						benchmarks = new CEC05Benchmark(DIM, F);
-						nProblems = CEC05Benchmark.nProblems();
 						break;
 					case "CEC13":
 						benchmarks = new CEC13Benchmark(DIM, F);
-						nProblems = CEC13Benchmark.nProblems();
 						break;
 					case "CEC14":
 						benchmarks = new CEC14Benchmark(DIM, F);
-						nProblems = CEC14Benchmark.nProblems();
 						break;
 					case "CEC15":
 						benchmarks = new CEC15Benchmark(DIM, F);
-						nProblems = CEC15Benchmark.nProblems();
 						break;
 					default:
 						System.err.println("No benchmark avaiable.");
@@ -122,7 +101,7 @@ public class CMAES {
 			}
 		}
 
-		records.exportExcel("G-CMAES" + "-" + name);
+		records.exportExcel("GCMAES" + "-" + "P" +nProblems + "-" + name);
 
 	}
 
@@ -132,7 +111,6 @@ public class CMAES {
 		//fitfun2.DIM = DIM;
 		//fitfun2.FUN =F;
 		//IObjectiveFunction fitfun = fitfun2;
-		Rand rand = new Rand(seeds.getSeed(F));
 		// new a CMA-ES and set some initial values
 		CMAEvolutionStrategy cma = new CMAEvolutionStrategy();
 		//cma.readProperties(); // read options, see file CMAEvolutionStrategy.properties

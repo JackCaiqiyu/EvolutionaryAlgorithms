@@ -11,13 +11,55 @@ import com.benchmark.seeds;
  * Created by framg on 11/04/2016.
  */
 public class Test {
+
+
     public static void main(String [] args) {
+//        run("CEC05",1,CEC05Benchmark.nProblems());
+//        run("CEC13",1,CEC13Benchmark.nProblems());
+//        run("CEC14",1,CEC14Benchmark.nProblems());
+//        run("CEC15",1,CEC15Benchmark.nProblems());
+        String name_benchmark = null;
+        Integer start_function = null;
+        Integer finish_function = null;
+        for(int i=0; i<args.length; i++){
+            if(args[i].equals("-sF")){
+                start_function = Integer.valueOf(args[i+1]);
+            }
+            if(args[i].equals("-fF")){
+                finish_function = Integer.valueOf(args[i+1]);
+            }
+            if(args[i].equals("-b")){
+                name_benchmark = args[i+1];
+            }
+        }
 
-        run("CEC05",1,CEC05Benchmark.nProblems());
-        run("CEC13",1,CEC13Benchmark.nProblems());
-        run("CEC14",1,CEC14Benchmark.nProblems());
-        run("CEC15",1,CEC15Benchmark.nProblems());
+        if(name_benchmark != null) {
+            if (start_function == null) {
+                start_function = 1;
+            }
+            if (finish_function == null) {
+                switch (name_benchmark) {
+                    case "CEC05":
+                        finish_function = CEC05Benchmark.nProblems();
+                        break;
+                    case "CEC13":
+                        finish_function = CEC13Benchmark.nProblems();
+                        break;
+                    case "CEC14":
+                        finish_function = CEC14Benchmark.nProblems();
+                        break;
+                    case "CEC15":
+                        finish_function = CEC15Benchmark.nProblems();
+                        break;
+                    default:
+                        System.err.println("No benchmark avaiable.");
+                        System.exit(0);
+                        break;
+                }
+            }
 
+            run(name_benchmark, start_function, finish_function);
+        }
     }
 
 
@@ -27,6 +69,7 @@ public class Test {
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
+            Configuration.rand = new Rand(seeds.getSeed(F));
             for(int DIM = 10; DIM <= 50; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
@@ -53,7 +96,6 @@ public class Test {
                     Configuration.D = DIM;
                     Configuration.nF = F;
                     Configuration.max_nfes = 10000 * DIM;
-                    Configuration.rand = new Rand(seeds.getSeed(Configuration.nF));
                     LSHADEND algorithm = new LSHADEND();
                     algorithm.execute();
                 }
