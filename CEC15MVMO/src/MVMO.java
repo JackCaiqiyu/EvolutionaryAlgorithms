@@ -1,6 +1,7 @@
 import sun.security.provider.SHA;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Created by framg on 17/03/2016.
@@ -277,7 +278,7 @@ public class MVMO {
 
     public double execute(){
         while(true){
-            ff = BigDecimal.valueOf(proc.i_eval).divide(BigDecimal.valueOf(n_eval)).doubleValue(); //proc.i_eval / n_eval;
+            ff = BigDecimal.valueOf(proc.i_eval).divide(BigDecimal.valueOf(n_eval), 64, RoundingMode.HALF_UP).doubleValue(); //proc.i_eval / n_eval;
             ff2 = ff *ff;
             vvqq=Math.pow(10.0 , -(13.3+ff*35.0));
 

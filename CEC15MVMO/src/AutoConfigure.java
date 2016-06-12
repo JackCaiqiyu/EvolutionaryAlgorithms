@@ -17,7 +17,7 @@ public class AutoConfigure {
     }
 
     public void auto_configure(){
-        Configuration.rand = new Rand();
+        //Configuration.rand = new Rand();
         int best = optimizeDE();
         selectConfiguration(best);
     }
@@ -42,23 +42,24 @@ public class AutoConfigure {
         double best_fit = 1e200;
         int best_index = 0;
 
-        switch (D){
-            case 10:
-                Configuration.max_fes = 6000;
-                break;
-            case 30:
-                Configuration.max_fes = 2000;
-                break;
-            case 50:
-                Configuration.max_fes = 1200;
-                break;
-            default:
-                System.err.print("Not valid dimension.");
-                System.exit(0);
-        }
+//        switch (D){
+//            case 10:
+//                Configuration.max_fes = 6000;
+//                break;
+//            case 30:
+//                Configuration.max_fes = 2000;
+//                break;
+//            case 50:
+//                Configuration.max_fes = 1200;
+//                break;
+//            default:
+//                System.err.print("Not valid dimension.");
+//                System.exit(0);
+//        }
+
 
         //for(int t=0; t<params_n; t++){
-        for(int t=0; t<1; t++){
+        for(int t=0; t<10; t++){
             selectConfiguration(t);
             MVMO algorithm = new MVMO();
             double fit = algorithm.execute();

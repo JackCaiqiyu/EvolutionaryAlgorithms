@@ -89,33 +89,34 @@ public class Test {
                         System.exit(0);
                         break;
                 }
-
-              //  AutoConfigure autoConfigure = new AutoConfigure(DIM, F);
-              //  autoConfigure.auto_configure();
-                Configuration.n_par = 150;
-                Configuration.n_tosave = 15;
-                Configuration.fs_factor_start = 1;
-                Configuration.fs_factor_end= 25;
-                Configuration.delta_Shape_dyn = 0.1;
-                Configuration.local_prob = 10;
-                Configuration.min_eval_LS = Math.round(0.05 * 10000 * DIM);
-                Configuration.max_eval_LS = Math.round(1.00 * 10000 * DIM) ;
-                Configuration.ratio_gute_max = 0.8;
-                Configuration.ratio_gute_min = 0.3;;
-                Configuration.n_random_ini = 6;
-                Configuration.n_random_last = 2;
-                Configuration.local_max = 10000;
-                Configuration.shape_ini = 350;;
-                Configuration.shape_dyn_ini = 350;
-                Configuration.value_ini = 0.9;
-                Configuration.r_select = 1;
-                Configuration.mappingST = 2;
+                Configuration.DIM = DIM;
+                Configuration.max_fes = 10000 * DIM;
+                AutoConfigure autoConfigure = new AutoConfigure(DIM, F);
+                autoConfigure.auto_configure();
+                Configuration.max_fes = 10000 * DIM;
+//                Configuration.n_par = 150;
+//                Configuration.n_tosave = 15;
+//                Configuration.fs_factor_start = 1;
+//                Configuration.fs_factor_end= 25;
+//                Configuration.delta_Shape_dyn = 0.1;
+//                Configuration.local_prob = 10;
+//                Configuration.min_eval_LS = Math.round(0.05 * 10000 * DIM);
+//                Configuration.max_eval_LS = Math.round(1.00 * 10000 * DIM) ;
+//                Configuration.ratio_gute_max = 0.8;
+//                Configuration.ratio_gute_min = 0.3;;
+//                Configuration.n_random_ini = 6;
+//                Configuration.n_random_last = 2;
+//                Configuration.local_max = 10000;
+//                Configuration.shape_ini = 350;;
+//                Configuration.shape_dyn_ini = 350;
+//                Configuration.value_ini = 0.9;
+//                Configuration.r_select = 1;
+//                Configuration.mappingST = 2;
 
                 Configuration.records.startRecord();
                 System.out.println("FUN " + F + " DIM " + DIM);
                 for(int run=0; run < 1; run++) {
-                    Configuration.DIM = DIM;
-                    Configuration.max_fes = 10000 * DIM;
+
 
                     MVMO algorithm = new MVMO();
                     algorithm.execute();
