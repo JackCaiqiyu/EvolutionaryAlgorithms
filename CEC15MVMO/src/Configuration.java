@@ -8,7 +8,7 @@ import com.benchmark.Records;
 public class Configuration {
     public static Rand rand;
     public static AllBenchmarks benchmark;
-    public static double PPL = 1e-20;
+    public static double PPL = 1e-50;
     public static Records records;
     public static int DIM;
     public static int max_fes;

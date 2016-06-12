@@ -69,7 +69,7 @@ public class Test {
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
-            Configuration.rand = new Rand(seeds.getSeed(F));
+            Configuration.rand = new Rand();
             for(int DIM = 10; DIM <= 10; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
