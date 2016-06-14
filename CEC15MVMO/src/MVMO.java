@@ -179,7 +179,7 @@ public class MVMO {
         }
 
         if (n_eval <= 0) {
-            n_eval = 100000;
+            n_eval = 10000 * D;
         }
 
         if (fs_factor_start <= 0) {
@@ -342,7 +342,6 @@ public class MVMO {
                 }
 
                 x_normalized[ipp] = Util.divideArray(Util.subArray(x_normalized[ipp], ps.x_min), parameter.scaling);
-
                 Fill_solution_archive();
                 meann_app[ipp] = Util.copyArray(meann[ipp]);
                 if(proc.i_eval > indepent_runs){
@@ -383,7 +382,7 @@ public class MVMO {
                        // beta1 = BigDecimal.valueOf(alpha).multiply(BigDecimal.valueOf(3.0).multiply(BigDecimal.valueOf(bbb).multiply(BigDecimal.valueOf(Configuration.rand.getDouble()).subtract(BigDecimal.valueOf((1.0-ff2)).multiply(BigDecimal.valueOf(0.30)))))).doubleValue();
                         beta10=0.0;
 
-                        while (beta1 != beta10 ){ //TODO pensar mejor sistema de comparar dos doubles
+                        while (beta1 != beta10 ){
                             beta10 = beta1;
                             for(int jx=0; jx<ps.D; jx++){
                                 ccc=table.bests[0][jx][bestp]-table.bests[0][jx][worstp];
@@ -697,7 +696,7 @@ public class MVMO {
 
             if ((no_inin[ipp] >= n_to_save)) {
                 for (int ivvar = 1; ivvar < D; ivvar++) {
-                    //[meann(ipp, ivvar), shape(ipp, ivvar)]=mv_noneq(nnnnnn, table.bests(1:nnnnnn, ivvar, ipp), meann(ipp, ivvar), shape(ipp, ivvar), vvqq); //TODO implementar
+                    //[meann(ipp, ivvar), shape(ipp, ivvar)]=mv_noneq(nnnnnn, table.bests(1:nnnnnn, ivvar, ipp), meann(ipp, ivvar), shape(ipp, ivvar), vvqq);
                     double [] input = new double[nnnnnn];
                     for(int i=0; i<nnnnnn; i++){
                         input[i] = table.bests[i][ivvar][ipp];
