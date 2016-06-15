@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
  * Created by framg on 19/03/2016.
  */
 public class Util {
-    public static double inf = 999999999;
-    public static double ninf = -999999999;
+    public static double inf = 200e299;
+    public static double ninf = -200e299;
     public static int iinf = 999999999;
 
     public static boolean cointains(double [] array, double val){

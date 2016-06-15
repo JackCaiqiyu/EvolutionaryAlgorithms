@@ -1,4 +1,5 @@
 import CMAESold.Cmaes;
+import com.benchmark.AllBenchmarks;
 
 import java.util.ArrayList;
 
@@ -36,8 +37,9 @@ public class Xcmaes {
     int npt;
     int pop_size;
     Cmaes cmaes;
+    boolean bipop_criterion;
  //   int[] def_coeff = new int[4];
-
+    MyStat mystat;
 
     public Xcmaes(){
         N = Configuration.DIM;
@@ -45,10 +47,8 @@ public class Xcmaes {
     }
 
     public void execute(){
-        boolean bipop_criterion = false; //TODO ver que es bipop_criterion e inicializarlo
 
         while (cur_state.iRun <= nrestarts || bipop_criterion){
-            //TODO cargar modelos de datos
 
             algo.nevals = 0;
             algo.realfunc = 1;
@@ -56,25 +56,28 @@ public class Xcmaes {
             algo.aSZ = 0;
             algo.Fmin = 1e30;
 
-            optSVM.init = false;
-            optSVM.def_coeff = new int[4];
-            optSVM.def_coeff[0] = (int)(40 + Math.floor(4 *(Math.pow(N, 1.7))));
-            optSVM.def_coeff[1] = 6;
-            optSVM.def_coeff[2] = 3;
-            optSVM.def_coeff[3] = 1;
-            optSVM.coeff = Util.copyArray(optSVM.def_coeff);
+//            optSVM.init = false;
+//            optSVM.def_coeff = new int[4];
+//            optSVM.def_coeff[0] = (int)(40 + Math.floor(4 *(Math.pow(N, 1.7))));
+//            optSVM.def_coeff[1] = 6;
+//            optSVM.def_coeff[2] = 3;
+//            optSVM.def_coeff[3] = 1;
+//            optSVM.coeff = Util.copyArray(optSVM.def_coeff);
+//
+//            optSVM.xmin = new double[4];
+//            optSVM.xmin[0] = 4 * N;
+//            optSVM.xmin[1] = 0;
+//            optSVM.xmin[2] = 0;
+//            optSVM.xmin[3] = 0.5;
+//
+//            optSVM.xmax = new double[4];
+//            optSVM.xmax[0] = 2 * (40 + Math.floor(4* (Math.pow(N, 1.7))));
+//            optSVM.xmax[1] = 10;
+//            optSVM.xmax[2] = 6;
+//            optSVM.xmax[3] = 2;
 
-            optSVM.xmin = new double[4];
-            optSVM.xmin[0] = 4 * N;
-            optSVM.xmin[1] = 0;
-            optSVM.xmin[2] = 0;
-            optSVM.xmin[3] = 0.5;
-
-            optSVM.xmax = new double[4];
-            optSVM.xmax[0] = 2 * (40 + Math.floor(4* (Math.pow(N, 1.7))));
-            optSVM.xmax[1] = 10;
-            optSVM.xmax[2] = 6;
-            optSVM.xmax[3] = 2;
+            modelType = Configuration.modelType;
+            optModel = InitModelParameters(modelType, N, Configuration.withModelOptimization);
 
             algo.CMAactive = Configuration.CMAactive;
             algo.withDisp = Configuration.withDisp;
@@ -84,11 +87,13 @@ public class Xcmaes {
 
 
 
-            if(!Configuration.withModelOptimization){
-                algo.maxArchSize = (int) Math.floor( optSVM.def_coeff[0]);
-            }else{
-                algo.maxArchSize = (int) Math.floor( optSVM.xmax[0]);
-            }
+
+//            if(!Configuration.withModelOptimization){
+//                algo.maxArchSize = (int) Math.floor( optSVM.def_coeff[0]);
+//            }else{
+//                algo.maxArchSize = (int) Math.floor( optSVM.xmax[0]);
+//            }
+            algo.maxArchSize = optModel.MaxTrainingPoints;
             algo.ARX = new double[algo.maxArchSize][N];
             algo.ARF = new double[algo.maxArchSize];
             algo.ARneval = new double[algo.maxArchSize];
@@ -115,7 +120,7 @@ public class Xcmaes {
             cur_state.stopflag = false;
             algo.err = 0.5;
             algo.iter = 0;
-            iSTEP = 1;
+            iSTEP = 0;
             WeDontBelieveInModel_STEP = 0;
 
             isIPOPRun = true;
@@ -125,11 +130,11 @@ public class Xcmaes {
                     nrestarts++;
                     nrunswithsmallpopsize++;
                     budget.irunwithsmallpopsize = cur_state.iRun;
-                    insigmafac = Math.pow(0.01, Configuration.rand.getFloat());
+                    insigmafac = Math.pow(0.01, Configuration.rand.getDouble());
 
                     lambda0 = Configuration.popSize;
                     if(!Configuration.newRestartRules){
-                        lambda0 = (int)Math.floor(lambda0 * Math.pow(cur_state.lambda / Configuration.IncPopSize /lambda0, Math.pow(Configuration.rand.getFloat(),2)));
+                        lambda0 = (int)Math.floor(lambda0 * Math.pow(cur_state.lambda / Configuration.IncPopSize /lambda0, Math.pow(Configuration.rand.getDouble(),2)));
                     }else{
                         lambda0 = Configuration.popSize;
                     }
@@ -157,8 +162,11 @@ public class Xcmaes {
             }
             stop = false;
             loop();
+            if(break_result){
+                break;
+            }
 
-            //TODO si ha llegado al parametro de fin terminar cuando el error era muy bajo creo recordar
+            //TODO CMAES_FINALIZE
 
             if(Configuration.newRestartRules == true){
                 if((isIPOPRun) || (cur_state.irun < 3)){
@@ -198,179 +206,31 @@ public class Xcmaes {
     }
 
     private void loop(){
-
         while(!stop) {
+
+            if (mystat.nevals > Configuration.MaxEvalsWithSurrogate){
+                algo.withSurr = false;
+            }
+
+            if(mystat.nevals > Configuration.max_evals){
+                stop = true;
+            }
+
             if (algo.withSurr == false) {
                 cur_state = cmaes.cmaes_iteration(cur_state);
                 stop = cur_state.stop;
-            } else { //TODO esta parte del algoritmo en ninguno de los test que hay propuestos se llama, porque implementarla?
-              /*  double err = 0;
-                algo.iter++;
-                if (algo.iter < algo.iterstart) {
-                    cur_state = cmaes.cmaes_iteration(cur_state);
-                    algo.sav_fitness = cur_state.fitness;
-                    algo.sav_out = cur_state.out;
-                    algo.sav_counteval = cur_state.counteval;
-                } else {
-                    algo.realfunc = 0;
+            } else {
 
-                    for (int i = 0; i<optSVM.coeff.length  ; i++) {
-                        cur_coeff[i] = (optSVM.coeff[i] - optSVM.xmin[i]) / (optSVM.xmax[i] - optSVM.xmin[i]);
-                    }
-                    algo.coeffs[algo.iter-1] = Util.copyArray(cur_coeff);
-
-                    for(int i=0; i<algo.iter - algo.iterstart; i++) {
-                        algo.coeffs_mean[i] = Util.mean(algo.coeffs[i+algo.iterstart]);
-                    }
-                    model = xacmes_buildModel_RANKSVM(cur_state, optSVM.coeff); //TODO implementar funcion
-                    RSVM  = new Model(model);
-
-                    initial_state = new State(cur_state);
-                    cur_state.savemodulo = false;
-                    for (int i = 0; i < iSTEP; i++) {
-                        algo.realfunc = 0;
-                        cur_state = cmaes.cmaes_iteration(cur_state); //TODO implementar metodo
-                    }
-                    algo_without_new_points = new Algo(algo);
-
-                    algo.realfunc = 1;
-                    cur_state.savemodulo = true;
-                    cur_state.fitness = algo.sav_fitness;
-                    cur_state.out = algo.sav_out;
-                    cur_state.counteval = algo.sav_counteval;
-
-                    cur_state = cmaes.cmaes_iteration(cur_state); //TODO
-
-                    algo.sav_fitness = cur_state.fitness;
-                    algo.sav_out = cur_state.out;
-                    algo.sav_counteval = cur_state.counteval;
-
-                    stop = cur_state.stop;
-                    algo_without_new_points = new Algo(algo);
-
-                    for(int i=0; i<cur_state.Xnew_sorted.length; i++){
-                        xnew[i] = Util.copyArray(cur_state.Xnew_sorted[i]);
-                    }
-
-                    fnew = Util.copyArray(cur_state.arfitness);
-                    npt = xnew.length; //TODO check size (x,2)
-
-                    if (model.nCrossValidation == 0) {
-                        for(int i=0; i<model.CrossValidX.length; i++){
-                            model.CrossValidX[i] = Util.copyArray(xnew[i]);
-                        }
-                        model.CrossValidF = Util.copyArray(fnew);
-                    } else {
-                        for (int i = 0; i < npt; i++) {
-                            model.CrossValidX[model.nCrossValidation + i] = Util.copyArray(xnew[i]);
-                            model.CrossValidF[model.nCrossValidation + i] = fnew[i];
-
-                        }
-                    }
-                    model.nCrossValidation += npt;
-
-                    err = xcmaes_estimateModelError(model); //TODO implementar metodo
-                    algo.model_err[algo.iter] = err;
-
-
-                    if ((iSTEP < Configuration.iSTEPminForHyperOptimization) && (WeDontBelieveInModel_STEP < Configuration.hyper_lambda)) {
-                        WeDontBelieveInModel = true;
-                        WeDontBelieveInModel_STEP++;
-                    } else {
-                        WeDontBelieveInModel = false;
-                        WeDontBelieveInModel_STEP = 0;
-                    }
-
-                    if ((algo.withModelOptimization == true) && (WeDontBelieveInModel == false)) {
-                        algo = new Algo(algo_without_new_points);
-                        optSVM.nCrossValidation = npt;
-                        for(int i=0; i<xnew.length; i++) {
-                            optSVM.CrossValidX[i] = Util.copyArray(xnew[i]);
-                        }
-                        optSVM.CrossValidF = Util.copyArray(fnew);
-                        optSVM.nx = cur_state.lambda;
-                        optSVM.algo_initial_state = initial_state;
-                        algo.realfunc = 2;
-                        if (optSVM.init == false) {
-                            int hyper_N = optSVM.coeff.length;
-                            double hyper_X_a = 0.2;
-                            double hyper_X_b = 0.8;
-                            double hyper_sigma = 0.6;
-                            int hyper_lambda = Configuration.hyper_lambda;
-
-                            hyper_opts = cmaes_initialize('defaults'); //TODO implementar este modulo
-                            hyper_opts.MaxFunEvals = 1e+10;
-                            hyper_opts.StopFitness = -1;
-                            hyper_opts.DispModulo = -1;
-                            hyper_opts.DispFinal = "off";
-                            hyper_opts.CMAactive = algo.CMAactive;
-                            hyper_opts.LogModulo = 0;
-                            hyper_opts.LogTime = 0;
-                            hyper_opts.SaveVariables = "off";
-
-                            hyper_opts.PopSize = hyper_lambda;
-                            //TODO hyper_xstart raro de la ostia
-                            optSVM.cur_state = cmaes_initialize(wrapperfct, hyper_xstart, hyper_sigma, hyper_opts);
-                            optSVM.cur_state.irun = optSVM.cur_state.irun + 1;
-                            optSVM.cur_state = cmaes_initializeRun(optSVM.cur_state);
-                            optSVM.cur_state.stopflag = {}; //TODO check
-                            optSVM.init = true;
-                            optSVM.coeff = optSVM.def_coeff;
-                        } else {
-                            optSVM.cur_state = cmaes_iteration(optSVM.cur_state);
-
-                            boolean hyper_stop = cur_state.stop;
-
-                            xmean = optSVM.cur_state.xmean; //TODO check si es array copiarlo en dicho caso
-                            ncoeff = size(optSVM.coeff, 2);
-                            boolean correct = true;
-                            for (int j = 0; j < ncoeff; j++) {
-                                if ((xmean(j) < 0) || (xmean(j) > 1)) {
-                                    correct = false;
-                                }
-                                coeff(j) = optSVM.xmin(j) + xmean(j) * (optSVM.xmax(j) - optSVM.xmin(j));
-                            }
-                            if (correct == true)
-                                optSVM.coeff = coeff;
-                            else
-                                optSVM.coeff = optSVM.def_coeff;
-
-
-                            //TODO display
-                        }
-                        algo = new Algo(algo_without_new_points);
-                        algo.realfunc = 1;
-                    }
-                }
-                if (algo.iter < algo.iterstart) {
-                    algo.model_avrerr[algo.iter] = algo.err;
-                }
-                if (algo.iter >= algo.iterstart) {
-                    double est_err = err;
-                    algo.err = algo.err * (1 - Configuration.alpha) + Configuration.alpha * est_err;
-                    algo.model_avrerr[algo.iter] = algo.err;
-                    double pos = (Configuration.maxerr - algo.err) / Configuration.maxerr;
-                    iSTEP = (int) Math.floor(pos * Configuration.maxStepts) - 1;
-                    if (iSTEP < 0) {
-                        iSTEP = 0;
-                    }
-                    if (iSTEP > Configuration.maxStepts) {
-                        iSTEP = Configuration.maxStepts;
-                    }
-                    szcoeffs = size(algo.coeffs, 2);
-                }*/
             }
-              /*  if (mystat.stop == 1)
-                    stop = true;
+            if (mystat.stop == true)
+                stop = true;
 
-
-                if (algo.Fmin < Configuration.Ter_err) {
+            if (algo.Fmin < AllBenchmarks.objective()) {
                     stop = true;
                     return;
-                }*/
+                }
 
         }
-        //TODO display resultados
 
     }
 

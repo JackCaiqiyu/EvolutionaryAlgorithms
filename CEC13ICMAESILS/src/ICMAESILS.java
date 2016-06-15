@@ -53,12 +53,12 @@ public class ICMAESILS {
         // deployment phase
         if (icmaes_train_reward[dim] > mtsls1_train_reward[dim]) {
             solution = ILSmtsls1(Configuration.max_fes * (1 - Configuration.getlearn_perbudget * 2), Configuration.getmtsls1per_ratedim * dim, mtsls1_train_reward);
-            System.out.println("Fit1: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
+          //  System.out.println("Fit1: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
 
         } else {
             icmaes_train_reward[dim + 1] = mtsls1_train_reward[dim + 1];
             solution=icmaes(Configuration.max_fes * (1 - Configuration.getlearn_perbudget * 2), icmaes_train_reward);
-            System.out.println("Fit2: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
+          //  System.out.println("Fit2: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
         }
 
 //        for(int i=0; i<icmaessolfitness.length; i++){

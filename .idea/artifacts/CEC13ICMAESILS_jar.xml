@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CEC13ICMAESILS:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CEC13ICMAESILS_jar</output-path>
+    <root id="archive" name="CEC13ICMAESILS.jar">
+      <element id="module-output" name="CEC13ICMAESILS" />
+      <element id="module-output" name="Utils" />
+      <element id="module-output" name="AllBenchmarks" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jscience.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-math3-3.6.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/poi-3.14-20160307.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/Jama-1.0.3.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -1,4 +1,9 @@
+import com.benchmark.AllBenchmarks;
+import com.benchmark.Rand;
+
 public class Configuration {
+    public static int max_evals;
+    public static int MaxEvalsWithSurrogate;
     public static boolean newRestartRules;
     public static boolean BIPOP;
     public static int popSize;
