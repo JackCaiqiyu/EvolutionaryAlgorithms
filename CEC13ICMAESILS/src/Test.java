@@ -14,7 +14,6 @@ import com.benchmark.seeds;
 public class Test {
     public static void main(String [] args) {
 
-        run("CEC13",1,1);
         String name_benchmark = null;
         Integer start_function = null;
         Integer finish_function = null;
@@ -115,7 +114,7 @@ public class Test {
                 Configuration.records.endRecord(F, DIM);
             }
         }
-        Configuration.records.exportExcel("ICMAESILS" + "-" + benchmark);
+        Configuration.records.exportExcel("ICMAESILS" + "-" + "P" + finish_problem + "-" + benchmark);
     }
 
 

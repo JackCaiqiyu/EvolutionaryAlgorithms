@@ -1,7 +1,5 @@
-import junit.framework.Assert;
 import org.junit.Test;
 
-import java.util.Random;
 import static org.junit.Assert.assertEquals;
 /**
  * Created by framg on 13/04/2016.

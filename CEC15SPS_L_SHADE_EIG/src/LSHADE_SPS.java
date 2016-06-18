@@ -1,6 +1,3 @@
-import com.benchmark.Rand;
-import com.benchmark.cec.cec05.Bounds;
-
 import java.util.ArrayList;
 import java.util.List;
 

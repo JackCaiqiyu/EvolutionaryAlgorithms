@@ -1,8 +1,3 @@
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.EigenDecomposition;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.stat.correlation.Covariance;
-import org.apache.commons.math3.linear.LUDecomposition;
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;

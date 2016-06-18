@@ -1,4 +1,3 @@
-
 public class AutoConfigure {
     double [][] X;
     int DIM;

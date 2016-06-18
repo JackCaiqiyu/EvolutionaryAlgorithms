@@ -1,7 +1,4 @@
 import cmaes.CMAEvolutionStrategy;
-import com.benchmark.AllBenchmarks;
-import com.benchmark.Rand;
-import com.benchmark.seeds;
 
 import java.util.*;
 
