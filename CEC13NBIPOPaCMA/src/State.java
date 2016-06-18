@@ -1,28 +1,20 @@
+import javafx.util.Pair;
+
+import java.util.List;
+
+/**
+ * Created by framg on 16/06/2016.
+ */
 public class State {
-    public double lambda;
-    public int popsize;
-    public boolean stopflag;
-    public int irun;
-    public double sigma;
-    public double [] insigma;
-    public int stopMaxIter;
-    public boolean stop;
-    public double fitness;
-    public double out;
-    public int  counteval;
-    public boolean savemodulo;
-    public int iRun;
-    public double [][] Xnew_sorted;
-    public double [] arfitness;
-    double invsqrtC;
+    int irun;
+    int lambda;
+    int popsize;
+    double sigma;
+    double []  insigma;
+    int stopMaxIter;
+    boolean stop;
+    double fitness;
+    int counteval;
+    double [] out;
     double [] xmean;
-
-    public State(){
-        //TODO
-    }
-
-    public State(State state){
-        //TODO constructor de copia
-    }
-
 }

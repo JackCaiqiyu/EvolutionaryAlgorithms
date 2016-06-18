@@ -1,13 +1,14 @@
 import com.benchmark.AllBenchmarks;
 import com.benchmark.Rand;
+import com.benchmark.Records;
 
 public class Configuration {
     public static int max_evals;
     public static int MaxEvalsWithSurrogate;
     public static boolean newRestartRules;
     public static boolean BIPOP;
-    public static int popSize;
-    public static int IncPopSize;
+    public static boolean noisy;
+   // public static int popSize;
     public static Rand rand = new Rand();
     public static int iSTEPminForHyperOptimization;
     public static int hyper_lambda;
@@ -21,12 +22,16 @@ public class Configuration {
     public static boolean withDisp;
     public static int iterstart;
     public static     int iGlobalRun;
-    public static int MaxIter;
+    //public static int MaxIter;
+
+    public static Xcmaes.MyStat myStat;
 
     public static long seed;
     public static double Ter_err;
     public static int DIM;
     public static int F;
     public static AllBenchmarks benchmark;
+    public static Records records;
 
+    public static int MaxTrainingPoints;
 }

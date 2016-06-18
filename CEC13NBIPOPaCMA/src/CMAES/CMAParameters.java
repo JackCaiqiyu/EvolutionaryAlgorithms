@@ -1,4 +1,22 @@
-package CMAESold;
+package CMAES;/*
+    Copyright 2003, 2005, 2007 Nikolaus Hansen 
+    e-mail: hansen .AT. bionik.tu-berlin.de
+            hansen .AT. lri.fr
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License, version 3,
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Last change: $Date: 2010-12-02 23:57:21 +0100 (Thu, 02 Dec 2010) $
+*/
 
 /**
  * Interface to strategy parameters for the CMA Evolution
@@ -170,30 +188,33 @@ public class CMAParameters implements java.io.Serializable {
 								opts.stopMaxFunEvals/lambda)))	
 								+ cs ;                                      /* minor increment */
 
-		if (cc <= 0)
+
+		if(Options.ccov1){
+			ccov = Math.min(2,lambda/3) / (Math.pow(N+1.3,2)+mueff);
+			ccovsep = Math.min(1, ccov * (N + 1.5) / 3.0);
+		}
+
+		if(Options.ccovmu){
+			mucov = Math.min(1-ccov, Math.min(2, lambda/3) * (mueff-2+1/mueff) /(Math.pow(N+2,2) + mueff));
+		}
+
+		if(Options.ccum){
+			cc = ((N+4 + 2*mueff/N) / Math.pow((4 + mueff/N),-1));
+		}
+
+
+		if (cc <= 0 || cc >= 1)
 			cc = 4.0 / (N + 4.0);
 
-
-		//ccov = Math.min(2, lambda/3) / (Math.pow(Configuration.DIM+1.3, 2+mueff));
-		cc = Math.pow(((N+4 + 2*mueff/N) / (4 + mueff/N)),-1) ;
-		cs = (mueff+2)/(N+mueff+3);
-		//mucov = Math.min(2, lambda/3) * (mueff-2+1/mueff);
-
-		ccov = Math.min(2,lambda/3) / ((N+1.3) * (N+1.3)+mueff);
-		mucov = Math.min(1-ccov, Math.min(2,lambda/3) * (mueff-2+1/mueff) / ((N+2) * (N+2)+mueff));
-		ccovsep = Math.min(1, ccov * (N + 1.5) / 3.0);
-
-
-		//NBIPOPaCMA implementation
-		/*if (mucov < 0)
+		if (mucov < 0)
 			mucov = mueff;
 
-		if (ccov < 0) {
+		if (ccov < 0) { // TODO: setting should depend on gendiagonalcov 
 			ccov = 2.0 / (N + 1.41) / (N + 1.41) / mucov
 			+ (1 - (1.0 / mucov))
 			* Math.min(1, (2 * mueff - 1) / (mueff + (N + 2) * (N + 2)));
 			ccovsep = Math.min(1, ccov * (N + 1.5) / 3.0);
-		}*/
+		}
 
 		// check everything
 		String s = check();
@@ -221,8 +242,8 @@ public class CMAParameters implements java.io.Serializable {
 	 * 
 	 * @param mu
 	 *            New value for the number of parents mu.
-	 * @see #setRecombination(int, CMAParameters.RecombinationType)
-	 * @see #setRecombinationWeights(CMAParameters.RecombinationType)
+	 * @see #setRecombination(int, RecombinationType)
+	 * @see #setRecombinationWeights(RecombinationType)
 	 */
 	public void setMu(int mu) {
 		if (locked != 0) // needed because of recombination weights
@@ -248,8 +269,8 @@ public class CMAParameters implements java.io.Serializable {
 	 * @param lambda  set population size
 	 */
 	void setLambda(int lambda) {
-		//if (locked != 0)
-		//	error("parameters cannot be set anymore");
+		if (locked != 0)
+			error("parameters cannot be set anymore");
 		this.lambda = lambda; 
 	}
 	/** @see #getLambda() */
@@ -334,7 +355,10 @@ public class CMAParameters implements java.io.Serializable {
 
 	/** normalizes recombination weights vector and sets mueff **/
 	protected void setWeights(double[] weights) {
-		assert locked == 0;
+		if(locked == 0){
+			System.err.print("Assert locked == 0");
+			System.exit(0);
+		}
 		double sum = 0;
 		for (int i = 0; i < weights.length; ++i)
 			sum += weights[i];
@@ -370,8 +394,7 @@ public class CMAParameters implements java.io.Serializable {
 	 * 
 	 */
 	public double getMucov() {
-		//return mucov;
-		return Math.min(2, lambda/3) * (mueff-2+1/mueff);
+		return mucov;
 	}
 
 	/**
@@ -384,7 +407,7 @@ public class CMAParameters implements java.io.Serializable {
 	public void setMucov(double mucov) {
 		if (locked != 0) // on the save side as mucov -> ccov, but in principle not essential
 			error("parameters cannot be set anymore");
-		this.mucov = Math.min(2, lambda/3) * (mueff-2+1/mueff) ; // can be set anytime
+		this.mucov = mucov; // can be set anytime
 	}
 
 	/**
@@ -399,7 +422,7 @@ public class CMAParameters implements java.io.Serializable {
 	public double getCcov(boolean flgdiag) {
 		if (flgdiag)
 			return ccovsep;
-		return Math.min(2, lambda/3) / (Math.pow(Configuration.DIM+1.3, 2+mueff));
+		return ccov;
 	}
 	/**
 	 * Getter for property covariance matrix learning rate ccov
@@ -408,8 +431,7 @@ public class CMAParameters implements java.io.Serializable {
 	 * 
 	 */
 	public double getCcov() {
-		//return ccov;
-		return Math.min(2, lambda/3) / (Math.pow(Configuration.DIM+1.3, 2+mueff));
+		return ccov;
 	}
 
 
@@ -423,7 +445,7 @@ public class CMAParameters implements java.io.Serializable {
 	 * @see #getCcov()
 	 */
 	public void setCcov(double ccov) {
-		this.ccov = Math.min(2, lambda/3) / (Math.pow(Configuration.DIM+1.3, 2+mueff)); // can be set anytime, cave: switching from diagonal to full cov
+		this.ccov = ccov; // can be set anytime, cave: switching from diagonal to full cov
 	}
 
 	/**
@@ -459,8 +481,7 @@ public class CMAParameters implements java.io.Serializable {
 	 * 
 	 */
 	public double getCc() {
-
-		return Math.pow((Configuration.DIM + 4 + 2*mueff/ Configuration.DIM) / (4 + mueff/ Configuration.DIM), -1);
+		return cc;
 	}
 
 	/**
@@ -468,8 +489,7 @@ public class CMAParameters implements java.io.Serializable {
 	 * 
 	 */
 	public void setCc(double cc) {
-
-		this.cc = Math.pow((Configuration.DIM + 4 + 2*mueff/ Configuration.DIM) / (4 + mueff/ Configuration.DIM), -1);
+		this.cc = cc;
 	}
 
 	/**

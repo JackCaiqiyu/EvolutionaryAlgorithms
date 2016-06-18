@@ -1,4 +1,4 @@
-package CMAESnew;
+package CMAES;
 
 /** solution point in search space. Rather plain implementation of the interface ISolutionPoint.
  * 
