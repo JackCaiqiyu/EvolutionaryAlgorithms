@@ -16,6 +16,7 @@ public class IcmaesilsTest {
 
         do {
             double value = algorithm(F);
+            System.out.println(value);
             if (value <= mean + std) {
                 sucess = true;
             }

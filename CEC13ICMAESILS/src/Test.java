@@ -104,7 +104,6 @@ public class Test {
                     Configuration.getmtsls1_iterbias_choice = 0.01910;
                     Configuration.getmtsls1_initstep_rate = 0.6703;
                     Configuration.getmtsls1per_ratedim = 1;
-                    Configuration.benchmark = new CEC13Benchmark(DIM, F);
 
                     Configuration.max_fes = 10000 * DIM;
 

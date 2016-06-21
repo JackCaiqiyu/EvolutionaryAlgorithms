@@ -12,10 +12,12 @@ public class ICMAESILS {
     public double f;
     public double[] x;
     public double [][] matrix;
-    public double initevalscout = 0;
+    public int initevalscout = 0;
     public double initbestvalue = Configuration.FLT_MAX;
     public double[] initkeepbestx;
+    public int countevals = 0;
 
+    public double liaoevalscount;
 
     public ICMAESILS() {
         x = new double[Configuration.DIM];
@@ -62,6 +64,7 @@ public class ICMAESILS {
 //            //System.out.println("FIT: " + icmaessolfitness[i]);
 //        }
      //   //System.out.println("Fit4: " + Math.abs(solution[dim] - Configuration.benchmark.bias()) + " at: " + solution[dim + 1]);
+        Configuration.records.endRun(Math.abs(solution[dim] - Configuration.benchmark.bias()), (int) Math.round(liaoevalscount), Configuration.max_fes);
         return Math.abs(solution[dim] - Configuration.benchmark.bias());
     }
 
@@ -76,7 +79,6 @@ public class ICMAESILS {
         double fmean;
         int irun;
         int lambda = 0;
-        int countevals = 0;
         int maxevals;
         String stop;
         double long_fitness;
@@ -88,7 +90,7 @@ public class ICMAESILS {
         int first = 1;
         double[] icmaeskeepbestxk = new double[dim];
         double liaobestvalue;
-        double liaoevalscount;
+
 
 
 
@@ -124,6 +126,7 @@ public class ICMAESILS {
             //
             //com.benchmark.cec.cec05.test_func(x, f, dim,1,Configuration.getProblemID());
             f = Configuration.benchmark.f(x);
+            countevals++;
             liaofirstforxinit = f;
             liaoevalscount++;
 
@@ -174,10 +177,13 @@ public class ICMAESILS {
                     }
 
                     f = Configuration.benchmark.f(pop[i]);
+                    countevals++;
                     while(Double.isNaN(f)){
                         pop[i] = cma.resampleSingle(i);
                         f = Configuration.benchmark.f(pop[i]);
+                        countevals++;
                     }
+
 
                     long_fitness = f;
                    // //System.out.println("Fit3: " + long_fitness + " at: " + cma.getCountEval());
@@ -226,7 +232,6 @@ public class ICMAESILS {
         }
         icmaessolfitness[dim] = liaobestvalue;
         icmaessolfitness[dim + 1] = countmaxevalsforicmaes;
-
         return Util.copyArray(icmaessolfitness);
     }
 
@@ -257,7 +262,7 @@ public class ICMAESILS {
             x[n] = xk[n];
         }
         f = Configuration.benchmark.f(x);
-
+        countevals++;
         liaofirstforxinitmtsls1 = f;
         liaoevalsmtsls1count++;
         if (liaobestmtsls1value - liaofirstforxinitmtsls1 > 1e-30) {
@@ -299,6 +304,7 @@ public class ICMAESILS {
                             x[n] = xk[n];
                         }
                         f = Configuration.benchmark.f(x);
+                        countevals++;
                         before1 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
                     //    //System.out.println("Fit5: " + Math.abs(liaobestmtsls1value - Configuration.benchmark.bias()) + " at: " + liaoevalsmtsls1count);
                         liaoevalsmtsls1count++;
@@ -324,6 +330,7 @@ public class ICMAESILS {
                         }
                         //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                         f = Configuration.benchmark.f(x);
+                        countevals++;
                         after1 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
 
                         liaoevalsmtsls1count++;
@@ -358,6 +365,7 @@ public class ICMAESILS {
                                 }
                                 //com.benchmark.cec.cec05.test_func(x, f, dim, 1, Configuration.getProblemID());
                                 f = Configuration.benchmark.f(x);
+                                countevals++;
                                 after2 = f + addPenalty(lsmin, lsmax, xk, dim, liaoevalsmtsls1count);
 
                                 liaoevalsmtsls1count++;
@@ -470,6 +478,7 @@ public class ICMAESILS {
             }
 
             f = Configuration.benchmark.f(x);
+            countevals++;
             initevalscout++;
             matrix[i][Configuration.DIM] = f;
             if (initbestvalue - matrix[i][Configuration.DIM]>1e-30)

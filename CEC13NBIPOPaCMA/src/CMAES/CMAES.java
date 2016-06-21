@@ -74,8 +74,10 @@ public class CMAES {
 		cma.parameters.setLambda(lambda);
 		cma.setDimension(DIM); // overwrite some loaded properties
 		cma.setInitialX(xstart); // in each dimension, also setTypicalX can be used
-		cma.setInitialStandardDeviation(sigma); // also a mandatory setting
 
+		if(sigma > 0){
+			cma.setInitialStandardDeviation(sigma); // also a mandatory setting
+		}
 		if(opts.max_iter) {
 			this.stopMaxIter = (int) Math.round (100 + 50 * Math.pow(DIM+3, 2) / Math.sqrt(pop_size));
 			cma.options.stopMaxIter = this.stopMaxIter;

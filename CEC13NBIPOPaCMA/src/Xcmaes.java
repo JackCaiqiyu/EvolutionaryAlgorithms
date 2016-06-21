@@ -3,6 +3,7 @@ import CMAES.Options;
 import com.sun.org.apache.bcel.internal.generic.BIPUSH;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Xcmaes {
     //  State cur_state;
@@ -28,8 +29,8 @@ public class Xcmaes {
     int N;
     int n_resultsBigPOP;
     int n_resultsSmallPOP;
-    double[] resultsBigPOP;
-    double[] resultsSmallPOP;
+    List<Double> resultsBigPOP;
+    List<Double> resultsSmallPOP;
     double SmallPOPdivBigPOPbudget;
     boolean stop;
 
@@ -87,6 +88,7 @@ public class Xcmaes {
             //TODO opcional
         }
 
+        options.restarts = 9;
         sigma0 = 200 * 0.6;
         double[] xstart = new double[N];
         for (int i = 0; i < 10; i++) {
@@ -107,10 +109,8 @@ public class Xcmaes {
             SmallPOPdivBigPOPbudget = 1.0;
             n_resultsBigPOP = 0;
             n_resultsSmallPOP = 0;
-            resultsBigPOP = new double[1];
-            resultsBigPOP[0] = 0;
-            resultsSmallPOP = new double[1];
-            resultsSmallPOP[0] = 0;
+            resultsBigPOP = new ArrayList<>();
+            resultsSmallPOP = new ArrayList<>();
         }
 
     }
@@ -182,7 +182,11 @@ public class Xcmaes {
 
                     lambda0 = cmaes.pop_size;
                     if (!Configuration.newRestartRules) {
-                        lambda0 = (int) Math.floor(lambda0 * Math.pow(cmaes.lambda / cmaes.IncPopSize / lambda0, Math.pow(Configuration.rand.getDouble(), 2)));
+                        if(lambda0 == 0 || cmaes.lambda == 0){
+                            lambda0 = 0;
+                        }else {
+                            lambda0 = (int) Math.floor(lambda0 * Math.pow(cmaes.lambda / cmaes.IncPopSize / lambda0, Math.pow(Configuration.rand.getDouble(), 2)));
+                        }
                     } else {
                         lambda0 = cmaes.pop_size;
                     }
@@ -222,14 +226,14 @@ public class Xcmaes {
 
             if (Configuration.newRestartRules == true) {
                 if ((isIPOPRun) || (cmaes.irun < 3)) {
-                    resultsBigPOP[n_resultsBigPOP] = algo.Fmin;
+                    resultsBigPOP.add( algo.Fmin);
                     n_resultsBigPOP++;
                 }
                 if ((!isIPOPRun) || (cmaes.irun < 3)) {
-                    resultsSmallPOP[n_resultsSmallPOP] = algo.Fmin;
+                    resultsSmallPOP.add( algo.Fmin);
                     n_resultsSmallPOP++;
                 }
-                if (Util.min(resultsBigPOP) < Util.min(resultsSmallPOP)) {
+                if (Util.min(Util.listToArrayDouble(resultsBigPOP)) < Util.min(Util.listToArrayDouble(resultsSmallPOP))) {
                     SmallPOPdivBigPOPbudget = 0.5;
                 } else {
                     SmallPOPdivBigPOPbudget = 2.0;

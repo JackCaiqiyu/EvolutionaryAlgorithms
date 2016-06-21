@@ -42,12 +42,15 @@ public class GenerateScripts {
             System.exit(0);
         }
 
+
+
         if(!automatic) {
             String scriptName = fileName + name_benchmark + "F" + finish_function;
+            String nameForOge = "F" + finish_function +fileName;
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("#!/bin/bash\n");
-            stringBuilder.append("#$ -N " + scriptName + "\n");
+            stringBuilder.append("#$ -N " + nameForOge + "\n");
             stringBuilder.append("#$ -q " + queue + "\n");
             stringBuilder.append("#$ -o OUT_" + scriptName + ".txt\n");
             stringBuilder.append("#$ -e ERR_" + scriptName + ".txt\n");
@@ -61,7 +64,10 @@ public class GenerateScripts {
             script.append("qsub " + "GC_" + scriptName + "\n");
             write("execute", script.toString());
         }else{
-            
+            if(name_benchmark.equals("CEC05"));
+
+
+
         }
     }
 
