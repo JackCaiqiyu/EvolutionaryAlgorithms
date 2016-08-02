@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="CEC15LSHADEND:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/CEC15LSHADEND_jar</output-path>
-    <root id="archive" name="CEC15LSHADEND.jar">
-      <element id="module-output" name="CEC15LSHADEND" />
+  <artifact type="jar" name="CEC11GA-MPC:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CEC11GA_MPC_jar</output-path>
+    <root id="archive" name="CEC11GA-MPC.jar">
+      <element id="module-output" name="CEC11GA-MPC" />
       <element id="module-output" name="AllBenchmarks" />
       <element id="extracted-dir" path="$PROJECT_DIR$/out/artifacts/CEC14LSHADE_jar/CEC14LSHADE.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/junit-4.12.jar" path-in-jar="/" />

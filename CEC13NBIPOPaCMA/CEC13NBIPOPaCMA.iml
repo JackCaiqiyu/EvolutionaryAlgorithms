@@ -8,8 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="CEC14LSHADE" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="module" module-name="AllBenchmarks" />
-    <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="library" scope="TEST" name="junit-4.12" level="project" />
   </component>
 </module>

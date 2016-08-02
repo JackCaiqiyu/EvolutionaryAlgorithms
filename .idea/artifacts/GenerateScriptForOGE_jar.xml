@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="GenerateScriptForOGE:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/GenerateScriptForOGE_jar</output-path>
-    <root id="archive" name="GenerateScriptForOGE.jar">
-      <element id="module-output" name="GenerateScriptForOGE" />
-    </root>
-  </artifact>
-</component>
