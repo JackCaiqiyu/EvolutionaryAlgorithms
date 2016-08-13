@@ -7,6 +7,7 @@ import com.benchmark.cec.cec14.CEC14Benchmark;
 import com.benchmark.cec.cec15.CEC15Benchmark;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 /**
  * Created by framg on 11/05/2016.
@@ -23,7 +24,9 @@ public class RA {
         double [] x = {1,2,3,4,5,6,7,8,9,10};
         benchmark.g(x);
 
-
+        Rand rand = new Rand();
+        for(int i=0; i<30; i++)
+        System.out.println(rand.getInt(0, 10));
         //ra("CEC05", true);
         //ra("CEC05", true);
         //ra("CEC13", false);

@@ -10,10 +10,49 @@ import com.benchmark.seeds;
 public class Test {
 
     public static void main(String [] args) {
+        run("CEC05",1,1);
+        String name_benchmark = null;
+        Integer start_function = null;
+        Integer finish_function = null;
+        for(int i=0; i<args.length; i++){
+            if(args[i].equals("-sF")){
+                start_function = Integer.valueOf(args[i+1]);
+            }
+            if(args[i].equals("-fF")){
+                finish_function = Integer.valueOf(args[i+1]);
+            }
+            if(args[i].equals("-b")){
+                name_benchmark = args[i+1];
+            }
+        }
 
-        run("CEC05", 1, CEC05Benchmark.nProblems());
+        if(name_benchmark != null) {
+            if (start_function == null) {
+                start_function = 1;
+            }
+            if (finish_function == null) {
+                switch (name_benchmark) {
+                    case "CEC05":
+                        finish_function = CEC05Benchmark.nProblems();
+                        break;
+                    case "CEC13":
+                        finish_function = CEC13Benchmark.nProblems();
+                        break;
+                    case "CEC14":
+                        finish_function = CEC14Benchmark.nProblems();
+                        break;
+                    case "CEC15":
+                        finish_function = CEC15Benchmark.nProblems();
+                        break;
+                    default:
+                        System.err.println("No benchmark avaiable.");
+                        System.exit(0);
+                        break;
+                }
+            }
 
-
+            run(name_benchmark, start_function, finish_function);
+        }
 
     }
 
@@ -24,6 +63,7 @@ public class Test {
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
+            Configuration.rand = new Rand(seeds.getSeed(Configuration.I_fno));
             for(int DIM = 10; DIM <= 50; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
@@ -50,9 +90,6 @@ public class Test {
                     Configuration.dim = DIM;
                     Configuration.I_fno = F;
                     Configuration.max_eval = 10000 * DIM;
-                    Rand rand = new Rand(seeds.getSeed(Configuration.I_fno));
-                    Configuration.rand = rand;
-
                     GAMPC gampc = new GAMPC();
                     gampc.execute();
                 }

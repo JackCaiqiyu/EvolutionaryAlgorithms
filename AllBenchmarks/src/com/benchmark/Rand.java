@@ -34,16 +34,19 @@ public class Rand {
     }
 
     public int getInt(int min, int max){
+        if(isMock == false) {
 
-
-        return random.nextInt(max - min + 1) + min;
+            return random.nextInt(max - min + 1) + min;
+        }else{
+            return Math.round((getFloat()*max) - min);
+        }
     }
 
     public float getFloat(){
         if(isMock == false) {
             return random.nextFloat();
         }else{
-            mock_float += 0.1;
+            mock_float += 0.3;
             //double algo = ((mock_double + 0.1) / 3) * 2;
             if(mock_float > 1){
                 mock_float = 0;
@@ -72,7 +75,7 @@ public class Rand {
             return random.nextDouble();
             //return Beta(111111, 22222);
         }else{
-            mock_double += 0.1;
+            mock_double += 0.017;
             //mock_double = ((mock_double + 0.18) * 2)% 1;
             if(mock_double > 1){
                 mock_double = 0;

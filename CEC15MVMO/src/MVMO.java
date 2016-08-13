@@ -1,4 +1,5 @@
-import sun.security.provider.SHA;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Created by framg on 17/03/2016.
@@ -84,6 +85,7 @@ public class MVMO {
 
 
     public void initialize() {
+        alpha = 1;
         parameter.scaling = ps.x_max - ps.x_min;
         indepent_runs = parameter.n_par * 2;
 
@@ -92,7 +94,7 @@ public class MVMO {
 
         for (int iijj = 0; iijj < parameter.n_par; iijj++) {
             for (int jjkk = 0; jjkk < ps.D; jjkk++) {
-                xx[iijj][jjkk] = ps.x_min + Configuration.rand.getFloat() * (ps.x_max - ps.x_min);
+                xx[iijj][jjkk] = ps.x_min + Configuration.rand.getDouble() * (ps.x_max - ps.x_min);
             }
 
             for (int i = 0; i < ps.D; i++) {
@@ -115,7 +117,7 @@ public class MVMO {
 
         for (int i = 0; i < n_par; i++) {
             IX[i] = i;
-            izm[i] = Math.round(Configuration.rand.getFloat() * (ps.D - 1));
+            izm[i] = (int)Math.round(Configuration.rand.getDouble() * (ps.D - 1));
             for (int k = 0; k < ps.D; k++) {
                 Shape_dyn[i][k] = shape_dyn_ini;
                 shape[i][k] = shape_ini;
@@ -145,7 +147,7 @@ public class MVMO {
         if (value_ini == 2) {
             for (int i = 0; i < meann.length; i++)
                 for (int j = 0; j < meann[i].length; j++)
-                    meann[i][j] = Configuration.rand.getFloat();
+                    meann[i][j] = Configuration.rand.getDouble();
         } else {
             Util.assignMatrix(meann, value_ini);
         }
@@ -175,7 +177,7 @@ public class MVMO {
         }
 
         if (n_eval <= 0) {
-            n_eval = 100000;
+            n_eval = 10000 * D;
         }
 
         if (fs_factor_start <= 0) {
@@ -274,7 +276,7 @@ public class MVMO {
 
     public double execute(){
         while(true){
-            ff = proc.i_eval / n_eval;
+            ff = BigDecimal.valueOf(proc.i_eval).divide(BigDecimal.valueOf(n_eval), 64, RoundingMode.HALF_UP).doubleValue(); //proc.i_eval / n_eval;
             ff2 = ff *ff;
             vvqq=Math.pow(10.0 , -(13.3+ff*35.0));
 
@@ -286,7 +288,7 @@ public class MVMO {
 
             if(yes_n_randomly){
                 n_randomly_X = (int)Math.round(n_randomly_ini - ff * delta_nrandomly);
-                n_randomly = Math.round(n_randomly_last+Configuration.rand.getFloat()*(n_randomly_X-n_randomly_last));
+                n_randomly =(int) Math.round(n_randomly_last+Configuration.rand.getDouble()*(n_randomly_X-n_randomly_last));
             }
 
             if(yes_fs_factor){
@@ -294,7 +296,13 @@ public class MVMO {
             }
             ipx = 0;
             while(ipx < n_par){
+                if(proc.i_eval == 225){
+                    System.out.print("DEBUG");
+                }
+
+
                 ipp = IX[ipx];
+              // double [] xxxx = {0.8977    ,0.4658   , 0.5636  ,  0.8131 ,  0.6043   , 0.6939  ,  0.8927   , 0.9000    ,0.9000   , 0.9000};
                 ipx++;
 
                 for(int i=0; i<ps.D; i++){
@@ -332,7 +340,6 @@ public class MVMO {
                 }
 
                 x_normalized[ipp] = Util.divideArray(Util.subArray(x_normalized[ipp], ps.x_min), parameter.scaling);
-
                 Fill_solution_archive();
                 meann_app[ipp] = Util.copyArray(meann[ipp]);
                 if(proc.i_eval > indepent_runs){
@@ -368,11 +375,12 @@ public class MVMO {
                         onep1 = returnObject[1];
                         worstp = returnObject[2];
 
-                        bbb=1.1+(Configuration.rand.getFloat()-0.5)*2.0;
-                        beta1 = alpha*3.0*bbb*((1.0+2.5*ff2)*Configuration.rand.getFloat() - (1.0-ff2)*0.30);
+                        bbb=1.1+(Configuration.rand.getDouble()-0.5)*2.0;
+                        beta1 = alpha*3.0*bbb*((1.0+2.5*ff2)*Configuration.rand.getDouble() - (1.0-ff2)*0.30);
+                       // beta1 = BigDecimal.valueOf(alpha).multiply(BigDecimal.valueOf(3.0).multiply(BigDecimal.valueOf(bbb).multiply(BigDecimal.valueOf(Configuration.rand.getDouble()).subtract(BigDecimal.valueOf((1.0-ff2)).multiply(BigDecimal.valueOf(0.30)))))).doubleValue();
                         beta10=0.0;
 
-                        while (beta1 != beta10 ){ //TODO pensar mejor sistema de comparar dos doubles
+                        while (beta1 != beta10 ){
                             beta10 = beta1;
                             for(int jx=0; jx<ps.D; jx++){
                                 ccc=table.bests[0][jx][bestp]-table.bests[0][jx][worstp];
@@ -381,7 +389,7 @@ public class MVMO {
                                 }else{
                                     x_normalized[ipp][jx] = table.bests[0] [jx] [onep1];
                                 }
-                                if (table.bests[0][jx][bestp] < 0.85 && table.bests[0][jx][bestp] > 0.15 && Configuration.rand.getFloat() > 0.15){
+                                if (table.bests[0][jx][bestp] < 0.85 && table.bests[0][jx][bestp] > 0.15 && Configuration.rand.getDouble() > 0.15){
                                     while (x_normalized[ipp][jx] > 1.0 ||  x_normalized[ipp][jx]<0.0){
 
                                         returnObject = must();
@@ -391,14 +399,14 @@ public class MVMO {
 
                                         ccc = table.bests[0] [jx] [bestp] - table.bests[0] [jx][worstp];
                                         if (Math.abs(ccc) > 1.0e-15) {
-                                            bbb = 1.1 + (Configuration.rand.getFloat() - 0.5)*2.0;
-                                            beta1 = alpha * 3.0 * bbb * ((1.0 + 2.5 * ff2)*Configuration.rand.getFloat() - (1.0- ff2)*0.3);
+                                            bbb = 1.1 + (Configuration.rand.getDouble() - 0.5)*2.0;
+                                            beta1 = alpha * 3.0 * bbb * ((1.0 + 2.5 * ff2)*Configuration.rand.getDouble() - (1.0- ff2)*0.3);
                                             x_normalized[ipp] [jx] = table.bests[0] [jx] [onep1] + beta1 * ccc;
                                         }else {
                                             x_normalized[ipp] [jx] = table.bests[0] [jx] [onep1];
                                         }
                                     }
-                                }else if(table.bests[0][jx][bestp] > 0.85 || table.bests[0][jx][bestp] < 0.15 && Configuration.rand.getFloat() < 0.15 ){
+                                }else if(table.bests[0][jx][bestp] > 0.85 || table.bests[0][jx][bestp] < 0.15 && Configuration.rand.getDouble() < 0.15 ){
                                     while (x_normalized[ipp][jx] > 1.0 ||  x_normalized[ipp][jx] < 0.0) {
 
                                         returnObject = must();
@@ -407,8 +415,8 @@ public class MVMO {
                                         worstp = returnObject[2];
                                         ccc = table.bests[0] [jx][bestp] - table.bests[0] [jx] [worstp];
                                         if (Math.abs(ccc) > 1.e-15) {
-                                            bbb = 1.1 + (Configuration.rand.getFloat() - 0.5)*2.0;
-                                            beta1 = alpha * 3.0 * bbb * ((1.0 + 2.5 * ff2)* Configuration.rand.getFloat() - (1.0 - ff2)*0.30);
+                                            bbb = 1.1 + (Configuration.rand.getDouble() - 0.5)*2.0;
+                                            beta1 = alpha * 3.0 * bbb * ((1.0 + 2.5 * ff2)* Configuration.rand.getDouble() - (1.0 - ff2)*0.30);
                                             x_normalized[ipp][jx] = table.bests[0] [jx] [onep1] + beta1 * ccc;
                                         }else {
                                             x_normalized[ipp][jx] = table.bests[0] [jx] [onep1];
@@ -426,7 +434,7 @@ public class MVMO {
                         for(int i=0; i<ps.D; i++)
                             meann_app[ipp][i] =x_normalized[ipp][i];
                     }else{
-                        if (Configuration.rand.getFloat() > (1.0-ff)*0.2){
+                        if (Configuration.rand.getDouble() > (1.0-ff)*0.2){
                             for(int i=0; i<ps.D; i++)
                                 x_normalized[ipp][i]=0.999 * table.bests[0][i][ipp]+0.0010 * table.bests[0][i][verybest];
                         }else{
@@ -434,7 +442,7 @@ public class MVMO {
                                 x_normalized[ipp][i]=0.999 * table.bests[1][i][ipp]+0.0010 * table.bests[0][i][verybest];
                             }
                         }
-                        int irandom=Math.round(Configuration.rand.getFloat()*(border_gute-1));
+                        int irandom=(int)Math.round(Configuration.rand.getDouble()*(border_gute-1));
                         for (int jxx=0; jxx < ps.D; jxx++){
                             meann_app[ipp][jxx] = meann[irandom][jxx];
                         }
@@ -444,7 +452,7 @@ public class MVMO {
                         x_normalized[ipp][i]=table.bests[0][i][ipp];
                 }
 
-                if (Configuration.rand.getFloat() < local_search0 &&  proc.i_eval > min_eval_LS &&  proc.i_eval < max_eval_LS && goodbad[ipp]) {
+                if (Configuration.rand.getDouble() < local_search0 &&  proc.i_eval > min_eval_LS &&  proc.i_eval < max_eval_LS && goodbad[ipp]) {
                     local_search[ipp] = true;
                 }else {
                     local_search[ipp] = false;
@@ -456,7 +464,7 @@ public class MVMO {
                 for(int ivar=0; ivar < D; ivar++){
                     if (considered[ipp][ivar]) {
                         if (goodbad[ipp]) {
-                            x_normalized[ipp][ivar] = Configuration.rand.getFloat();
+                            x_normalized[ipp][ivar] = Configuration.rand.getDouble();
                         }
 
 
@@ -467,8 +475,8 @@ public class MVMO {
                             double grosser;
                             double kleiner;
                             double sss1 = shape[ipp][ivar];
-                            double fs_factor1 = fs_factor0 * (1.0 + ff2 * Configuration.rand.getFloat());
-                            double delta_ddd_x = delta_Shape_dyn0 * (Configuration.rand.getFloat() - 0.5)*2.0 + delta_Shape_dyn1;
+                            double fs_factor1 = fs_factor0 * (1.0 + ff2 * Configuration.rand.getDouble());
+                            double delta_ddd_x = delta_Shape_dyn0 * (Configuration.rand.getDouble() - 0.5)*2.0 + delta_Shape_dyn1;
                             if (sss1 > Shape_dyn[ipp] [ivar]) {
                                 Shape_dyn[ipp] [ivar] = Shape_dyn[ipp] [ivar] * delta_ddd_x;
                             }else {
@@ -485,7 +493,7 @@ public class MVMO {
                                 mmm1 = meann_app[ipp][ivar];
                                 mmm2 = 0.00;
                             }else if (mappingST==2) {
-                                mmm1 = Configuration.rand.getFloat();
+                                mmm1 = Configuration.rand.getDouble();
                                 mmm2 = 0.5;
                             }else {
                                 mmm1 = meann_app[ipp][ivar];
@@ -598,7 +606,7 @@ public class MVMO {
             for (int ii = 0; ii < n_randomly - 1; ii++) {
                 boolean isrepeat = false;
                 while (!isrepeat) {
-                    inn = Math.round(Configuration.rand.getFloat() * (n_var - 1));
+                    inn = (int)Math.round(Configuration.rand.getDouble() * (n_var - 1));
                     if (!considered[ipp][inn]) {
                         isrepeat = true;
                     }
@@ -656,7 +664,7 @@ public class MVMO {
 
         if (changed) {
             int nnnnnn = n_to_save;
-            if (i_position == 1) {
+            if (i_position == 0) {
                 changed_best = true;
             }
             if (no_inin[ipp] < n_to_save) {
@@ -686,7 +694,7 @@ public class MVMO {
 
             if ((no_inin[ipp] >= n_to_save)) {
                 for (int ivvar = 1; ivvar < D; ivvar++) {
-                    //[meann(ipp, ivvar), shape(ipp, ivvar)]=mv_noneq(nnnnnn, table.bests(1:nnnnnn, ivvar, ipp), meann(ipp, ivvar), shape(ipp, ivvar), vvqq); //TODO implementar
+                    //[meann(ipp, ivvar), shape(ipp, ivvar)]=mv_noneq(nnnnnn, table.bests(1:nnnnnn, ivvar, ipp), meann(ipp, ivvar), shape(ipp, ivvar), vvqq);
                     double [] input = new double[nnnnnn];
                     for(int i=0; i<nnnnnn; i++){
                         input[i] = table.bests[i][ivvar][ipp];
@@ -706,23 +714,23 @@ public class MVMO {
         int [] returnObject = new int[3];
 
         int iup = (int) (Math.round(5.0 * (1.0 - ff2)));
-        int ilow = 1;
-        int bestp = Math.round(Configuration.rand.getFloat() * (iup - ilow)) + ilow;
+        int ilow = 0;
+        int bestp = (int)Math.round(Configuration.rand.getDouble() * (iup - ilow)) + ilow;
         int worstp = -1;
-        iup = 15;
-        ilow = 0;
+        iup = 14;
+        ilow = -1;
         while ((worstp <= bestp) || (worstp >= n_par)){
-            worstp=Math.round(Configuration.rand.getFloat()*(iup-ilow))+ ilow;
+            worstp=(int)Math.round(Configuration.rand.getDouble()*(iup-ilow))+ ilow;
             worstp = Math.round(border_gute + (worstp -3));
         }
         iup = worstp -1;
         ilow = bestp + 1;
-        int onep1 = Math.round(Configuration.rand.getFloat() * (iup - ilow)) + ilow;
+        int onep1 = (int)Math.round(Configuration.rand.getDouble() * (iup - ilow)) + ilow;
         if(worstp >= n_par){
             System.out.println("DEBUG");
         }
-        returnObject[1] = IX[onep1];
         returnObject[0] = IX[bestp];
+        returnObject[1] = IX[onep1];
         returnObject[2] = IX[worstp];
 
         return returnObject;

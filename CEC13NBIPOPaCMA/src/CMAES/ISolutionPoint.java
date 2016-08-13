@@ -1,4 +1,4 @@
-package CMAESold;
+package CMAES;
 
 /** solution point in search space, single-objective case
      *  

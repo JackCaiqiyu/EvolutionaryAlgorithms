@@ -1,4 +1,4 @@
-package CMAESnew;
+package CMAES;
 
 import java.util.Properties;
 

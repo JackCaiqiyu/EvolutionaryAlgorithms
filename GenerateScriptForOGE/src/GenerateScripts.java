@@ -7,12 +7,15 @@ import java.io.IOException;
  */
 public class GenerateScripts {
     public static void main(String [] args) {
-        String fileName = "CEC15LSHADEND";
+        String fileName = "Algorithm";
 
         String queue = "media";
         String name_benchmark = null;
         Integer start_function = null;
         Integer finish_function = null;
+
+        boolean automatic = false;
+
         for(int i=0; i<args.length; i++){
             if(args[i].equals("-sF")){
                 start_function = Integer.valueOf(args[i+1]);
@@ -29,26 +32,43 @@ public class GenerateScripts {
             if(args[i].equals("-name")){
                 fileName = args[i+1];
             }
+            if(args[i].equals("-a")){
+                automatic = true;
+            }
+        }
+
+        if(start_function == null || finish_function == null || name_benchmark == null ){
+            System.out.print("No enough arguments.");
+            System.exit(0);
         }
 
 
-        String scriptName = fileName+name_benchmark+"F"+finish_function;
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("#!/bin/bash\n");
-        stringBuilder.append("#$ -N " + scriptName + "\n");
-        stringBuilder.append("#$ -q "+ queue +"\n");
-        stringBuilder.append("#$ -o OUT_"+scriptName+".txt\n");
-        stringBuilder.append("#$ -e ERR_"+scriptName+".txt\n");
-        stringBuilder.append("#$ -cwd\n");
-        stringBuilder.append("java -jar "+fileName+".jar"+" -b " +name_benchmark+" -sF " + start_function + " -fF " + finish_function + "\n");
+        if(!automatic) {
+            String scriptName = fileName + name_benchmark + "F" + finish_function;
+            String nameForOge = "F" + finish_function +fileName;
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("#!/bin/bash\n");
+            stringBuilder.append("#$ -N " + nameForOge + "\n");
+            stringBuilder.append("#$ -q " + queue + "\n");
+            stringBuilder.append("#$ -o OUT_" + scriptName + ".txt\n");
+            stringBuilder.append("#$ -e ERR_" + scriptName + ".txt\n");
+            stringBuilder.append("#$ -cwd\n");
+            stringBuilder.append("java -jar " + fileName + ".jar" + " -b " + name_benchmark + " -sF " + start_function + " -fF " + finish_function + "\n");
 
 
-        write("GC_"+scriptName, stringBuilder.toString());
+            write("GC_" + scriptName, stringBuilder.toString());
 
-        StringBuilder script = new StringBuilder();
-        script.append("qsub " + "GC_"+scriptName + "\n");
-        write("execute", script.toString());
+            StringBuilder script = new StringBuilder();
+            script.append("qsub " + "GC_" + scriptName + "\n");
+            write("execute", script.toString());
+        }else{
+            if(name_benchmark.equals("CEC05"));
+
+
+
+        }
     }
 
 
