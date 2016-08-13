@@ -15,7 +15,7 @@ public class Test {
 //        run("CEC05",1,CEC05Benchmark.nProblems());
 //        run("CEC13",1,CEC13Benchmark.nProblems());
 //        run("CEC14",1,CEC14Benchmark.nProblems());
-        run("CEC15",1,1);
+        //run("CEC15",1,1);
 
 
         String name_benchmark = null;
@@ -56,6 +56,11 @@ public class Test {
                         System.exit(0);
                         break;
                 }
+            }else{
+                run("CEC05", 1, CEC05Benchmark.nProblems());
+                run("CEC13",1, CEC13Benchmark.nProblems());
+                run("CEC14", 1, CEC14Benchmark.nProblems());
+                run("CEC15", 1, CEC15Benchmark.nProblems());
             }
 
             run(name_benchmark, start_function, finish_function);
@@ -69,8 +74,8 @@ public class Test {
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
-            Configuration.rand = new Rand();
-            for(int DIM = 10; DIM <= 10; DIM += 20) {
+            Configuration.rand = new Rand(seeds.getSeed(F));
+            for(int DIM = 10; DIM <= 50; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
                         Configuration.benchmark = new CEC05Benchmark(DIM, F);
@@ -115,15 +120,17 @@ public class Test {
 
                 Configuration.records.startRecord();
                 System.out.println("FUN " + F + " DIM " + DIM);
-                for(int run=0; run < 1; run++) {
+                for(int run=0; run < runs; run++) {
 
 
                     MVMO algorithm = new MVMO();
                     algorithm.execute();
+
                 }
                 Configuration.records.endRecord(F, DIM);
+                Configuration.records.exportExcel("MVMO" + "-" + "P" +nProblems + "-" + benchmark);
             }
         }
-        Configuration.records.exportExcel("MVMO" + "-" + "P" +nProblems + "-" + benchmark);
+
     }
 }

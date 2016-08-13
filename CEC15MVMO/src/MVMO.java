@@ -296,9 +296,9 @@ public class MVMO {
             }
             ipx = 0;
             while(ipx < n_par){
-                if(proc.i_eval == 225){
-                    System.out.print("DEBUG");
-                }
+//                if(proc.i_eval == 225){
+//                    System.out.print("DEBUG");
+//                }
 
 
                 ipp = IX[ipx];
@@ -336,6 +336,7 @@ public class MVMO {
                 }
 
                 if(proc.finish){
+                    Configuration.records.endRun(proc.best_value, proc.i_eval, Configuration.max_fes);
                     return proc.best_value;
                 }
 

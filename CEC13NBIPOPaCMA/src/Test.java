@@ -53,6 +53,11 @@ public class Test {
             }
 
             run(name_benchmark, start_function, finish_function);
+        }else{
+            run("CEC05", 1, CEC05Benchmark.nProblems());
+            run("CEC13",1, CEC13Benchmark.nProblems());
+            run("CEC14", 1, CEC14Benchmark.nProblems());
+            run("CEC15", 1, CEC15Benchmark.nProblems());
         }
 
     }
@@ -109,9 +114,10 @@ public class Test {
                     nbipoPaCMA.execute();
                 }
                 Configuration.records.endRecord(F, DIM);
+                Configuration.records.exportExcel("GAMPC" + "-" + "P" +nProblems + "-" + benchmark);
             }
         }
-        Configuration.records.exportExcel("GAMPC" + "-" + "P" +nProblems + "-" + benchmark);
+
     }
 
 

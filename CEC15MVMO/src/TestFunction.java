@@ -13,12 +13,14 @@ public class TestFunction {
             System.exit(1);
         }
 
-        System.out.println("Fit: " + f + " at: " + MVMO.proc.i_eval);
+      //  System.out.println("Fit: " + f + " at: " + MVMO.proc.i_eval);
 
         if(f < AllBenchmarks.objective()){
             f = 0;
         }
         MVMO.proc.i_eval++;
+
+        Configuration.records.newRecord(f, MVMO.proc.i_eval );
 
         if(MVMO.proc.i_eval <= MVMO.proc.n_eval && MVMO.proc.i_eval >= 1){
             if(MVMO.proc.best_value > f){
