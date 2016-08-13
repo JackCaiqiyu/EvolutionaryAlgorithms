@@ -1,10 +1,14 @@
 
+import lbfgsb.*;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import org.apache.commons.math3.linear.*;
+
+import java.util.ArrayList;
+
 /**
  * Created by framg on 15/05/2016.
  */
@@ -75,10 +79,30 @@ public final class Matlab {
     }
 
     static fminconOutput fmincon(FminconFunction fun, double [] x, int FEsAllowed){
+//        fminconOutput out = new fminconOutput();
+//        out.fit = fun.f(x);
+//        out.x = Util.copyArray(x);
+//        out.evals = 1;
+//        return out;
+
         fminconOutput out = new fminconOutput();
-        out.fit = fun.f(x);
-        out.x = Util.copyArray(x);
-        out.evals = 1;
+        Minimizer alg = new Minimizer();
+        ArrayList<Bound> bounds = new ArrayList<>();
+        for(int i=0; i<x.length; i++) {
+            bounds.add(new Bound(fun.lb(), fun.ub()));
+        }
+        alg.setBounds(bounds);
+        alg.getStopConditions().setMaxIterations(FEsAllowed);
+        System.out.println(fun.f(x));
+        try {
+            Result result = alg.run(fun, x);
+            out.fit = result.functionValue;
+            out.x = Util.copyArray(result.point);
+            out.evals = result.iterationsInfo.functionEvaluations;
+            System.out.println(result);
+        } catch (LBFGSBException e) {
+            e.printStackTrace();
+        }
         return out;
     }
 
@@ -90,7 +114,10 @@ public final class Matlab {
         public double oox;
     }
 
-    public static abstract class FminconFunction{
+    public static abstract class FminconFunction implements DifferentiableFunction {
         public abstract double f(double [] x);
+        public abstract double [] g(double [] x);
+        public abstract double lb();
+        public abstract double ub();
     }
 }

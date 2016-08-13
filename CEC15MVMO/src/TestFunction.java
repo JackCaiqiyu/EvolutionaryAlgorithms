@@ -31,6 +31,21 @@ public class TestFunction {
 
         return f;
     }
+    public static double [] gradient(double [] x){
+        //double [] g = Configuration.benchmark.g(x);
+        double [] g = new double[x.length];
+        for(int i=0; i<x.length; i++){
+            g[i] = Configuration.benchmark.f(x);
+        }
+        return g;
+    }
 
+    public static double ub(){
+        return Configuration.benchmark.ubound();
+    }
+
+    public static double lb(){
+        return Configuration.benchmark.lbound();
+    }
 
 }
