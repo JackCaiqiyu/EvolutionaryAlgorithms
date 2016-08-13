@@ -17,7 +17,6 @@ public class Test {
 //        run("CEC14",1,CEC14Benchmark.nProblems());
         //run("CEC15",1,1);
 
-
         String name_benchmark = null;
         Integer start_function = null;
         Integer finish_function = null;
@@ -56,21 +55,21 @@ public class Test {
                         System.exit(0);
                         break;
                 }
-            }else{
-                run("CEC05", 1, CEC05Benchmark.nProblems());
-                run("CEC13",1, CEC13Benchmark.nProblems());
-                run("CEC14", 1, CEC14Benchmark.nProblems());
-                run("CEC15", 1, CEC15Benchmark.nProblems());
             }
 
             run(name_benchmark, start_function, finish_function);
+        }else{
+            run("CEC05", 1, CEC05Benchmark.nProblems());
+            run("CEC13",1, CEC13Benchmark.nProblems());
+            run("CEC14", 1, CEC14Benchmark.nProblems());
+            run("CEC15", 1, CEC15Benchmark.nProblems());
         }
     }
 
 
     public static void run(String benchmark, int start_problem, int finish_problem){
         int nProblems = finish_problem;
-        int runs = 1;AllBenchmarks.runs();
+        int runs = AllBenchmarks.runs();
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
@@ -96,8 +95,10 @@ public class Test {
                 }
                 Configuration.DIM = DIM;
                 Configuration.max_fes = 10000 * DIM;
+                Configuration.isRecordsEnable = false;
                 AutoConfigure autoConfigure = new AutoConfigure(DIM, F);
                 autoConfigure.auto_configure();
+                Configuration.isRecordsEnable = true;
                 Configuration.max_fes = 10000 * DIM;
 //                Configuration.n_par = 150;
 //                Configuration.n_tosave = 15;

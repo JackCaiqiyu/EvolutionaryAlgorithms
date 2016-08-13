@@ -336,7 +336,9 @@ public class MVMO {
                 }
 
                 if(proc.finish){
-                    Configuration.records.endRun(proc.best_value, proc.i_eval, Configuration.max_fes);
+                    if(Configuration.isRecordsEnable) {
+                        Configuration.records.endRun(Math.abs(MVMO.proc.best_value- Configuration.benchmark.bias()), proc.i_eval, Configuration.max_fes);
+                    }
                     return proc.best_value;
                 }
 

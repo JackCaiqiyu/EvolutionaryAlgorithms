@@ -10,6 +10,7 @@ public class Configuration {
     public static AllBenchmarks benchmark;
     public static double PPL = 1e-50;
     public static Records records;
+    public static boolean isRecordsEnable = true;
     public static int DIM;
     public static int max_fes;
 

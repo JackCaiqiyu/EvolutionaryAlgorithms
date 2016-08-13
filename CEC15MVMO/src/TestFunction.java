@@ -20,14 +20,16 @@ public class TestFunction {
         }
         MVMO.proc.i_eval++;
 
-        Configuration.records.newRecord(f, MVMO.proc.i_eval );
+        if(Configuration.isRecordsEnable) {
+            Configuration.records.newRecord(Math.abs(f - Configuration.benchmark.bias()) , MVMO.proc.i_eval);
 
+        }
         if(MVMO.proc.i_eval <= MVMO.proc.n_eval && MVMO.proc.i_eval >= 1){
             if(MVMO.proc.best_value > f){
                 MVMO.proc.best_value = f;
             }
         }
-        if(MVMO.proc.i_eval >= MVMO.proc.n_eval || MVMO.proc.best_value < AllBenchmarks.objective()){
+        if(MVMO.proc.i_eval >= MVMO.proc.n_eval || Math.abs(MVMO.proc.best_value- Configuration.benchmark.bias())  < AllBenchmarks.objective()){
             MVMO.proc.finish=true;
         }
 
