@@ -17,6 +17,8 @@ public class Test {
 //        run("CEC14",1,CEC14Benchmark.nProblems());
         //run("CEC15",1,1);
 
+      //  run("CEC05", 1, 1);
+
         String name_benchmark = null;
         Integer start_function = null;
         Integer finish_function = null;
@@ -69,7 +71,7 @@ public class Test {
 
     public static void run(String benchmark, int start_problem, int finish_problem){
         int nProblems = finish_problem;
-        int runs = AllBenchmarks.runs();
+        int runs =25; AllBenchmarks.runs();
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {

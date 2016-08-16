@@ -13,7 +13,7 @@ public class TestFunction {
             System.exit(1);
         }
 
-      //  System.out.println("Fit: " + f + " at: " + MVMO.proc.i_eval);
+     //   System.out.println("Fit: " + Math.abs(f- Configuration.benchmark.bias()) + " at: " + MVMO.proc.i_eval);
 
         if(f < AllBenchmarks.objective()){
             f = 0;
