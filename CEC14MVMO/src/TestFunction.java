@@ -13,7 +13,8 @@ public class TestFunction {
             System.exit(1);
         }
 
-        System.out.println("Fit: " + f + " at: " + MVMO.proc.i_eval);
+       // System.out.println("Fit: " + f + " at: " + MVMO.proc.i_eval);
+        Configuration.records.newRecord(Math.abs(f - Configuration.benchmark.bias()) , MVMO.proc.i_eval);
 
         if(f < AllBenchmarks.objective()){
             f = 0;
@@ -25,12 +26,27 @@ public class TestFunction {
                 MVMO.proc.best_value = f;
             }
         }
-        if(MVMO.proc.i_eval >= MVMO.proc.n_eval || MVMO.proc.best_value < AllBenchmarks.objective()){
+        if(MVMO.proc.i_eval >= MVMO.proc.n_eval || Math.abs(MVMO.proc.best_value- Configuration.benchmark.bias()) < AllBenchmarks.objective()){
             MVMO.proc.finish=true;
         }
 
         return f;
     }
+    public static double [] gradient(double [] x){
+        //double [] g = Configuration.benchmark.g(x);
+        double [] g = new double[x.length];
+        for(int i=0; i<x.length; i++){
+            g[i] = Configuration.benchmark.f(x);
+        }
+        return g;
+    }
 
+    public static double ub(){
+        return Configuration.benchmark.ubound();
+    }
+
+    public static double lb(){
+        return Configuration.benchmark.lbound();
+    }
 
 }

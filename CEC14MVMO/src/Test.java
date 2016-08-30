@@ -5,18 +5,13 @@ import com.benchmark.cec.cec05.CEC05Benchmark;
 import com.benchmark.cec.cec13.CEC13Benchmark;
 import com.benchmark.cec.cec14.CEC14Benchmark;
 import com.benchmark.cec.cec15.CEC15Benchmark;
+import com.benchmark.seeds;
 
 /**
  * Created by framg on 27/04/2016.
  */
 public class Test {
     public static void main(String [] args) {
-//        run("CEC05",1,CEC05Benchmark.nProblems());
-//        run("CEC13",1,CEC13Benchmark.nProblems());
-//        run("CEC14",1,CEC14Benchmark.nProblems());
-        run("CEC14",1,1);
-
-
         String name_benchmark = null;
         Integer start_function = null;
         Integer finish_function = null;
@@ -58,19 +53,24 @@ public class Test {
             }
 
             run(name_benchmark, start_function, finish_function);
+        }else{
+            run("CEC05", 1, CEC05Benchmark.nProblems());
+            run("CEC13",1, CEC13Benchmark.nProblems());
+            run("CEC14", 1, CEC14Benchmark.nProblems());
+            run("CEC15", 1, CEC15Benchmark.nProblems());
         }
     }
 
 
     public static void run(String benchmark, int start_problem, int finish_problem){
         int nProblems = finish_problem;
-        int runs = 1;
+        int runs = 25;
         AllBenchmarks.runs();
         Configuration.records = new Records(runs);
 
         for(int F = start_problem; F <= finish_problem; F++) {
-            Configuration.rand = new Rand();
-            for(int DIM = 10; DIM <= 10; DIM += 20) {
+            Configuration.rand = new Rand(seeds.getSeed(F));
+            for(int DIM = 10; DIM <= 50; DIM += 20) {
                 switch (benchmark) {
                     case "CEC05":
                         Configuration.benchmark = new CEC05Benchmark(DIM, F);
@@ -91,37 +91,20 @@ public class Test {
                 }
                 Configuration.DIM = DIM;
                 Configuration.max_fes = 10000 * DIM;
-//                Configuration.n_par = 150;
-//                Configuration.n_tosave = 15;
-//                Configuration.fs_factor_start = 1;
-//                Configuration.fs_factor_end= 25;
-//                Configuration.delta_Shape_dyn = 0.1;
-//                Configuration.local_prob = 10;
-//                Configuration.min_eval_LS = Math.round(0.05 * 10000 * DIM);
-//                Configuration.max_eval_LS = Math.round(1.00 * 10000 * DIM) ;
-//                Configuration.ratio_gute_max = 0.8;
-//                Configuration.ratio_gute_min = 0.3;;
-//                Configuration.n_random_ini = 6;
-//                Configuration.n_random_last = 2;
-//                Configuration.local_max = 10000;
-//                Configuration.shape_ini = 350;;
-//                Configuration.shape_dyn_ini = 350;
-//                Configuration.value_ini = 0.9;
-//                Configuration.r_select = 1;
-//                Configuration.mappingST = 2;
 
                 Configuration.records.startRecord();
                 System.out.println("FUN " + F + " DIM " + DIM);
-                for(int run=0; run < 1; run++) {
+                for(int run=0; run < runs; run++) {
 
 
                     MVMO algorithm = new MVMO();
                     algorithm.execute();
                 }
                 Configuration.records.endRecord(F, DIM);
+                Configuration.records.exportExcel("MVMO14" + "-" + "P" +nProblems + "-" + benchmark);
             }
         }
-        Configuration.records.exportExcel("MVMO14" + "-" + "P" +nProblems + "-" + benchmark);
+
     }
 
 }

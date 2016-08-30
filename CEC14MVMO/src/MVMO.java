@@ -325,7 +325,6 @@ public class MVMO {
     public double execute() {
 
         while (true) {
-            System.out.print("DEBUG");
             for (ipp = 0; ipp < parameter.n_par; ipp++) {
                 ff = BigDecimal.valueOf(proc.i_eval).divide(BigDecimal.valueOf(n_eval), 64, RoundingMode.HALF_UP).doubleValue(); //proc.i_eval / n_eval;
                 ff2 = ff * ff;
@@ -374,6 +373,7 @@ public class MVMO {
                 }
 
                 if (proc.finish) {
+                    Configuration.records.endRun(Math.abs(proc.best_value - Configuration.benchmark.bias()), proc.i_eval, Configuration.max_fes);
                     return proc.best_value;
                 }
 
