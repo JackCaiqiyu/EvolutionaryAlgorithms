@@ -5,6 +5,6 @@ These algorithms they are the CEC winners from each year. They are implemented i
 
 Here you can find the benchmarcks and results (in spanish):
 
-[(https://github.com/framg/EvolutionaryAlgorithms/blob/master/maeb2017.pdf)]
+https://github.com/framg/EvolutionaryAlgorithms/blob/master/maeb2017.pdf
 
-[(https://github.com/framg/EvolutionaryAlgorithms/blob/master/memoria.pdf)]
+https://github.com/framg/EvolutionaryAlgorithms/blob/master/memoria.pdf
